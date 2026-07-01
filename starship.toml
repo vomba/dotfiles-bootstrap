@@ -1,0 +1,91 @@
+format = """
+[](#BA1861)\
+$username\
+[](bg:#DB4678 fg:#BA1861)\
+$directory\
+[](fg:#DB4678 bg:#E87D8C)\
+$git_branch\
+$git_status\
+[](fg:#E87D8C bg:#89ABCE)\
+$golang\
+$java\
+$nodejs\
+$rust\
+$ruby\
+[](fg:#89ABCE bg:#06969A)\
+$kubernetes\
+[](fg:#06969A bg:#33658A)\
+$time\
+[ ](fg:#33658A)\
+"""
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+[username]
+show_always = true
+style_user = "bg:#BA1861"
+style_root = "bg:#BA1861"
+format = '[$user ]($style)'
+
+[directory]
+style = "bg:#DB4678"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = " "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+symbol = ""
+style = "bg:#E87D8C"
+format = '[[ $symbol $branch ](bg:#E87D8C)]($style)'
+
+[git_status]
+style = "bg:#E87D8C"
+format = '[[($all_status$ahead_behind )](bg:#E87D8C)]($style)'
+
+[golang]
+symbol = " "
+style = "bg:#89ABCE"
+format = '[[ $symbol ($version) ](bg:#89ABCE)]($style)'
+
+[java]
+symbol = " "
+style = "bg:#89ABCE"
+format = '[[ $symbol ($version) ](bg:#89ABCE)]($style)'
+
+[nodejs]
+symbol = "󰎙 "
+style = "bg:#89ABCE"
+format = '[[ $symbol ($version) ](bg:#89ABCE)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#89ABCE"
+format = '[[ $symbol ($version) ](bg:#89ABCE)]($style)'
+
+[ruby]
+symbol = ""
+style = "bg:#89ABCE"
+format = '[[ $symbol ($version) ](bg:#89ABCE)]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:#33658A"
+format = '[[  $time ](bg:#33658A)]($style)'
+
+[kubernetes]
+disabled = false
+symbol = "⎈"
+format = '[$symbol](bg:#06969A)[$context( \($namespace\))]($style)'
+style = "bg:#06969A"
+
+[[kubernetes.contexts]]
+context_pattern = "^production$"
+context_alias = "production"
+style = "green"

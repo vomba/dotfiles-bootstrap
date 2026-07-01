@@ -1,0 +1,29 @@
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+  config = lib.mkIf config.dotfiles.dev.lsp.enable {
+    home.packages = [
+      pkgs.nixfmt
+      pkgs.nixd
+      pkgs.nix-tree
+      pkgs.typos-lsp
+      pkgs.bash-language-server
+      pkgs.shellcheck
+      pkgs.yaml-language-server
+      pkgs.vscode-json-languageserver
+      pkgs.jq
+      pkgs.jq-lsp
+      pkgs.marksman
+      pkgs.mpls
+      pkgs.vale
+      pkgs.terraform-ls
+      pkgs.helm-ls
+      pkgs.gopls
+      pkgs.delve
+    ];
+  };
+}

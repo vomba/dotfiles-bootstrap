@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Linux
+            target: .#example-linux
+          - os: macos-latest
+            name: macOS
+            target: .#example-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Check formatting
+        run: nix run nixpkgs#nixfmt -- --check flake.nix $(find modules -name '*.nix') $(find examples -name '*.nix') overlays/*.nix
+      - name: Check flake
+        run: nix flake check
+      - name: Gitleaks
+        run: nix run nixpkgs#gitleaks -- detect --no-git --source .
+      - name: ShellCheck
+        run: |
+          if ls scripts/*.sh >/dev/null 2>&1; then
+            nix run nixpkgs#shellcheck -- scripts/*.sh
+          fi
+      - name: Build example
+        run: nix build ${{ matrix.target }} --no-link
