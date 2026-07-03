@@ -10,7 +10,6 @@
     ./apps/editors.nix
     ./apps/packages.nix
     ./apps/yazi.nix
-    ./apps/zed.nix
     ./dev/dev.nix
     ./dev/cloud.nix
     ./dev/kubernetes.nix
