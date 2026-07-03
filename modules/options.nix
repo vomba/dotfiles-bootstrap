@@ -80,6 +80,11 @@
           default = true;
         };
       };
+      cursor = {
+        enable = lib.mkEnableOption "Cursor AI editor (IDE + CLI)" // {
+          default = true;
+        };
+      };
       yazi = {
         enable = lib.mkEnableOption "Yazi file manager" // {
           default = true;
