@@ -75,11 +75,6 @@
           default = true;
         };
       };
-      zed = {
-        enable = lib.mkEnableOption "Zed editor" // {
-          default = true;
-        };
-      };
       cursor = {
         enable = lib.mkEnableOption "Cursor AI editor (IDE + CLI)" // {
           default = true;
