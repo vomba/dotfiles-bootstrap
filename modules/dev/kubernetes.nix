@@ -29,6 +29,7 @@ in
       pkgs.crossplane-cli
       pkgs.kubectl-view-secret
       pkgs.viddy
+      pkgs.ansible
     ];
 
     home.file.".kube/kubie.yaml" = lib.mkIf (cfg.kubieConfigPath != null) {
