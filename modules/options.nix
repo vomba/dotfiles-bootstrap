@@ -60,6 +60,11 @@
           default = true;
         };
       };
+      gnuTools = {
+        enable = lib.mkEnableOption "GNU coreutils shadowing BSD utils on Darwin" // {
+          default = true;
+        };
+      };
     };
     apps = {
       enable = lib.mkEnableOption "misc packages" // {
