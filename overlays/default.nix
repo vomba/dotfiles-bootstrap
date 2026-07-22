@@ -1,10 +1,10 @@
-self: super:
-(import ./languages.nix self super)
+final: prev:
+(import ./languages.nix final prev)
 // {
-  cidr = super.callPackage ./cidr.nix { };
-  openstack-tui = super.callPackage ./openstack-tui.nix { };
-  kubernetes-helm = import ./helm.nix { inherit super; };
-  helmfile = import ./helmfile.nix { inherit super; };
-  yq-go = import ./yq.nix { inherit super; };
-  sops = import ./sops.nix { inherit super; };
+  cidr = prev.callPackage ./cidr.nix { };
+  openstack-tui = prev.callPackage ./openstack-tui.nix { };
+  kubernetes-helm = import ./helm.nix { super = prev; };
+  helmfile = import ./helmfile.nix { super = prev; };
+  yq-go = import ./yq.nix { super = prev; };
+  sops = import ./sops.nix { super = prev; };
 }
