@@ -16,6 +16,7 @@
       pkgs.pre-commit
       pkgs.skopeo
       pkgs.parallel-full
-    ];
+    ]
+    ++ lib.optional pkgs.stdenv.isDarwin pkgs.xcodegen;
   };
 }
