@@ -6,6 +6,7 @@
     ./shell/zsh.nix
     ./shell/gpg.nix
     ./shell/git.nix
+    ./shell/gnu-tools.nix
     ./apps/firefox.nix
     ./apps/editors.nix
     ./apps/packages.nix
