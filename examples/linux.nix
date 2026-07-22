@@ -35,5 +35,5 @@
   dotfiles.dev.cloud.enable = false;
   dotfiles.dev.kubernetes.enable = false;
   dotfiles.apps.firefox.enable = false;
-  dotfiles.apps.zed.enable = false;
+  dotfiles.apps.cursor.enable = false;
 }
