@@ -3,17 +3,17 @@
 let
   helm = super.kubernetes-helm.overrideAttrs (_oldAttrs: rec {
     pname = "kubernetes-helm";
-    version = "4.2.2";
+    version = "4.2.3";
 
     src = super.fetchFromGitHub {
       owner = "helm";
       repo = "helm";
       rev = "v${version}";
-      hash = "sha256-q5s/d351Vcs9s2nhwr6nzwJYOnsn/CmrU6cGDFaHDcg=";
+      hash = "sha256-t7cdJjazG38T49y+x2B1akBNvZNXhN2ig3eNnHirV2g=";
     };
 
     proxyVendor = true;
-    vendorHash = "sha256-Xst69X7tqIsiABItWFQRHz4qmiUxRyPQttPqmX1Ko1w=";
+    vendorHash = "sha256-wCIl7NrPr6wb5D8c6PWqVIFOeCjsI8G/aKQxlbeFahA=";
 
     doCheck = false;
 

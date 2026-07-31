@@ -2,16 +2,16 @@
 
 super.helmfile.overrideAttrs (_oldAttrs: rec {
   pname = "helmfile";
-  version = "1.6.0";
+  version = "1.7.1";
 
   src = super.fetchFromGitHub {
     owner = "helmfile";
     repo = "helmfile";
     rev = "v${version}";
-    hash = "sha256-rv7C/2CExlMO6fXaMMMAgSxqKP5iwLyMFI2huHeFVe0=";
+    hash = "sha256-RfhOc/iraWHdccKE5rp7WR5s9HhLOmxtSe1SZXy2UMI=";
   };
 
-  vendorHash = "sha256-uHzDxhJynjijm6dXW9fgiLilxUkch/IBmtQpOXTvA9M=";
+  vendorHash = "sha256-Q+G4G27hwT+zravktjk+mU0VC3OlS9zqXwclwACG9B0=";
 
   ldflags = [
     "-s"
