@@ -21,6 +21,11 @@
       shellAliases = {
         cat = "bat";
         yq4 = "yq";
+        tree = "eza --tree";
+        watch = "viddy";
+        top = "btop";
+        du = "dust";
+        df = "duf";
       };
       initContent = ''
         compdef kubecolor=kubectl
