@@ -27,6 +27,7 @@
     };
 
     programs.fd.enable = true;
+    programs.ripgrep.enable = true;
 
     programs.starship = {
       enable = true;
@@ -39,5 +40,16 @@
       enableZshIntegration = true;
       nix-direnv.enable = true;
     };
+
+    home.packages = with pkgs; [
+      dust
+      duf
+      btop
+      sd
+      xh
+      tealdeer
+      procs
+      doggo
+    ];
   };
 }
