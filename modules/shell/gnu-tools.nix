@@ -11,7 +11,7 @@
     # on Linux (everything here is GNU already). `pkgs.bash` is already
     # provided by modules/apps/packages.nix on darwin.
     home.packages =
-      if pkgs.stdenv.isDarwin then
+      if pkgs.stdenv.hostPlatform.isDarwin then
         with pkgs;
         [
           coreutils # readlink --canonicalize, date -d, sha256sum, realpath

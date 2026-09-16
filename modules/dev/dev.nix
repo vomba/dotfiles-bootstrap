@@ -17,6 +17,6 @@
       pkgs.skopeo
       pkgs.parallel-full
     ]
-    ++ lib.optional pkgs.stdenv.isDarwin pkgs.xcodegen;
+    ++ lib.optional pkgs.stdenv.hostPlatform.isDarwin pkgs.xcodegen;
   };
 }
