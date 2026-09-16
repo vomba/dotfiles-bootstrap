@@ -23,7 +23,7 @@
       pkgs.nodejs_24
       pkgs.python3
     ]
-    ++ lib.optionals pkgs.stdenv.isLinux [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       pkgs.powershell
     ];
   };
