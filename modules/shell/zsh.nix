@@ -1,10 +1,18 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 {
   config = lib.mkIf config.dotfiles.shell.zsh.enable {
+    # ksync calls its packaged helper directly; no vendor bin directory in PATH.
+    home.packages = with pkgs; [
+      bash
+      kubectl
+      rsync
+    ];
+
     home.sessionVariables = {
       GOPATH = "${config.home.homeDirectory}/.go";
       KREW_ROOT = "${config.home.homeDirectory}/.krew";
@@ -33,11 +41,13 @@
       oh-my-zsh = {
         enable = true;
         theme = "robbyrussell";
+        custom = "${pkgs.zsh-kubecolor}/share/oh-my-zsh/custom";
         plugins = [
           "git"
           "fzf"
           "gh"
           "helm"
+          "zsh-kubecolor"
           "golang"
           "terraform"
           "aws"
@@ -50,5 +60,7 @@
         ];
       };
     };
+    # Oh My Zsh owns the sole fzf Zsh integration.
+    programs.fzf.enableZshIntegration = lib.mkForce false;
   };
 }

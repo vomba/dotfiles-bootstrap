@@ -8,7 +8,7 @@
   config = lib.mkIf config.dotfiles.shell.enable {
     programs.fzf = {
       enable = true;
-      enableZshIntegration = true;
+      enableZshIntegration = lib.mkDefault true;
     };
 
     programs.bat.enable = true;
@@ -32,7 +32,9 @@
     programs.starship = {
       enable = true;
       enableZshIntegration = true;
-      settings = builtins.fromTOML (builtins.readFile ../../starship.toml);
+      settings = lib.mapAttrsRecursive (_: lib.mkOptionDefault) (
+        builtins.fromTOML (builtins.readFile ../../starship.toml)
+      );
     };
 
     programs.direnv = {

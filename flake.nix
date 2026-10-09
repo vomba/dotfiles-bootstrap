@@ -32,6 +32,36 @@
           inherit nixpkgs system;
           overlays = sharedOverlays;
         };
+      scriptTests =
+        pkgs:
+        pkgs.runCommand "bootstrap-script-tests"
+          {
+            nativeBuildInputs = with pkgs; [
+              python3
+              zsh
+              bash
+              coreutils
+              gnugrep
+              gnused
+            ];
+          }
+          ''
+            export HOME="$TMPDIR/home"
+            mkdir -p "$HOME"
+            cp -r ${self} source
+            chmod -R u+w source
+            patchShebangs --build source/scripts \
+              source/oh-my-zsh/plugins/zsh-kubecolor/bin
+            ${pkgs.python3}/bin/python3 -m unittest discover \
+              -s source/tests/scripts -p 'test_*.py'
+            touch "$out"
+          '';
+      nordProfile =
+        pkgs:
+        import ./tests/nord-profile.nix {
+          inherit pkgs home-manager;
+          bootstrapModule = self.homeManagerModules.bootstrap;
+        };
     in
     {
       lib = bootstrapLib;
@@ -52,6 +82,9 @@
           pre-commit
           shellcheck
           gitleaks
+          python3
+          zsh
+          bash
         ];
       };
 
@@ -61,6 +94,9 @@
           pre-commit
           shellcheck
           gitleaks
+          python3
+          zsh
+          bash
         ];
       };
 
@@ -87,10 +123,26 @@
         ];
       };
 
-      packages.${linuxSystem}.example-linux = self.homeConfigurations."example-linux".activationPackage;
-      packages.${darwinSystem}.example-darwin = self.darwinConfigurations."example-darwin".system;
+      packages.${linuxSystem} = {
+        example-linux = self.homeConfigurations."example-linux".activationPackage;
+        zsh-kubecolor = (mkPkgs linuxSystem).zsh-kubecolor;
+      };
+      packages.${darwinSystem} = {
+        example-darwin = self.darwinConfigurations."example-darwin".system;
+        zsh-kubecolor = (mkPkgs darwinSystem).zsh-kubecolor;
+      };
 
-      checks.${linuxSystem}.example-linux = self.packages.${linuxSystem}.example-linux;
-      checks.${darwinSystem}.example-darwin = self.packages.${darwinSystem}.example-darwin;
+      checks.${linuxSystem} = {
+        example-linux = self.packages.${linuxSystem}.example-linux;
+        script-tests = scriptTests (mkPkgs linuxSystem);
+        nord-profile = nordProfile (mkPkgs linuxSystem);
+        zsh-kubecolor = self.packages.${linuxSystem}.zsh-kubecolor;
+      };
+      checks.${darwinSystem} = {
+        example-darwin = self.packages.${darwinSystem}.example-darwin;
+        script-tests = scriptTests (mkPkgs darwinSystem);
+        nord-profile = nordProfile (mkPkgs darwinSystem);
+        zsh-kubecolor = self.packages.${darwinSystem}.zsh-kubecolor;
+      };
     };
 }

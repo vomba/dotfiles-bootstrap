@@ -5,7 +5,7 @@
 }:
 
 let
-  version = "0.13.7";
+  version = "0.13.8";
 
   # Map Nix system names to release artifact system names
   systemMap = {
@@ -15,16 +15,16 @@ let
     aarch64-darwin = "aarch64-apple-darwin";
   };
 
-  system = systemMap.${stdenv.system} or stdenv.system;
+  system = systemMap.${stdenv.hostPlatform.system} or stdenv.hostPlatform.system;
 
   cli-src = fetchurl {
     url = "https://github.com/gtema/openstack/releases/download/v${version}/openstack_cli-${system}.tar.xz";
     sha256 =
       {
-        "x86_64-unknown-linux-gnu" = "b4bfe560880b13bc5256246f9010e55a4362897e001329fd211f8755e6b907bc";
-        "aarch64-unknown-linux-gnu" = "7368e79734d99af2c81eb7c96df6b440d1fee9837d5efbd4e5ca82fe34e230a3";
-        "x86_64-apple-darwin" = "014c73006ed050cd252aac1a9507c73791ca7421043918f47a12e1d57c9a0c1d";
-        "aarch64-apple-darwin" = "201ef11b29f23425dc435c8dc9d58401e4dfe61cf8d6bb486ca42a26cf896cca";
+        "x86_64-unknown-linux-gnu" = "sha256-EsUuRXuDsNVMTFkTWDVk6gx0EU/+O0W3vPJQt7cvKUQ=";
+        "aarch64-unknown-linux-gnu" = "sha256-cj7PCBMDW38WUG6BNQZsEbBWeLsIO69eIjn91WOmH5M=";
+        "x86_64-apple-darwin" = "sha256-hPeqgUhBR7s2wCC/04nXEOekT3rS+prSEmux9xatxnM=";
+        "aarch64-apple-darwin" = "sha256-Hn9gW3lNlITZkgFyFaUU+6f9eu6lgCD9aDD3NPxBhhY=";
       }
       .${system};
   };
@@ -33,10 +33,10 @@ let
     url = "https://github.com/gtema/openstack/releases/download/v${version}/openstack_tui-${system}.tar.xz";
     sha256 =
       {
-        "x86_64-unknown-linux-gnu" = "6e1020bd8934af8eb4d82af9cdcd10830e4bb71bf5c2e768848d3a47c75bfdd9";
-        "aarch64-unknown-linux-gnu" = "aceabdbd53cd853f1bab8e03294f415479af752a85f79d22654581603d4b6c5c";
-        "x86_64-apple-darwin" = "9efc7d4cde27ec404066e5ca6713319db274abb2d3546a2ace3be260298978b2";
-        "aarch64-apple-darwin" = "338e35ebd74ca48464a529d9db8bc037d137b42c9408bb0462fbd1c91f6bb218";
+        "x86_64-unknown-linux-gnu" = "sha256-bg6TgDgSqBcOto+GG8qGy31HiJNGOvHlYJeC9K96w00=";
+        "aarch64-unknown-linux-gnu" = "sha256-NTqHhMFL6jhe7UuA/F5hVnof6z7DuWAlx3Y4ZwA1/WE=";
+        "x86_64-apple-darwin" = "sha256-w0Rv7BEcZDdgpiWKAombZxWEU/ccTqatDwNKuNqXdWw=";
+        "aarch64-apple-darwin" = "sha256-wnk8bcjgIB0Re9xvsRxvAopoayn8F9Uv0uBELRPnY78=";
       }
       .${system};
   };

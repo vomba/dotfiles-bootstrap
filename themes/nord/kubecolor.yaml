@@ -1,0 +1,13 @@
+preset: dark
+theme:
+  base:
+    primary: "fg=#5E81AC"
+    secondary: "fg=#81A1C1"
+    success: "fg=#A3BE8C"
+    warning: "fg=#EBCB8B"
+    danger: "fg=#BF616A"
+    muted: "fg=#7B88A1"
+    info: "fg=#ECEFF4"
+    key:
+      - "fg=#5E81AC"
+      - "fg=#81A1C1"

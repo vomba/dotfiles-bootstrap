@@ -1,0 +1,27 @@
+Nord theme assets
+
+The palette is based on Nord: https://www.nordtheme.com/
+Nord dircolors: https://github.com/nordtheme/dircolors
+Copyright (c) 2016-present Sven Greb <development@svengreb.de>
+(https://www.svengreb.de). See LICENSE-nord-dircolors.
+
+vivid-nord.yml is a contrast-adjusted version of Vivid's Nord theme:
+https://github.com/sharkdp/vivid/blob/master/themes/nord.yml
+The original attribution and documented variations are retained in the file.
+Vivid is available under MIT or Apache-2.0; this copy uses its MIT license.
+See LICENSE-vivid. ls-colors-nord is the pregenerated output of this local
+vivid-nord.yml; no Vivid execution is required during Nix evaluation.
+
+The Bat, Btop, Glamour, DMS, Kubecolor and Starship profiles use the Nord
+palette with local contrast adjustments. The Helix profile inherits Helix's
+bundled nord theme instead of vendoring it. The Yazi flavor is obtained from
+Nixpkgs' yaziPlugins.nord package and retains the package's upstream licensing.
+
+starship.toml adapts Starship's Pastel Powerline preset with the Nord palette
+and a different selection of prompt modules:
+https://starship.rs/presets/pastel-powerline.html
+The original preset is inspired by the M365Princess Oh My Posh theme.
+Copyright (c) 2019-2022, Starship Contributors. See LICENSE-starship.
+
+DMS and Kubecolor assets are portable data only. The module does not install
+a desktop shell or deploy a Kubernetes configuration file.

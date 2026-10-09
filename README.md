@@ -12,6 +12,7 @@ The intended consumer is a private activation repo that imports this flake and l
 - `lib.mkPkgs`
 - `lib.mkHomeConfiguration`
 - `lib.mkDarwinConfiguration`
+- `packages.<system>.zsh-kubecolor`
 
 ## Consumption
 
@@ -29,6 +30,39 @@ Typical composition order:
 2. add private options and host-specific modules
 3. layer private overlays after `inputs.bootstrap.overlays.default` if needed
 
+## Portable profiles
+
+Zsh includes a store-backed kubecolor plugin and its rsync helper. Kubernetes completion is generated at build time from the selected `kubectl`; startup never writes into the plugin directory. Oh My Zsh owns the single fzf Zsh integration. No private checkout path is required.
+
+The Nord profile is disabled by default:
+
+```nix
+dotfiles.theme.nord.enable = true;
+```
+
+It styles enabled shell, Git, Helix, Yazi, and Glow consumers. Theme leaves are defaults, so ordinary consumer settings override them without `mkForce`. Existing unmanaged files retain Home Manager collision protection; the profile never forces replacement of `btop.conf`. Delta selects its custom syntax theme only when Bat's theme cache is enabled.
+
+Portable DMS and kubecolor palettes are available under `themes/nord/`; the base does not deploy a desktop, choose a location/wallpaper, write a kubeconfig-adjacent file, or set private kubie exclusions. Source attribution and licenses accompany the assets.
+
+## Package updates
+
+Generic Helm, Helmfile, OpenStack, and Nordic definitions live in `overlays/`. Check releases without changing files:
+
+```bash
+scripts/check-updates.py --dry-run
+```
+
+Explicitly apply complete supported OpenStack or Helm-secrets artifact updates:
+
+```bash
+scripts/check-updates.py --apply --yes
+```
+
+Go source/vendor updates (Helm, Helmfile, CIDR, SOPS, YQ) remain manual. Nordic variants remain individually pinned. Unknown source shapes fail closed. Exit status is `0` for current/no updates, `1` for available updates, and `2` for an error. Checks/tests do not use credentials or make provider calls; explicitly running the release checker queries public GitHub release metadata.
+
+The nixpkgs lock supplies the Go toolchain required by the promoted Helmfile source (Go >= 1.26.6). Its compatibility pin was updated without changing the Home Manager or nix-darwin inputs.
+
+
 ## Layout
 
 ```text
@@ -39,13 +73,16 @@ lib/
 modules/
 overlays/
 examples/
+themes/nord/
+scripts/check-updates.py
+tests/
 .github/workflows/ci.yml
 ```
 
 ## Verification
 
 ```bash
-nix run nixpkgs#nixfmt -- --check flake.nix $(find modules -name '*.nix') $(find examples -name '*.nix') overlays/*.nix
+nix run nixpkgs#nixfmt -- --check flake.nix $(find modules -name '*.nix') $(find examples -name '*.nix') overlays/*.nix tests/*.nix
 nix flake check
 nix build .#example-linux --no-link
 ```
@@ -60,6 +97,8 @@ On Linux, `nix flake check` will only execute checks for compatible systems unle
 
 The example configurations intentionally disable the modules that usually need extra host setup, such as desktop GUI, cloud, and Kubernetes tooling.
 
+Native checks include the example build, offline updater/plugin behavior suites, optional Nord enable/disable/override boundaries, and the compiled kubecolor package. The script check uses a writable disposable source tree and patched shebangs so fixtures work inside the Nix sandbox.
+
 ## CI
 
 `.github/workflows/ci.yml`:
@@ -67,7 +106,7 @@ The example configurations intentionally disable the modules that usually need e
 1. runs `nixfmt`
 2. runs `nix flake check`
 3. runs `gitleaks`
-4. runs `shellcheck` only if `scripts/*.sh` exists
+4. runs `shellcheck` on the retained kubectl-rsync helper
 5. builds `example-linux` on Ubuntu and `example-darwin` on macOS
 
 ## Privacy Guardrails

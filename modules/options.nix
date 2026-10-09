@@ -1,6 +1,7 @@
 { lib, ... }:
 {
   options.dotfiles = {
+    theme.nord.enable = lib.mkEnableOption "the optional Nord theme profile";
     desktop = {
       enable = lib.mkEnableOption "desktop environment" // {
         default = true;

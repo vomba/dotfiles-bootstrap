@@ -1,0 +1,17 @@
+inherits = "nord"
+
+"ui.background" = { bg = "nord0" }
+"ui.text" = "nord6"
+"ui.linenr" = "nord3_bright"
+"ui.linenr.selected" = "nord6"
+"ui.statusline.normal" = { fg = "nord6", bg = "nord10" }
+"ui.statusline.select" = { fg = "nord6", bg = "nord9" }
+"ui.statusline.insert" = { fg = "nord0", bg = "nord6" }
+"comment" = { fg = "nord3_bright", modifiers = ["italic"] }
+
+[palette]
+nord0 = "#1e222a"
+nord3_bright = "#7b88a1"
+nord4 = "#eceff4"
+nord7 = "#81a1c1"
+nord8 = "#81a1c1"

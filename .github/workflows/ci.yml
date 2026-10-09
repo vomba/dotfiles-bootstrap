@@ -31,15 +31,12 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
       - name: Check formatting
-        run: nix run nixpkgs#nixfmt -- --check flake.nix $(find modules -name '*.nix') $(find examples -name '*.nix') overlays/*.nix
+        run: nix run nixpkgs#nixfmt -- --check flake.nix $(find modules -name '*.nix') $(find examples -name '*.nix') overlays/*.nix tests/*.nix
       - name: Check flake
         run: nix flake check
       - name: Gitleaks
         run: nix run nixpkgs#gitleaks -- detect --no-git --source .
       - name: ShellCheck
-        run: |
-          if ls scripts/*.sh >/dev/null 2>&1; then
-            nix run nixpkgs#shellcheck -- scripts/*.sh
-          fi
+        run: nix run nixpkgs#shellcheck -- oh-my-zsh/plugins/zsh-kubecolor/bin/kubectl-rsync
       - name: Build example
         run: nix build ${{ matrix.target }} --no-link

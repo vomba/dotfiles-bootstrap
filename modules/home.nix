@@ -2,6 +2,7 @@
 {
   imports = [
     ./options.nix
+    ./themes/nord.nix
     ./shell/shell.nix
     ./shell/zsh.nix
     ./shell/gpg.nix
