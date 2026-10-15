@@ -104,10 +104,9 @@ class UpdaterCliTests(unittest.TestCase):
             "UPDATES_REQUEST_LOG": str(self.api_log),
             "UPDATES_PREFETCH_LOG": str(self.prefetch_log),
             "UPDATES_RELEASES": json.dumps({
-                "gtema/openstack": "0.13.9", "jkroepke/helm-secrets": "4.7.8",
+                "gtema/openstack": "0.13.9", "jkroepke/helm-secrets": "4.7.10",
                 "helm/helm": "4.4.0", "helmfile/helmfile": "1.9.0",
-                "bschaatsbergen/cidr": "2.4.0", "getsops/sops": "3.11.0",
-                "mikefarah/yq": "4.46.0",
+                "bschaatsbergen/cidr": "2.4.0",
             }),
         })
         env.update(overrides)
@@ -161,16 +160,18 @@ class UpdaterCliTests(unittest.TestCase):
 
     def test_apply_pairs_all_three_helm_secrets_artifacts(self) -> None:
         overlay = self.add_overlay("helm.nix")
+        original = overlay.read_text(encoding="utf-8")
+        go_source_group = original.split("customHelmPlugins =", 1)[0]
         result = self.invoke("--apply", "--yes")
         self.assertEqual(result.returncode, 1, (result.stdout, result.stderr))
         urls = self.urls()
         self.assertEqual(len(urls), 3)
-        self.assertTrue(all("/v4.7.8/" in url and "/vv" not in url for url in urls))
+        self.assertTrue(all("/v4.7.10/" in url and "/vv" not in url for url in urls))
         content = overlay.read_text(encoding="utf-8")
-        self.assertEqual(content.count('version = "4.7.8";'), 3)
-        self.assertIn('version = "4.3.0";', content)
+        self.assertEqual(content.count('version = "4.7.10";'), 3)
+        self.assertEqual(content.split("customHelmPlugins =", 1)[0], go_source_group)
         for url in urls:
-            artifact = url.rsplit("/", 1)[1].split("-4.7.8.tgz", 1)[0]
+            artifact = url.rsplit("/", 1)[1].split("-4.7.10.tgz", 1)[0]
             plugin = "helm-secrets" if artifact == "secrets" else f"helm-{artifact}"
             source = content.split(f'pluginName = "{plugin}";', 1)[1].split("};", 1)[0]
             digest = base64.b64encode(hashlib.sha256(url.encode()).digest()).decode()
@@ -289,7 +290,9 @@ class UpdaterCliTests(unittest.TestCase):
 
     def test_unsupported_source_shape_errors_without_modifying_other_records(self) -> None:
         overlay = self.add_overlay("helm.nix")
-        original = overlay.read_text(encoding="utf-8").replace('hash = "sha256-qi/nMXoLY7s3gWjFCtq50uU5dvcFI0odDtz40MtSJY4=";', 'sha256 = "sha256-qi/nMXoLY7s3gWjFCtq50uU5dvcFI0odDtz40MtSJY4=";')
+        original = overlay.read_text(encoding="utf-8")
+        plugin_hash = next(CHECK_UPDATES.PLUGIN.finditer(original))["hash"]
+        original = original.replace(f'hash = "{plugin_hash}";', f'sha256 = "{plugin_hash}";')
         overlay.write_text(original, encoding="utf-8")
         result = self.invoke("--apply", "--yes")
         self.assertEqual(result.returncode, 2, result.stdout)
@@ -304,7 +307,7 @@ class UpdaterCliTests(unittest.TestCase):
             UPDATES_FAIL_KIND="nonzero",
         )
         self.assertEqual(result.returncode, 2, (result.stdout, result.stderr))
-        self.assertIn('version = "4.7.8";', helm.read_text(encoding="utf-8"))
+        self.assertIn('version = "4.7.10";', helm.read_text(encoding="utf-8"))
         self.assertEqual(openstack.read_bytes(), original)
         self.assertIn("Partial update: already applied helm.nix", result.stderr)
 
@@ -318,7 +321,7 @@ class UpdaterCliTests(unittest.TestCase):
 
     def test_apply_leaves_existing_manual_go_overlays_unchanged(self) -> None:
         originals = {}
-        for name in ("cidr.nix", "sops.nix", "yq.nix"):
+        for name in ("cidr.nix",):
             overlay = self.add_overlay(name)
             originals[overlay] = overlay.read_bytes()
         result = self.invoke("--apply", "--yes")
@@ -343,7 +346,7 @@ class UpdaterCliTests(unittest.TestCase):
                 f"https://api.github.com/repos/{repo}/releases/latest"
                 for repo in (
                     "bschaatsbergen/cidr", "helm/helm", "jkroepke/helm-secrets",
-                    "helmfile/helmfile", "gtema/openstack", "getsops/sops", "mikefarah/yq",
+                    "helmfile/helmfile", "gtema/openstack",
                 )
             ],
         )

@@ -312,7 +312,7 @@ def check_file(file_path, apply_updates=False):
             plugin_available = report_release_from_url(content, filename, "jkroepke", "helm-secrets")
             planned = content
         available = go_available or plugin_available
-    elif filename in {"helmfile.nix", "cidr.nix", "sops.nix", "yq.nix"}:
+    elif filename in {"helmfile.nix", "cidr.nix"}:
         available, planned = report_go_source(content, filename), content
     elif filename == "nordic.nix":
         available, planned = report_nordic(content, filename), content

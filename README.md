@@ -58,9 +58,14 @@ Explicitly apply complete supported OpenStack or Helm-secrets artifact updates:
 scripts/check-updates.py --apply --yes
 ```
 
-Go source/vendor updates (Helm, Helmfile, CIDR, SOPS, YQ) remain manual. Nordic variants remain individually pinned. Unknown source shapes fail closed. Exit status is `0` for current/no updates, `1` for available updates, and `2` for an error. Checks/tests do not use credentials or make provider calls; explicitly running the release checker queries public GitHub release metadata.
+Go source/vendor updates (Helm, Helmfile, CIDR) remain manual. SOPS and yq use nixpkgs directly, without custom overrides. Nordic variants remain individually pinned. Unknown source shapes fail closed. Exit status is `0` for current/no updates, `1` for available updates, and `2` for an error. Checks/tests do not use credentials or make provider calls; explicitly running the release checker queries public GitHub release metadata.
 
-The nixpkgs lock supplies the Go toolchain required by the promoted Helmfile source (Go >= 1.26.6). Its compatibility pin was updated without changing the Home Manager or nix-darwin inputs.
+The nixpkgs lock supplies Go 1.27 for Helmfile 1.8.1 (Go >= 1.27.1), SOPS 3.13.3 and yq 4.54.1. Its compatibility pin was updated without changing the Home Manager or nix-darwin inputs.
+
+The retained standalone Home Manager pin still emits upstream deprecated
+`stdenv.isLinux` / `stdenv.isDarwin` alias warnings with this nixpkgs version
+(for example, its `modules/systemd.nix` default). Native checks and the example
+generation build pass; this package refresh does not repin Home Manager.
 
 
 ## Layout

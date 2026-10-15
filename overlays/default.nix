@@ -8,6 +8,4 @@ final: prev:
   zsh-kubecolor = import ./zsh-kubecolor.nix { super = final; };
   kubernetes-helm = import ./helm.nix { super = prev; };
   helmfile = import ./helmfile.nix { super = prev; };
-  yq-go = import ./yq.nix { super = prev; };
-  sops = import ./sops.nix { super = prev; };
 }

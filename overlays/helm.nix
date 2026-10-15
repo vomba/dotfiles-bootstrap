@@ -3,17 +3,17 @@
 let
   helm = super.kubernetes-helm.overrideAttrs (_oldAttrs: rec {
     pname = "kubernetes-helm";
-    version = "4.3.0";
+    version = "4.3.1";
 
     src = super.fetchFromGitHub {
       owner = "helm";
       repo = "helm";
       rev = "v${version}";
-      hash = "sha256-E1xhKV3ahZ8ahCDalga2XSOiLea0UyC8b1t3Gd4P6xA=";
+      hash = "sha256-XbRqZWsr012zT6dXumg4YShsjXeVNt6Qk52ttEFm/Oo=";
     };
 
     proxyVendor = true;
-    vendorHash = "sha256-KmKfrCRzPEMjEg2CWg8VMvgLrUydaGJsgGEZGvZSlPI=";
+    vendorHash = "sha256-m919rjFcL0K8MX7M+1MYFu/V8SYCOzb/oy6scIzPXSk=";
 
     doCheck = false;
 
@@ -68,28 +68,28 @@ let
   customHelmPlugins = super.kubernetes-helmPlugins // {
     helm-secrets = buildHelmPlugin rec {
       pluginName = "helm-secrets";
-      version = "4.7.7";
+      version = "4.7.9";
       src = super.fetchurl {
         url = "https://github.com/jkroepke/helm-secrets/releases/download/v${version}/secrets-${version}.tgz";
-        hash = "sha256-qi/nMXoLY7s3gWjFCtq50uU5dvcFI0odDtz40MtSJY4=";
+        hash = "sha256-W5zEcV9zySdJOltAE0KmpyxCO/WLQXX2RC6xEaHafWg=";
       };
     };
 
     helm-secrets-getter = buildHelmPlugin rec {
       pluginName = "helm-secrets-getter";
-      version = "4.7.7";
+      version = "4.7.9";
       src = super.fetchurl {
         url = "https://github.com/jkroepke/helm-secrets/releases/download/v${version}/secrets-getter-${version}.tgz";
-        hash = "sha256-GE4cF6KkJvheHI96ajIeyyzpx5f/3q7f22mXDRLEoNI=";
+        hash = "sha256-liON1ogfzXU8ERI6hsizCMYm3L8anp5tC32hbHlaC+s=";
       };
     };
 
     helm-secrets-post-renderer = buildHelmPlugin rec {
       pluginName = "helm-secrets-post-renderer";
-      version = "4.7.7";
+      version = "4.7.9";
       src = super.fetchurl {
         url = "https://github.com/jkroepke/helm-secrets/releases/download/v${version}/secrets-post-renderer-${version}.tgz";
-        hash = "sha256-1OgHPgh0Ix4nd6vLSq/TpkuIgn3FDYy0zQ+4t8wd7Gg=";
+        hash = "sha256-nLnXLumC/PFPREWec/MXBXX01hIUjmUdD/GiOsL+yoo=";
       };
     };
   };
