@@ -6,11 +6,6 @@
       enable = lib.mkEnableOption "desktop environment" // {
         default = true;
       };
-      hyprland = {
-        enable = lib.mkEnableOption "Hyprland window manager" // {
-          default = false;
-        };
-      };
       niri = {
         enable = lib.mkEnableOption "niri window manager" // {
           default = true;

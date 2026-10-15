@@ -44,6 +44,8 @@ It styles enabled shell, Git, Helix, Yazi, and Glow consumers. Theme leaves are 
 
 Portable DMS and kubecolor palettes are available under `themes/nord/`; the base does not deploy a desktop, choose a location/wallpaper, write a kubeconfig-adjacent file, or set private kubie exclusions. Source attribution and licenses accompany the assets.
 
+Remove any old `dotfiles.desktop.hyprland.enable` assignment: the unused option has been removed. The base has no Hyprland module.
+
 ## Package updates
 
 Generic Helm, Helmfile, OpenStack, and Nordic definitions live in `overlays/`. Check releases without changing files:
