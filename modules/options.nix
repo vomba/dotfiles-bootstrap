@@ -16,6 +16,11 @@
       enable = lib.mkEnableOption "development tools" // {
         default = true;
       };
+      mise = {
+        enable = lib.mkEnableOption "mise-managed development tools" // {
+          default = true;
+        };
+      };
       kubernetes = {
         enable = lib.mkEnableOption "Kubernetes tooling" // {
           default = true;

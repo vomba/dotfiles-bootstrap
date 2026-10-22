@@ -13,6 +13,7 @@
     ./apps/packages.nix
     ./apps/yazi.nix
     ./dev/dev.nix
+    ./dev/mise.nix
     ./dev/cloud.nix
     ./dev/kubernetes.nix
     ./dev/lsp.nix

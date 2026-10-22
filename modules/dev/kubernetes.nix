@@ -20,7 +20,6 @@ in
       pkgs.kubie
       pkgs.kind
       helmWithPlugins
-      pkgs.helmfile
       pkgs.kubecolor
       pkgs.kubectl
       pkgs.kubelogin-oidc

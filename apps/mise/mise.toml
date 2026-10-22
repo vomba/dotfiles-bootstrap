@@ -1,0 +1,9 @@
+[tool_alias]
+cidr = "github:bschaatsbergen/cidr"
+helmfile = "aqua:helmfile/helmfile"
+terraform = "aqua:hashicorp/terraform"
+
+[tools]
+cidr = "2.3.0"
+helmfile = "1.8.1"
+terraform = "1.5.7"

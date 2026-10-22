@@ -10,8 +10,13 @@
       pkgs.openstackclient-full
       pkgs.openstack-tui
       pkgs.upcloud-cli
-      pkgs.tenv
-      pkgs.cidr
+      (pkgs.symlinkJoin {
+        name = "${pkgs.tenv.name}-without-terraform";
+        paths = [ pkgs.tenv ];
+        postBuild = ''
+          rm "$out/bin/terraform"
+        '';
+      })
     ];
   };
 }

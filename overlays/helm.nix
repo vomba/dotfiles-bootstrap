@@ -1,39 +1,7 @@
 { super }:
 
 let
-  helm = super.kubernetes-helm.overrideAttrs (_oldAttrs: rec {
-    pname = "kubernetes-helm";
-    version = "4.3.1";
-
-    src = super.fetchFromGitHub {
-      owner = "helm";
-      repo = "helm";
-      rev = "v${version}";
-      hash = "sha256-XbRqZWsr012zT6dXumg4YShsjXeVNt6Qk52ttEFm/Oo=";
-    };
-
-    proxyVendor = true;
-    vendorHash = "sha256-m919rjFcL0K8MX7M+1MYFu/V8SYCOzb/oy6scIzPXSk=";
-
-    doCheck = false;
-
-    ldflags = [
-      "-w"
-      "-s"
-      "-X helm.sh/helm/v4/internal/version.version=v${version}"
-      "-X helm.sh/helm/v4/internal/version.gitCommit=${src.rev}"
-    ];
-
-    preBuild = ''
-      K8S_MODULES_VER="$(go list -f '{{.Version}}' -m k8s.io/client-go)"
-      K8S_MODULES_MAJOR_VER="$(($(cut -d. -f1 <<<"$K8S_MODULES_VER") + 1))"
-      K8S_MODULES_MINOR_VER="$(cut -d. -f2 <<<"$K8S_MODULES_VER")"
-      ldflags="''${ldflags} -X helm.sh/helm/v4/pkg/lint/rules.k8sVersionMajor=''${K8S_MODULES_MAJOR_VER}"
-      ldflags="''${ldflags} -X helm.sh/helm/v4/pkg/lint/rules.k8sVersionMinor=''${K8S_MODULES_MINOR_VER}"
-      ldflags="''${ldflags} -X helm.sh/helm/v4/pkg/chartutil.k8sVersionMajor=''${K8S_MODULES_MAJOR_VER}"
-      ldflags="''${ldflags} -X helm.sh/helm/v4/pkg/chartutil.k8sVersionMinor=''${K8S_MODULES_MINOR_VER}"
-    '';
-  });
+  helm = super.kubernetes-helm;
 
   buildHelmPlugin =
     {

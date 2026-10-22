@@ -62,6 +62,12 @@
           inherit pkgs home-manager;
           bootstrapModule = self.homeManagerModules.bootstrap;
         };
+      miseIntegration =
+        pkgs:
+        import ./tests/mise-integration.nix {
+          inherit pkgs home-manager;
+          bootstrapModule = self.homeManagerModules.bootstrap;
+        };
     in
     {
       lib = bootstrapLib;
@@ -125,10 +131,12 @@
 
       packages.${linuxSystem} = {
         example-linux = self.homeConfigurations."example-linux".activationPackage;
+        mise = (mkPkgs linuxSystem).mise;
         zsh-kubecolor = (mkPkgs linuxSystem).zsh-kubecolor;
       };
       packages.${darwinSystem} = {
         example-darwin = self.darwinConfigurations."example-darwin".system;
+        mise = (mkPkgs darwinSystem).mise;
         zsh-kubecolor = (mkPkgs darwinSystem).zsh-kubecolor;
       };
 
@@ -136,12 +144,14 @@
         example-linux = self.packages.${linuxSystem}.example-linux;
         script-tests = scriptTests (mkPkgs linuxSystem);
         nord-profile = nordProfile (mkPkgs linuxSystem);
+        mise-integration = miseIntegration (mkPkgs linuxSystem);
         zsh-kubecolor = self.packages.${linuxSystem}.zsh-kubecolor;
       };
       checks.${darwinSystem} = {
         example-darwin = self.packages.${darwinSystem}.example-darwin;
         script-tests = scriptTests (mkPkgs darwinSystem);
         nord-profile = nordProfile (mkPkgs darwinSystem);
+        mise-integration = miseIntegration (mkPkgs darwinSystem);
         zsh-kubecolor = self.packages.${darwinSystem}.zsh-kubecolor;
       };
     };

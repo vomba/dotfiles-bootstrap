@@ -105,8 +105,6 @@ class UpdaterCliTests(unittest.TestCase):
             "UPDATES_PREFETCH_LOG": str(self.prefetch_log),
             "UPDATES_RELEASES": json.dumps({
                 "gtema/openstack": "0.13.9", "jkroepke/helm-secrets": "4.7.10",
-                "helm/helm": "4.4.0", "helmfile/helmfile": "1.9.0",
-                "bschaatsbergen/cidr": "2.4.0",
             }),
         })
         env.update(overrides)
@@ -160,8 +158,6 @@ class UpdaterCliTests(unittest.TestCase):
 
     def test_apply_pairs_all_three_helm_secrets_artifacts(self) -> None:
         overlay = self.add_overlay("helm.nix")
-        original = overlay.read_text(encoding="utf-8")
-        go_source_group = original.split("customHelmPlugins =", 1)[0]
         result = self.invoke("--apply", "--yes")
         self.assertEqual(result.returncode, 1, (result.stdout, result.stderr))
         urls = self.urls()
@@ -169,13 +165,29 @@ class UpdaterCliTests(unittest.TestCase):
         self.assertTrue(all("/v4.7.10/" in url and "/vv" not in url for url in urls))
         content = overlay.read_text(encoding="utf-8")
         self.assertEqual(content.count('version = "4.7.10";'), 3)
-        self.assertEqual(content.split("customHelmPlugins =", 1)[0], go_source_group)
         for url in urls:
             artifact = url.rsplit("/", 1)[1].split("-4.7.10.tgz", 1)[0]
             plugin = "helm-secrets" if artifact == "secrets" else f"helm-{artifact}"
             source = content.split(f'pluginName = "{plugin}";', 1)[1].split("};", 1)[0]
             digest = base64.b64encode(hashlib.sha256(url.encode()).digest()).decode()
             self.assertIn(f'hash = "sha256-{digest}"', source)
+
+    def test_up_to_date_helm_plugins_do_not_fetch_or_write(self) -> None:
+        overlay = self.add_overlay("helm.nix")
+        original = overlay.read_bytes()
+        for args in [(), ("--dry-run",), ("--apply", "--yes")]:
+            with self.subTest(args=args):
+                result = self.invoke(
+                    *args,
+                    UPDATES_RELEASES=json.dumps({"jkroepke/helm-secrets": "4.7.9"}),
+                )
+                self.assertEqual(result.returncode, 0, (result.stdout, result.stderr))
+                self.assertEqual(overlay.read_bytes(), original)
+        self.assertEqual(self.urls(), [])
+        self.assertCountEqual(
+            self.api_log.read_text(encoding="utf-8").splitlines(),
+            ["https://api.github.com/repos/jkroepke/helm-secrets/releases/latest"] * 3,
+        )
 
     def test_any_prefetch_failure_preserves_entire_file(self) -> None:
         for kind in ("timeout", "nonzero", "malformed", "missing-hash", "invalid-hash"):
@@ -256,19 +268,6 @@ class UpdaterCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout)
         self.assertEqual(overlay.read_text(encoding="utf-8"), "concurrent edit\n")
 
-    def test_manual_go_sources_report_available_without_mutation(self) -> None:
-        for name in ("helm.nix", "helmfile.nix"):
-            with self.subTest(name=name):
-                overlay = self.add_overlay(name)
-                original = overlay.read_bytes()
-                result = self.invoke("--apply", "--yes")
-                self.assertEqual(result.returncode, 1, (result.stdout, result.stderr))
-                self.assertIn("source and vendor hashes manually", result.stdout)
-                self.assertEqual(
-                    overlay.read_bytes().split(b"customHelmPlugins =", 1)[0],
-                    original.split(b"customHelmPlugins =", 1)[0],
-                )
-
     def test_nordic_variants_are_individually_named_and_pinned(self) -> None:
         overlay = self.add_overlay("nordic.nix")
         original = overlay.read_bytes()
@@ -312,22 +311,15 @@ class UpdaterCliTests(unittest.TestCase):
         self.assertIn("Partial update: already applied helm.nix", result.stderr)
 
     def test_later_api_failure_keeps_prior_partial_result_and_errors(self) -> None:
-        self.add_overlay("helm.nix")
-        self.add_overlay("helmfile.nix")
+        helm = self.add_overlay("helm.nix")
+        openstack = self.add_overlay("openstack-tui.nix")
+        originals = {overlay: overlay.read_bytes() for overlay in (helm, openstack)}
         result = self.invoke("--dry-run", UPDATES_API_FAILURE_AFTER="1")
         self.assertEqual(result.returncode, 2)
         self.assertIn("UPDATE AVAILABLE", result.stdout)
         self.assertIn("Error:", result.stderr)
-
-    def test_apply_leaves_existing_manual_go_overlays_unchanged(self) -> None:
-        originals = {}
-        for name in ("cidr.nix",):
-            overlay = self.add_overlay(name)
-            originals[overlay] = overlay.read_bytes()
-        result = self.invoke("--apply", "--yes")
-        self.assertEqual(result.returncode, 1, (result.stdout, result.stderr))
         for overlay, original in originals.items():
-            self.assertEqual(overlay.read_bytes(), original, overlay.name)
+            self.assertEqual(overlay.read_bytes(), original)
         self.assertEqual(self.urls(), [])
 
     def test_promoted_overlay_inventory_is_read_only_in_check_mode(self) -> None:
@@ -340,13 +332,10 @@ class UpdaterCliTests(unittest.TestCase):
         for overlay, original in originals.items():
             self.assertEqual(overlay.read_bytes(), original, overlay.name)
         self.assertEqual(self.urls(), [])
-        self.assertEqual(
+        self.assertCountEqual(
             self.api_log.read_text(encoding="utf-8").splitlines(),
             [
                 f"https://api.github.com/repos/{repo}/releases/latest"
-                for repo in (
-                    "bschaatsbergen/cidr", "helm/helm", "jkroepke/helm-secrets",
-                    "helmfile/helmfile", "gtema/openstack",
-                )
+                for repo in {"jkroepke/helm-secrets", "gtema/openstack"}
             ],
         )

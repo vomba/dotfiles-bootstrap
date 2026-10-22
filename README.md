@@ -13,6 +13,7 @@ The intended consumer is a private activation repo that imports this flake and l
 - `lib.mkHomeConfiguration`
 - `lib.mkDarwinConfiguration`
 - `packages.<system>.zsh-kubecolor`
+- `packages.<system>.mise` — hash-pinned official mise release binary
 
 ## Consumption
 
@@ -46,9 +47,50 @@ Portable DMS and kubecolor palettes are available under `themes/nord/`; the base
 
 Remove any old `dotfiles.desktop.hyprland.enable` assignment: the unused option has been removed. The base has no Hyprland module.
 
+## Explicit mise tool installation
+
+`dotfiles.dev.mise.enable` defaults to true, independently of the general
+development flag. Cloud tooling requests CIDR 2.3.0 and Terraform 1.5.7 (the
+last MPL-2.0 release); Kubernetes tooling requests Helmfile 1.8.1.
+`apps/mise/mise.toml` owns these requests and backend aliases, and its committed
+lock contains checksummed downloads for four Linux/macOS architectures.
+
+Home Manager owns immutable `mise/config.toml` and its sibling `mise.lock`,
+without forced replacement. After a separately authorized activation, run
+`dotfiles-mise-install` explicitly to install selected tools and rebuild shims.
+Activation never downloads tools. The installer ignores caller project,
+environment and user/system mise configuration, but does not re-attest existing
+tool/plugin storage. It preserves ordinary foreign shim collisions and fails
+rather than reporting success; shim ownership follows mise's native heuristics,
+and failures do not roll back entries already refreshed.
+
+Bare commands use the shared `$XDG_DATA_HOME/mise-shims` directory. No mise shell
+activation or prompt/chpwd hooks are enabled. Managed direnv/nix-direnv is
+retired: use `mise exec -- command` for trusted project environment variables
+and dotenv settings, and `nix develop` for Nix devshells. There is no automatic
+Nix bridge. Explicit Nix environment commands can take precedence inside that
+shell. Automatic installation and shim system-command fallback are disabled,
+and normal resolution is offline; this is not a network sandbox for the tools
+or trusted project code. Explicit installation goes online. Project Terraform
+pins can override the global fallback; missing versions fail until installed.
+
+Full `mise activate` is intentionally not used: in .17 it removes tool shims
+when auto-install is disabled, allowing ordinary shell PATH lookup to bypass a
+missing selected tool version. Explicit execution preserves the strict policy.
+
+Personal additions can use unmanaged `config.local.toml` / `mise.local.lock`
+with disjoint keys. `mise use --global` cannot edit HM-owned configuration.
+Foreign configuration files retain Home Manager's normal collision protection.
+
+The mise package uses official release archives with measured per-platform
+hashes, source-matched completions, and self-update disabled. Native package
+checks exercise the shipped executable; packaging does not compile or run the
+upstream Rust test suite. Its exported package can be maintained with
+`nix-update --flake mise`; review every changed release and source hash.
+
 ## Package updates
 
-Generic Helm, Helmfile, OpenStack, and Nordic definitions live in `overlays/`. Check releases without changing files:
+Helm plugin, OpenStack, and retained Nordic definitions live in `overlays/`. Check releases without changing files:
 
 ```bash
 scripts/check-updates.py --dry-run
@@ -60,14 +102,23 @@ Explicitly apply complete supported OpenStack or Helm-secrets artifact updates:
 scripts/check-updates.py --apply --yes
 ```
 
-Go source/vendor updates (Helm, Helmfile, CIDR) remain manual. SOPS and yq use nixpkgs directly, without custom overrides. Nordic variants remain individually pinned. Unknown source shapes fail closed. Exit status is `0` for current/no updates, `1` for available updates, and `2` for an error. Checks/tests do not use credentials or make provider calls; explicitly running the release checker queries public GitHub release metadata.
+The checker owns only OpenStack and Helm-secrets release groups; Nordic variants
+remain individually pinned and report without mutation. Unknown source shapes
+fail closed. Exit status is `0` for current/no updates, `1` for available
+updates, and `2` for an error. Explicit release checks query public GitHub
+metadata; fixture tests do not contact providers.
 
-The nixpkgs lock supplies Go 1.27 for Helmfile 1.8.1 (Go >= 1.27.1), SOPS 3.13.3 and yq 4.54.1. Its compatibility pin was updated without changing the Home Manager or nix-darwin inputs.
+Helm's base, SOPS, yq, and ordinary GNU Parallel come directly from nixpkgs.
+The unused Parallel SQL-driver override is retired. CIDR and Helmfile are
+mise-owned, while tenv retains every command and completion except its
+`terraform` proxy; the filtered profile does not change tenv's source package
+or downloaded user versions. Disabling mise does not restore retired Nix owners.
+OpenStack remains 0.13.8 with its existing two-artifact/four-platform recipe.
 
-The retained standalone Home Manager pin still emits upstream deprecated
-`stdenv.isLinux` / `stdenv.isDarwin` alias warnings with this nixpkgs version
-(for example, its `modules/systemd.nix` default). Native checks and the example
-generation build pass; this package refresh does not repin Home Manager.
+The standalone nixpkgs, Home Manager and nix-darwin locked records are aligned
+with the consuming configuration. The current Nordic overlay is retained
+because the upstream package's SDDM/KDE dependency closure cannot be evaluated
+on Darwin; no unsupported-platform override or partial theme migration is used.
 
 
 ## Layout
@@ -104,7 +155,7 @@ On Linux, `nix flake check` will only execute checks for compatible systems unle
 
 The example configurations intentionally disable the modules that usually need extra host setup, such as desktop GUI, cloud, and Kubernetes tooling.
 
-Native checks include the example build, offline updater/plugin behavior suites, optional Nord enable/disable/override boundaries, and the compiled kubecolor package. The script check uses a writable disposable source tree and patched shebangs so fixtures work inside the Nix sandbox.
+Native checks include the example build, offline updater/plugin suites, optional Nord enable/disable/override boundaries, compiled kubecolor, and `mise-integration` (evaluated profile selections, immutable config/lock collisions, isolated installer, local-tool shim resolution, explicit project environments, and missing-version failures). Local immutable fixture tools do not attest downloaded release bytes; real artifact installation is a separate disposable smoke. The script check uses a writable disposable source tree and patched shebangs inside the Nix sandbox.
 
 ## CI
 

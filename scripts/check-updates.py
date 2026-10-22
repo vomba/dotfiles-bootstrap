@@ -42,11 +42,6 @@ MAP_SOURCE = re.compile(
     r'\s*sha256\s*=\s*\{(?P<hashes>.*?)\}\s*\.\$\{system\}\s*;', re.DOTALL,
 )
 MAP_HASH = re.compile(r'"(?P<system>[^"\n]+)"\s*=\s*"(?P<hash>[^"\n]+)"\s*;')
-GO_SOURCE = re.compile(
-    r'\bsrc\s*=\s*(?:super\.)?fetchFromGitHub\s*\{\s*owner\s*=\s*"(?P<owner>[^"\n]+)";'
-    r'\s*repo\s*=\s*"(?P<repo>[^"\n]+)";\s*rev\s*=\s*"v\$\{version\}";'
-    r'\s*(?:hash|sha256)\s*=\s*"(?P<hash>[^"\n]+)";\s*\};', re.MULTILINE,
-)
 NORDIC_SOURCE = re.compile(r'\(fetchFromGitHub\s*\{(?P<body>[^{}]+)\}\)')
 FIELD = re.compile(r'\b(?P<key>owner|repo|rev|hash|name)\s*=\s*"(?P<value>[^"\n]+)";')
 
@@ -225,22 +220,6 @@ def plan_plugins(content, filename):
     return True, with_replacements(content, replacements)
 
 
-def report_go_source(content, filename):
-    matches = list(GO_SOURCE.finditer(content))
-    if len(matches) != 1:
-        raise UpdateCheckError(f"{filename}: unsupported Go source/hash shape")
-    version = single_version(content[:matches[0].start()], filename)
-    if not HASH_PATTERN.fullmatch(matches[0]["hash"]) or not re.search(r'\bvendorHash\s*=\s*"sha256-[A-Za-z0-9+/]{43}=";', content):
-        raise UpdateCheckError(f"{filename}: missing source or vendor hash")
-    source = matches[0]
-    latest = get_latest_github_release(source["owner"], source["repo"])
-    if latest == version[1]:
-        print(f"[{filename}] Go source up to date ({latest})")
-        return False
-    print(f"[{filename}] UPDATE AVAILABLE: {version[1]} -> {latest}; refresh source and vendor hashes manually")
-    return True
-
-
 def report_nordic(content, filename):
     srcs = re.search(r'\bsrcs\s*=\s*\[(?P<body>.*?)\];', content, re.DOTALL)
     if not srcs:
@@ -305,15 +284,11 @@ def check_file(file_path, apply_updates=False):
             available = report_release_from_url(content, filename, "gtema", "openstack")
             planned = content
     elif filename == "helm.nix":
-        go_available = report_go_source(content, filename)
         if apply_updates:
-            plugin_available, planned = plan_plugins(content, filename)
+            available, planned = plan_plugins(content, filename)
         else:
-            plugin_available = report_release_from_url(content, filename, "jkroepke", "helm-secrets")
+            available = report_release_from_url(content, filename, "jkroepke", "helm-secrets")
             planned = content
-        available = go_available or plugin_available
-    elif filename in {"helmfile.nix", "cidr.nix"}:
-        available, planned = report_go_source(content, filename), content
     elif filename == "nordic.nix":
         available, planned = report_nordic(content, filename), content
     elif "fetchFromGitHub" in content or "releases/download/" in content:

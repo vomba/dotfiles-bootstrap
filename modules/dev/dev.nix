@@ -15,7 +15,7 @@
     home.packages = [
       pkgs.pre-commit
       pkgs.skopeo
-      pkgs.parallel-full
+      pkgs.parallel
     ]
     ++ lib.optional pkgs.stdenv.hostPlatform.isDarwin pkgs.xcodegen;
   };
