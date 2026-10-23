@@ -5,6 +5,8 @@
   ...
 }:
 {
+  imports = [ ./completions.nix ];
+
   config = lib.mkIf config.dotfiles.shell.zsh.enable {
     # ksync calls its packaged helper directly; no vendor bin directory in PATH.
     home.packages = with pkgs; [
@@ -25,6 +27,7 @@
 
     programs.zsh = {
       enable = true;
+      enableCompletion = true;
       dotDir = "${config.home.homeDirectory}/.config/zsh";
       shellAliases = {
         cat = "bat";

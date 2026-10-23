@@ -68,6 +68,12 @@
           inherit pkgs home-manager;
           bootstrapModule = self.homeManagerModules.bootstrap;
         };
+      shellCompletions =
+        pkgs:
+        import ./tests/shell-completions.nix {
+          inherit pkgs home-manager;
+          bootstrapModule = self.homeManagerModules.bootstrap;
+        };
     in
     {
       lib = bootstrapLib;
@@ -145,6 +151,7 @@
         script-tests = scriptTests (mkPkgs linuxSystem);
         nord-profile = nordProfile (mkPkgs linuxSystem);
         mise-integration = miseIntegration (mkPkgs linuxSystem);
+        shell-completions = shellCompletions (mkPkgs linuxSystem);
         zsh-kubecolor = self.packages.${linuxSystem}.zsh-kubecolor;
       };
       checks.${darwinSystem} = {
@@ -152,6 +159,7 @@
         script-tests = scriptTests (mkPkgs darwinSystem);
         nord-profile = nordProfile (mkPkgs darwinSystem);
         mise-integration = miseIntegration (mkPkgs darwinSystem);
+        shell-completions = shellCompletions (mkPkgs darwinSystem);
         zsh-kubecolor = self.packages.${darwinSystem}.zsh-kubecolor;
       };
     };

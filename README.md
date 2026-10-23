@@ -47,6 +47,37 @@ Portable DMS and kubecolor palettes are available under `themes/nord/`; the base
 
 Remove any old `dotfiles.desktop.hyprland.enable` assignment: the unused option has been removed. The base has no Hyprland module.
 
+## Zsh completion
+
+`dotfiles.shell.zsh.enable` enables completion discovery before Oh My Zsh's
+single `compinit`. Package-provided definitions take precedence over generated
+fallbacks, which take precedence over the supplemental `zsh-completions`
+collection. Disabling a software group removes its generated definitions.
+
+Build-time native generators cover act, golazo, UpCloud `upctl`, Sonobuoy,
+`kubectl-oidc_login`, Helmfile and lazygit. The OIDC provider uses its renamed
+binary, not Azure's unrelated `kubelogin`. Helmfile's build-only generator comes
+from the exact version, backend and artifact checksum in the committed mise
+lock; only its completion file enters the home profile. Lazygit's sourceable
+output is adapted for first-call Zsh autoload.
+
+Crossplane uses its upstream `complete -C` protocol through `bashcompinit`,
+registered after completion initialization without invoking the CLI at startup.
+This avoids its installer fragment's macOS login-shell lookup. Yazi and
+Home Manager lazygit shell wrappers inherit their target's provider, including
+consumer-renamed wrapper commands.
+
+Existing package/Oh My Zsh providers, including Terraform, kubectl, OpenStack,
+Ansible and mise task names, remain in place. Mise activation and automatic
+installation stay disabled. Tools without an upstream provider retain ordinary
+filename completion; CIDR's pinned release explicitly disables its native
+completion command, so no invented argument grammar is installed.
+
+These additions generate assets during a Nix build, not by installing tools
+or querying providers at startup. Dynamic upstream completers can query their
+services when completing resource names; this is not a network sandbox.
+After separately authorized activation, open a new Zsh session.
+
 ## Explicit mise tool installation
 
 `dotfiles.dev.mise.enable` defaults to true, independently of the general
@@ -155,7 +186,7 @@ On Linux, `nix flake check` will only execute checks for compatible systems unle
 
 The example configurations intentionally disable the modules that usually need extra host setup, such as desktop GUI, cloud, and Kubernetes tooling.
 
-Native checks include the example build, offline updater/plugin suites, optional Nord enable/disable/override boundaries, compiled kubecolor, and `mise-integration` (evaluated profile selections, immutable config/lock collisions, isolated installer, local-tool shim resolution, explicit project environments, and missing-version failures). Local immutable fixture tools do not attest downloaded release bytes; real artifact installation is a separate disposable smoke. The script check uses a writable disposable source tree and patched shebangs inside the Nix sandbox.
+Native checks include the example build, offline updater/plugin suites, optional Nord enable/disable/override boundaries, compiled kubecolor, `mise-integration`, and `shell-completions`. The latter exercises real upstream candidates in isolated interactive ZLE/PTY sessions, wrapper names, feature-disable transitions and completion-only ownership; it does not complete live provider resources. Local immutable mise fixture tools do not attest downloaded release bytes; real artifact installation is a separate disposable smoke. The script check uses a writable disposable source tree and patched shebangs inside the Nix sandbox.
 
 ## CI
 
