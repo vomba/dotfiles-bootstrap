@@ -95,6 +95,13 @@ Consumer-owned source workflow:
 
 Update versions, hashes, platform variants, runtime dependencies and lock graphs together. Keep known-good artifacts until a qualified candidate succeeds. Report upstream compatibility gaps rather than silently downgrading or claiming latest. Review licenses/notices before any separately authorized custom binary distribution.
 
+Crossplane follows the independently released `crossplane/cli`, not the server
+release version. Supported-platform downloads must have committed SHA-256 pins.
+For older releases without publisher checksums, reviewed hashes of the actual
+HTTPS artifacts are trust-on-first-use pins, not publisher attestations. Native
+mise refresh retains matching pins; missing integrity on a new selection blocks
+source checking rather than silently accepting an unverified download.
+
 ## Verification
 
 Native check dependencies are pinned internal tools, not runtime downloads from caller project configuration:
@@ -105,6 +112,12 @@ Native check dependencies are pinned internal tools, not runtime downloads from 
 ```
 
 `verify --checks --files-from JSON` selects explicit paths; `--no-tests` excludes behavior tests and is reduced scope. The public CI workflow exercises native Linux/macOS public-only render/behavior/security/style checks, not private inputs. Consumer private suites remain local. Follow actual verifier help and report optional native-tool skips honestly; no Nix devshell/flake checks remain.
+
+The static `provider-locks` gate reuses source-publication validation across both
+supported targets and public/private compositions. It remains mandatory with
+`--no-tests` or a selected-file list; an uninstalled tool is not an excuse to omit
+its lock integrity. Rendered shell validation also remains active without behavior
+tests.
 
 Behavior tests use disposable HOME/synthetic credentials, actual rendered outputs, ownership/feature/security contracts and real supported native tools where available. GUI/login/provider authentication and another platform are not proven by a source render or unit suite. Workers do not run integration gates mid-flight; the integration owner verifies the complete union and applies code/security review after implementation.
 

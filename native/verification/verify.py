@@ -600,6 +600,12 @@ def check(context, files=None, run_tests=True):
             lambda name=name, spec=spec: tools.update({name: readback(context, name, spec)}),
         )
 
+    # Reuse source-publication validation: an installable lock is a static
+    # prerequisite on both targets, not an optional installed-runtime test.
+    from source_workflow import _validate_graphs
+
+    stage("provider-locks", lambda: _validate_graphs(context, Path(context["base"])))
+
     def python_style():
         python = [p for p in formatted if p.suffix == ".py"]
         if python:

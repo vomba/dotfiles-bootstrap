@@ -105,21 +105,23 @@ url = "https://github.com/bschaatsbergen/cidr/releases/download/v2.3.0/cidr_2.3.
 url_api = "https://api.github.com/repos/bschaatsbergen/cidr/releases/assets/292888978"
 
 [[tools.crossplane]]
-version = "2.4.3"
+version = "2.5.0"
 backend = "aqua:crossplane/cli"
-specifiers = ["2.4.3"]
+specifiers = ["2.5.0"]
 
 [tools.crossplane."platforms.linux-arm64"]
-url = "https://cli.crossplane.io/stable/2.4.3/bin/linux_arm64/crossplane"
+url = "https://cli.crossplane.io/stable/v2.5.0/bin/linux_arm64/crossplane"
 
 [tools.crossplane."platforms.linux-x64"]
-url = "https://cli.crossplane.io/stable/2.4.3/bin/linux_amd64/crossplane"
+checksum = "sha256:065dd6b40c9ea5fc71e49900d5c924cc0bec7f58375922ddbde6b402f292347e"
+url = "https://cli.crossplane.io/stable/v2.5.0/bin/linux_amd64/crossplane"
 
 [tools.crossplane."platforms.macos-arm64"]
-url = "https://cli.crossplane.io/stable/2.4.3/bin/darwin_arm64/crossplane"
+checksum = "sha256:6e0e00370fce82299b931fabee8559eed8a79446172ceb2c24c6d1d76f76fb8c"
+url = "https://cli.crossplane.io/stable/v2.5.0/bin/darwin_arm64/crossplane"
 
 [tools.crossplane."platforms.macos-x64"]
-url = "https://cli.crossplane.io/stable/2.4.3/bin/darwin_amd64/crossplane"
+url = "https://cli.crossplane.io/stable/v2.5.0/bin/darwin_amd64/crossplane"
 
 [[tools.delta]]
 version = "0.20.1"
@@ -551,10 +553,12 @@ backend = "aqua:PaulJuliusMartinez/jless"
 specifiers = ["0.9.0"]
 
 [tools.jless."platforms.linux-x64"]
+checksum = "sha256:a1e0eb63ef347adc649989ac5c7d2dc896df6d494622b953c86e3a248e733a93"
 url = "https://github.com/PaulJuliusMartinez/jless/releases/download/v0.9.0/jless-v0.9.0-x86_64-unknown-linux-gnu.zip"
 url_api = "https://api.github.com/repos/PaulJuliusMartinez/jless/releases/assets/117306822"
 
 [tools.jless."platforms.macos-arm64"]
+checksum = "sha256:1967568762e44d3a5a7b09211c55ff9680419878a5a7045876d2cc6870e40390"
 url = "https://github.com/PaulJuliusMartinez/jless/releases/download/v0.9.0/jless-v0.9.0-aarch64-apple-darwin.zip"
 url_api = "https://api.github.com/repos/PaulJuliusMartinez/jless/releases/assets/117306820"
 
@@ -1344,6 +1348,7 @@ url = "https://github.com/andreazorzetto/yh/releases/download/v0.4.0/yh-linux-38
 url_api = "https://api.github.com/repos/andreazorzetto/yh/releases/assets/27230421"
 
 [tools.yh."platforms.linux-x64"]
+checksum = "sha256:ec5df94b2b681da8a89b3039f8ca2814da1420e3e6750040634ba0c109e15ce9"
 url = "https://github.com/andreazorzetto/yh/releases/download/v0.4.0/yh-linux-amd64.zip"
 url_api = "https://api.github.com/repos/andreazorzetto/yh/releases/assets/27230425"
 

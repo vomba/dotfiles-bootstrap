@@ -347,6 +347,60 @@ class Fixture(unittest.TestCase):
         self.assertEqual(set(self.calls()[0]["seen"]), set(inputs))
         self.assertEqual({name: (self.repo / name).read_bytes() for name in inputs}, inputs)
 
+    def test_static_checks_reject_missing_foreign_platform_download_integrity(self):
+        self.context["base"] = str(self.repo)
+        pins = self.repo / "native/engine/pins.json"
+        pins.parent.mkdir(parents=True)
+        shutil.copyfile(PUBLIC / "native/engine/pins.json", pins)
+        save(
+            self.repo / "native/manifests/base.json",
+            {
+                "schema_version": 1,
+                "packages": [
+                    {
+                        "id": "sample",
+                        "provider": "mise",
+                        "tool": "sample",
+                        "version": "1.0.0",
+                        "platforms": ["linux-x64", "macos-arm64"],
+                    }
+                ],
+            },
+        )
+        directory = self.repo / "apps/mise"
+        directory.mkdir(parents=True)
+        (directory / "mise.toml").write_text(
+            '[tool_alias]\nsample = "github:fixture/sample"\n[tools]\nsample = "1.0.0"\n'
+        )
+        header = (
+            'lockfile_version = 1\n[[tools.sample]]\nversion = "1.0.0"\n'
+            'backend = "github:fixture/sample"\nspecifiers = ["1.0.0"]\n'
+        )
+        digest = 'checksum = "sha256:' + "a" * 64 + '"\n'
+        linux = (
+            '[tools.sample."platforms.linux-x64"]\n'
+            'url = "https://publisher.example.invalid/linux"\n' + digest
+        )
+        mac = (
+            '[tools.sample."platforms.macos-arm64"]\n'
+            'url = "https://publisher.example.invalid/macos"\n'
+        )
+        lock = directory / "mise.lock"
+        lock.write_text(header + linux + mac + digest)
+        with patch.object(
+            verify, "download", side_effect=AssertionError("static check downloaded")
+        ):
+            results = verify.check(self.context, [], run_tests=False)
+            integrity = next(result for result in results if result["name"] == "provider-locks")
+            self.assertEqual(integrity["status"], "passed", integrity["detail"])
+            lock.write_text(header + linux + mac)
+            before = lock.read_bytes()
+            results = verify.check(self.context, [], run_tests=False)
+        integrity = next(result for result in results if result["name"] == "provider-locks")
+        self.assertEqual(integrity["status"], "failed")
+        self.assertIn("sample", integrity["detail"])
+        self.assertEqual(lock.read_bytes(), before)
+
     @unittest.skipUnless(os.environ.get("DOTFILES_TEST_CHEZMOI"), "native chezmoi required")
     def test_static_only_checks_reject_invalid_rendered_shell(self):
         source = self.repo / "native/chezmoi/dot_local/bin/executable_sample.tmpl"

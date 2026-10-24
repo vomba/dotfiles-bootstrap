@@ -69,7 +69,7 @@ helmfile = "1.8.2"
 terraform = "1.5.7"
 
 # Exact reviewed global selections; projects may explicitly select their own
-# installed versions. Node 24 is the qualified AI/MCP runtime, not Node latest.
+# installed versions. Node 24 is the qualified shared tooling runtime, not Node latest.
 go = "1.27.3"
 node = "24.22.1"
 python = "3.14.9"
@@ -124,7 +124,7 @@ kubelogin-oidc = "1.36.4"
 kubectl-view-secret = "0.16.0"
 sonobuoy = "0.57.5"
 velero = "1.18.4"
-crossplane = "2.4.3"
+crossplane = "2.5.0"
 viddy = "1.3.1"
 upctl = "3.37.0"
 fx = "40.0.1"

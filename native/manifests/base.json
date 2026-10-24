@@ -2379,7 +2379,7 @@
       "id": "crossplane",
       "provider": "mise",
       "tool": "crossplane",
-      "version": "2.4.3",
+      "version": "2.5.0",
       "platforms": [
         "linux-x64",
         "macos-arm64"
@@ -2389,7 +2389,7 @@
       "executables": {
         "crossplane": "bin/crossplane"
       },
-      "upstream": "https://github.com/crossplane/crossplane/releases/tag/v2.4.3"
+      "upstream": "https://github.com/crossplane/cli/releases/tag/v2.5.0"
     },
     {
       "id": "viddy",
