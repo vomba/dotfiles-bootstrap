@@ -306,10 +306,13 @@ def _acquire_mise(context, tree):
             shutil.copytree(sidecars, scratch / ".mise/locks", symlinks=False)
         for name, selection in config["tools"].items():
             package = by_tool[name]
+            variants = [item for item in packages if item["tool"] == name]
             old = selection["version"] if isinstance(selection, dict) else selection
-            if old != package["version"]:
-                raise Error("canonical mise policy/version mismatch: " + name)
             policy = package.get("policy")
+            if any(item["version"] != old or item.get("policy") != policy for item in variants):
+                raise Error(
+                    "canonical mise policy/version mismatch across platform variants: " + name
+                )
             if policy != "latest-stable":
                 if not package.get("reason"):
                     raise Error("mise policy exception requires an explicit reason: " + name)
@@ -346,7 +349,8 @@ def _acquire_mise(context, tree):
             text, count = pattern.subn(lambda m: m[1] + latest + m[2], text)
             if count != 1:
                 raise Error("canonical mise request cannot be narrowly rewritten: " + name)
-            package["version"] = latest
+            for variant in variants:
+                variant["version"] = latest
             details.append(
                 {
                     "tool": name,
@@ -830,9 +834,13 @@ def run(context, operation, options=None):
         raise Error("desktop version options cannot accompany mise-only preparation")
     if "branch" in options and (
         not isinstance(options["branch"], str)
-        or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", options["branch"])
+        or len(options["branch"]) > 255
+        or not re.fullmatch(
+            r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}(?:/[A-Za-z0-9][A-Za-z0-9_-]{0,63})*",
+            options["branch"],
+        )
     ):
-        raise Error("publication branch must be a simple explicit branch name")
+        raise Error("publication branch requires safe nonempty ref components")
     if "message" in options and (
         not isinstance(options["message"], str)
         or not options["message"].strip()

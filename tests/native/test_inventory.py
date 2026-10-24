@@ -79,6 +79,21 @@ class NativeInventory(unittest.TestCase):
             with self.subTest(flag=flag):
                 self.assertIn(package, self.selected(flags=[flag + "=true"], disabled=True))
 
+    def test_jless_native_abi_dependency_closure_does_not_require_a_desktop(self):
+        linux = self.selected(disabled=True, flags=["apps.enable=true"])
+        dependencies = [linux[name] for name in linux["jless"]["requires"]]
+        self.assertEqual(
+            {package["name"] for package in dependencies},
+            {"libxcb1", "libxcb-render0", "libxcb-shape0", "libxcb-xfixes0"},
+        )
+        self.assertTrue(all(package["provider"] == "apt" for package in dependencies))
+        self.assertTrue(all(package["retain_shared_runtime"] for package in dependencies))
+        mac = self.selected(platform="macos-arm64", disabled=True, flags=["apps.enable=true"])
+        self.assertEqual(mac["jless"].get("requires", []), [])
+        self.assertFalse(
+            any(package.get("name", "").startswith("libxcb") for package in mac.values())
+        )
+
     def test_disabling_one_group_does_not_disable_independent_modules(self):
         context = self.selected(
             flags=["apps.enable=false", "dev.enable=false", "shell.enable=false"]

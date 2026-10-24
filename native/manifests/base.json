@@ -1835,7 +1835,27 @@
       "tool": "jless",
       "version": "0.9.0",
       "platforms": [
-        "linux-x64",
+        "linux-x64"
+      ],
+      "requires": [
+        "jless-xcb",
+        "jless-xcb-render",
+        "jless-xcb-shape",
+        "gui-xcb-xfixes"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "jless": "bin/jless"
+      },
+      "upstream": "https://github.com/PaulJuliusMartinez/jless/releases/tag/v0.9.0"
+    },
+    {
+      "id": "jless",
+      "provider": "mise",
+      "tool": "jless",
+      "version": "0.9.0",
+      "platforms": [
         "macos-arm64"
       ],
       "when": "apps.enable",
@@ -1844,6 +1864,42 @@
         "jless": "bin/jless"
       },
       "upstream": "https://github.com/PaulJuliusMartinez/jless/releases/tag/v0.9.0"
+    },
+    {
+      "id": "jless-xcb",
+      "provider": "apt",
+      "name": "libxcb1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.enable",
+      "retain_shared_runtime": true,
+      "policy": "distro-security",
+      "reason": "The official Jless Linux binary links the native XCB ABI; retain the signed Noble shared runtime independently of desktop build dependencies."
+    },
+    {
+      "id": "jless-xcb-render",
+      "provider": "apt",
+      "name": "libxcb-render0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.enable",
+      "retain_shared_runtime": true,
+      "policy": "distro-security",
+      "reason": "The official Jless Linux binary links the native XCB Render ABI even without a desktop session."
+    },
+    {
+      "id": "jless-xcb-shape",
+      "provider": "apt",
+      "name": "libxcb-shape0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.enable",
+      "retain_shared_runtime": true,
+      "policy": "distro-security",
+      "reason": "The official Jless Linux binary links the native XCB Shape ABI even without a desktop session."
     },
     {
       "id": "glow",

@@ -95,12 +95,23 @@ Consumer-owned source workflow:
 
 Update versions, hashes, platform variants, runtime dependencies and lock graphs together. Keep known-good artifacts until a qualified candidate succeeds. Report upstream compatibility gaps rather than silently downgrading or claiming latest. Review licenses/notices before any separately authorized custom binary distribution.
 
+Publication defaults to `main`; select another destination with
+`--branch feature/update`. Safe slash-separated branch components are accepted,
+but the remote branch tip must still equal the reviewed source pin. Publication
+never redirects or force-updates a different branch.
+
 Crossplane follows the independently released `crossplane/cli`, not the server
 release version. Supported-platform downloads must have committed SHA-256 pins.
 For older releases without publisher checksums, reviewed hashes of the actual
 HTTPS artifacts are trust-on-first-use pins, not publisher attestations. Native
 mise refresh retains matching pins; missing integrity on a new selection blocks
 source checking rather than silently accepting an unverified download.
+
+Platform-specific native library requirements belong to the consuming package.
+Jless's Linux variant includes its four signed-distro XCB runtime dependencies
+even when desktop support is disabled or only `--id jless` is provisioned; its
+macOS variant does not acquire Linux libraries. Source updates advance every
+disjoint platform variant of one canonical mise tool together.
 
 ## Verification
 

@@ -345,6 +345,42 @@ else:
         )
         self.assertIn("/metadata", self.requests)
 
+    def test_source_refresh_updates_all_disjoint_platform_variants(self):
+        path = self.base / "native/manifests/base.json"
+        declared = safety.load(path)
+        linux = next(package for package in declared["packages"] if package.get("tool") == "tool")
+        linux["platforms"] = ["linux-x64"]
+        mac = copy.deepcopy(linux)
+        mac["platforms"] = ["macos-arm64"]
+        linux["requires"] = ["sample-native-runtime"]
+        declared["packages"].extend(
+            [
+                mac,
+                {
+                    "id": "sample-native-runtime",
+                    "provider": "apt",
+                    "name": "libsample-runtime",
+                    "platforms": ["linux-x64"],
+                    "policy": "distro-security",
+                    "reason": "Synthetic native ABI dependency",
+                },
+            ]
+        )
+        save(path, declared)
+        pin_before = (self.private / "bootstrap.lock.json").read_bytes()
+        workflow._acquire_mise(self.context, self.base)
+        for platform in ("linux-x64", "macos-arm64"):
+            context = manifest.compose(self.base, self.private, self.home, platform)
+            selected = next(
+                package for package in context["packages"] if package.get("tool") == "tool"
+            )
+            self.assertEqual(selected["version"], self.latest["github:fixture/tool"])
+            self.assertEqual(
+                selected.get("requires", []),
+                ["sample-native-runtime"] if platform == "linux-x64" else [],
+            )
+        self.assertEqual((self.private / "bootstrap.lock.json").read_bytes(), pin_before)
+
     def test_check_creates_candidate_but_does_not_promote_or_publish(self):
         before = (self.private / "bootstrap.lock.json").read_bytes()
         result = self.checked()
@@ -391,6 +427,37 @@ else:
         ):
             with self.assertRaises(safety.Error):
                 workflow.run(self.context, operation, options)
+
+    def test_invalid_publication_refs_fail_before_state_or_remote_mutation(self):
+        for branch in (
+            "/main",
+            "feat//update",
+            "feat/../main",
+            "feat/update/",
+            "-main",
+            "main:other",
+            "a" * 256,
+        ):
+            with self.subTest(branch=branch):
+                with self.assertRaisesRegex(safety.Error, "publication branch"):
+                    workflow.run(self.context, "publish", {"yes": True, "branch": branch})
+                self.assertEqual(
+                    self.git(self.remote, "rev-parse", "main").strip(), self.pin["revision"]
+                )
+        self.assertEqual(safety.load(self.private / "bootstrap.lock.json"), self.pin)
+
+    def test_signed_publication_targets_explicit_namespaced_branch_only(self):
+        branch = "feat/mise-adoption"
+        self.git(self.remote, "update-ref", "refs/heads/" + branch, self.pin["revision"])
+        self.checked()
+        self.signing()
+        result = workflow.run(self.context, "publish", {"yes": True, "branch": branch})
+        self.assertEqual(result["status"], "complete")
+        selected = safety.load(self.private / "bootstrap.lock.json")
+        self.assertEqual(selected["revision"], self.git(self.remote, "rev-parse", branch).strip())
+        self.assertNotEqual(selected["revision"], self.pin["revision"])
+        self.assertEqual(self.git(self.remote, "rev-parse", "main").strip(), self.pin["revision"])
+        self.assertEqual(self.git(self.private, "rev-list", "--all"), "")
 
     def test_publication_requires_check_confirmation_and_operator_signing(self):
         self.prepare()
