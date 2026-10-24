@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "dotfiles": {
+      "theme": {
+        "nord": {
+          "enable": true
+        }
+      }
+    }
+  },
+  "profiles": {
+    "macos-arm64": {
+      "dotfiles": {
+        "desktop": {
+          "enable": true
+        }
+      }
+    }
+  },
+  "packages": [],
+  "services": []
+}

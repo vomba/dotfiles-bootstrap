@@ -1,0 +1,547 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vomba/dotfiles-bootstrap/native/engine/schema.json",
+  "title": "Native dotfiles manifest fragment v1",
+  "type": "object",
+  "required": [
+    "schema_version"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "defaults": {
+      "type": "object"
+    },
+    "profiles": {
+      "type": "object",
+      "properties": {
+        "linux-x64": {
+          "type": "object"
+        },
+        "macos-arm64": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "overrides": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/package"
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/service"
+      }
+    },
+    "tasks": {
+      "type": "object"
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:+@-]*$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*\\\\)[^\\u0000]+$"
+    },
+    "feature": {
+      "type": "string",
+      "pattern": "^(?!dotfiles\\.)[A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+)+$"
+    },
+    "when": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/feature"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/feature"
+          },
+          "description": "All predicates (AND)"
+        },
+        {
+          "type": "object",
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/feature"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "platforms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "linux-x64",
+          "macos-arm64"
+        ]
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "url",
+        "sha256"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "archive": {
+          "enum": [
+            "tar",
+            "tar.gz",
+            "tar.xz",
+            "tar.bz2",
+            "tgz",
+            "txz",
+            "zip",
+            "raw",
+            "binary",
+            "file",
+            "appimage",
+            "dmg"
+          ]
+        },
+        "strip_components": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bin": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/path"
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/path"
+              }
+            }
+          ]
+        },
+        "app": {
+          "$ref": "#/$defs/path"
+        }
+      }
+    },
+    "package": {
+      "type": "object",
+      "required": [
+        "id",
+        "provider"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "provider": {
+          "enum": [
+            "apt",
+            "brew",
+            "cask",
+            "artifact",
+            "mise",
+            "recipe"
+          ]
+        },
+        "platforms": {
+          "$ref": "#/$defs/platforms"
+        },
+        "when": {
+          "$ref": "#/$defs/when"
+        },
+        "requires": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "requires_services": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "mutation_requires_inactive_services": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "retain_shared_runtime": {
+          "type": "boolean"
+        },
+        "safety_check": {
+          "type": "object",
+          "required": [
+            "path",
+            "action"
+          ],
+          "properties": {
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "action": {
+              "const": "update-check"
+            }
+          },
+          "additionalProperties": false
+        },
+        "policy": {
+          "enum": [
+            "latest-stable",
+            "distro-security",
+            "project",
+            "license-pinned"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "recipe": {
+          "$ref": "#/$defs/path"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "executables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sources": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/id"
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/source"
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "enum": [
+                  "apt",
+                  "brew",
+                  "cask"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "name"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mutation_requires_inactive_services": {
+                "minItems": 1
+              }
+            },
+            "required": [
+              "mutation_requires_inactive_services"
+            ]
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "const": "apt"
+              },
+              "platforms": {
+                "const": [
+                  "linux-x64"
+                ]
+              }
+            },
+            "required": [
+              "platforms"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "retain_shared_runtime": {
+                "const": true
+              }
+            },
+            "required": [
+              "retain_shared_runtime"
+            ]
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "enum": [
+                  "apt",
+                  "brew",
+                  "cask"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "safety_check"
+            ]
+          },
+          "then": {
+            "required": [
+              "retain_shared_runtime"
+            ],
+            "properties": {
+              "provider": {
+                "const": "cask"
+              },
+              "retain_shared_runtime": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "const": "mise"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "tool",
+              "version"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "const": "artifact"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "version"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "policy": {
+                "enum": [
+                  "distro-security",
+                  "project",
+                  "license-pinned"
+                ]
+              }
+            },
+            "required": [
+              "policy"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    },
+    "service": {
+      "type": "object",
+      "required": [
+        "id",
+        "manager",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "platforms": {
+          "$ref": "#/$defs/platforms"
+        },
+        "when": {
+          "$ref": "#/$defs/when"
+        },
+        "manager": {
+          "enum": [
+            "systemd-user",
+            "systemd-system",
+            "launchd"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/path"
+        },
+        "target": {
+          "$ref": "#/$defs/path"
+        },
+        "name": {
+          "$ref": "#/$defs/id"
+        },
+        "existing_unit": {
+          "type": "boolean"
+        },
+        "unit_package": {
+          "$ref": "#/$defs/id"
+        },
+        "package_id": {
+          "$ref": "#/$defs/id"
+        },
+        "conflicts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "manager": {
+                "const": "systemd-system"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "existing_unit",
+              "unit_package",
+              "package_id",
+              "platforms"
+            ],
+            "properties": {
+              "existing_unit": {
+                "const": true
+              },
+              "platforms": {
+                "const": [
+                  "linux-x64"
+                ]
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "source"
+                  ]
+                },
+                {
+                  "required": [
+                    "target"
+                  ]
+                }
+              ]
+            }
+          },
+          "else": {
+            "anyOf": [
+              {
+                "required": [
+                  "target"
+                ]
+              },
+              {
+                "required": [
+                  "source"
+                ]
+              }
+            ],
+            "properties": {
+              "existing_unit": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

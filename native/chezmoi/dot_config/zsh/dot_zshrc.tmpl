@@ -1,0 +1,63 @@
+# Authored interactive shell; Oh My Zsh alone initializes completion.
+HISTFILE="$ZDOTDIR/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_DUPS SHARE_HISTORY EXTENDED_HISTORY
+bindkey -e
+typeset -U fpath
+fpath=("{{ .paths.completions }}/package-native" "{{ .paths.completions }}/generated" "{{ .paths.completions }}/private" "{{ .paths.completions }}/supplemental" $fpath)
+export ZSH={{ .paths.omz | quote }}
+export ZSH_CUSTOM={{ printf "%s/native/assets/oh-my-zsh" .base | quote }}
+ZSH_THEME=robbyrussell
+ZSH_CACHE_DIR="$XDG_CACHE_HOME/oh-my-zsh"
+ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
+# Provisioning creates these caches; mkdir never downloads or installs anything.
+mkdir -p "$ZSH_CACHE_DIR" "${ZSH_COMPDUMP:h}"
+zstyle ':omz:update' mode disabled
+plugins=(git gh helm golang terraform aws pip python docker azure)
+{{ if .dotfiles.shell.enable -}}
+# These integrations have exactly one owner. Zoxide uses --cmd cd below.
+plugins+=(fzf eza)
+{{ end -}}
+plugins+=(zsh-kubecolor)
+if [[ ! -r "$ZSH/oh-my-zsh.sh" ]]; then
+  print -u2 -- 'dotfiles: Oh My Zsh is not provisioned; run the explicit provision operation'
+  return 1
+fi
+source "$ZSH/oh-my-zsh.sh"
+compdef kubecolor=kubectl
+[[ ! -r "{{ .paths.completions }}/init.zsh" ]] || source "{{ .paths.completions }}/init.zsh"
+alias cat=bat yq4=yq tree='eza --tree' watch=viddy top=btop du=dust df=duf
+{{ if .dotfiles.shell.enable -}}
+alias ls='eza --git --icons=auto'
+alias ll='eza --long --git --icons=auto'
+alias la='eza --all --git --icons=auto'
+alias l='eza --long --all --git --icons=auto'
+eval "$(zoxide init zsh --cmd cd)"
+{{ if .dotfiles.theme.nord.enable -}}
+export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:+$FZF_DEFAULT_OPTS }--color=fg:#ECEFF4,bg:#000000,hl:#81A1C1,fg+:#ECEFF4,bg+:#3B4252,hl+:#81A1C1,info:#A3BE8C,prompt:#5E81AC,pointer:#B48EAD,marker:#EBCB8B,spinner:#81A1C1,header:#5E81AC"
+{{ end -}}
+eval "$(starship init zsh)"
+{{ end -}}
+{{ if and .dotfiles.apps.yazi.enable .dotfiles.apps.yazi.enableZshIntegration -}}
+# The cwd file is invocation-owned, including on failure; never shared globally.
+function {{ .dotfiles.apps.yazi.shellWrapperName }}() {
+  local tmp cwd result
+  tmp=$(mktemp "${TMPDIR:-/tmp}/yazi-cwd.XXXXXX") || return
+  yazi "$@" --cwd-file="$tmp"
+  result=$?
+  if [[ -f "$tmp" ]]; then
+    cwd=$(<"$tmp")
+    [[ -z "$cwd" || "$cwd" == "$PWD" ]] || builtin cd -- "$cwd"
+  fi
+  command rm -f -- "$tmp"
+  return $result
+}
+{{ end -}}
+{{ if .dotfiles.shell.gpg.enable -}}
+[[ ! -t 0 ]] || export GPG_TTY=$(tty)
+# GnuPG's standard socket is discovered without killing or starting an agent.
+export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+{{ end -}}
+# Private sources can register compdefs only AFTER the sole OMZ compinit.
+[[ ! -r "$XDG_CONFIG_HOME/dotfiles/private.zsh" ]] || source "$XDG_CONFIG_HOME/dotfiles/private.zsh"

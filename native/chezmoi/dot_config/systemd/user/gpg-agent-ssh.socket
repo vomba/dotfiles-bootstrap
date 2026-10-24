@@ -1,0 +1,10 @@
+[Unit]
+Description=GnuPG SSH agent socket
+[Socket]
+ListenStream=%t/gnupg/S.gpg-agent.ssh
+FileDescriptorName=ssh
+SocketMode=0600
+DirectoryMode=0700
+Service=gpg-agent.service
+[Install]
+WantedBy=sockets.target

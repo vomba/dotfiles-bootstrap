@@ -10,7 +10,7 @@ https://github.com/sharkdp/vivid/blob/master/themes/nord.yml
 The original attribution and documented variations are retained in the file.
 Vivid is available under MIT or Apache-2.0; this copy uses its MIT license.
 See LICENSE-vivid. ls-colors-nord is the pregenerated output of this local
-vivid-nord.yml; no Vivid execution is required during Nix evaluation.
+vivid-nord.yml; no Vivid execution is required during configuration rendering.
 
 The Bat, Btop, Glamour, DMS, Kubecolor and Starship profiles use the Nord
 palette with local contrast adjustments. The Helix profile inherits Helix's

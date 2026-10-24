@@ -1,0 +1,30 @@
+{{- $canonical := include (joinPath .base "apps/mise/mise.toml") | fromToml -}}
+{{- $selected := dict -}}
+{{- range .packages -}}
+{{- if eq .provider "mise" -}}
+{{- $_ := set $selected .tool .version -}}
+{{- end -}}
+{{- end -}}
+# Selected installed native versions, never an auto-installer or shell hook.
+[tool_alias]
+{{ range $name, $version := $selected -}}
+{{ if hasKey $canonical.tool_alias $name -}}
+{{ $name | quote }} = {{ index $canonical.tool_alias $name | quote }}
+{{ end -}}
+{{ end }}
+[tools]
+{{ range $name, $version := $selected -}}
+{{ $name | quote }} = {{ $version | quote }}
+{{ end }}
+[settings]
+auto_install = false
+not_found_auto_install = false
+not_found_system_fallback = false
+registry_floating = false
+locked = true
+locked_scopes = ["global"]
+idiomatic_version_file_enable_tools = [{{ if .dotfiles.dev.cloud.enable }}"terraform"{{ end }}]
+task.run_auto_install = false
+
+# Engine/site merges public operation tasks and private task definitions.
+{{ dict "tasks" .tasks | toToml }}

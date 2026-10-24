@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "platform": "linux-x64",
+  "distribution": "ubuntu",
+  "release": "24.04",
+  "niri": {
+    "version": "26.04", "tag": "v26.04", "repository": "https://github.com/niri-wm/niri.git",
+    "commit": "8ed0da44d974c32c6877d2f4630c314da0717ecb",
+    "cargo_lock_sha256": "e71d9d5b104d297bc1185cebb4d7eb203f374c668c5739e41927e15a0b1e668c",
+    "features": ["dbus", "systemd", "xdp-gnome-screencast"]
+  },
+  "xwayland-satellite": {
+    "version": "0.8.3", "tag": "v0.8.3", "repository": "https://github.com/Supreeeme/xwayland-satellite.git",
+    "commit": "b83eab900644e4c7c77982ce3d44cb490f0c5e1d",
+    "cargo_lock_sha256": "9c36e02cb05a50ca6cf89c2bf8ca14a03dd8ec3627202f99b015bc296f764584",
+    "features": ["systemd"], "startup_owner": "niri-on-demand"
+  },
+  "rust": {
+    "version": "1.93.1",
+    "url": "https://static.rust-lang.org/dist/rust-1.93.1-x86_64-unknown-linux-gnu.tar.xz",
+    "sha256": "518872275a3648f735471d7add854d39171c5a6b17f423c4d7f931f52120c2af"
+  },
+  "runtime": {
+    "version": "2.0.0", "qt_version": "6.11.3", "wayland_version": "1.24.0", "protocols_version": "1.45", "quickshell_version": "0.3.2", "bzip2_version": "1.0.8",
+    "build_revision": 1,
+    "private_abi": true, "rebuild_quickshell_every_qt_release": true,
+    "bzip2_soname": "libbz2.so.1",
+    "bzip2_reason": "Official SDK FFmpeg requires the RHEL SONAME .so.1, not Noble's .so.1.0. Build the same public upstream ABI privately, never alias or replace the system library.",
+    "deployment_selection": "Dux/Quickshell application closure, not a general Qt SDK: omit unreferenced non-SQLite database connectors and the Quick3D-only spatial-audio adapter/tooling. All Quickshell production flags remain enabled. Preserve SQLite, QtMultimedia, FFmpeg and their QML plugins; capture actual SDK notices before selection. No proprietary client entitlement is assumed.",
+    "deployment_exclusions": [
+      "plugins/sqldrivers/libqsqlibase.so", "plugins/sqldrivers/libqsqlmimer.so",
+      "plugins/sqldrivers/libqsqlmysql.so", "plugins/sqldrivers/libqsqloci.so",
+      "plugins/sqldrivers/libqsqlodbc.so", "plugins/sqldrivers/libqsqlpsql.so",
+      "include/QtQuick3DSpatialAudio", "lib/libQt6Quick3DSpatialAudio.prl",
+      "lib/libQt6Quick3DSpatialAudio.so", "lib/libQt6Quick3DSpatialAudio.so.6",
+      "lib/libQt6Quick3DSpatialAudio.so.6.11.3",
+      "lib/cmake/Qt6Quick3DSpatialAudioPrivate",
+      "lib/cmake/Qt6Qml/QmlPlugins/Qt6quick3dspatialaudioAdditionalTargetInfo.cmake",
+      "lib/cmake/Qt6Qml/QmlPlugins/Qt6quick3dspatialaudioConfig.cmake",
+      "lib/cmake/Qt6Qml/QmlPlugins/Qt6quick3dspatialaudioConfigVersion.cmake",
+      "lib/cmake/Qt6Qml/QmlPlugins/Qt6quick3dspatialaudioConfigVersionImpl.cmake",
+      "lib/cmake/Qt6Qml/QmlPlugins/Qt6quick3dspatialaudioTargets-relwithdebinfo.cmake",
+      "lib/cmake/Qt6Qml/QmlPlugins/Qt6quick3dspatialaudioTargets.cmake",
+      "lib/cmake/Qt6Qml/QmlPlugins/Qt6quick3dspatialaudioTargetsPrecheck.cmake",
+      "metatypes/qt6quick3dspatialaudioprivate_metatypes.json",
+      "mkspecs/modules/qt_lib_quick3dspatialaudio_private.pri",
+      "modules/Quick3DSpatialAudioPrivate.json", "qml/QtQuick3D/SpatialAudio"
+    ],
+    "qt_standard_support_until": "2027-03-17", "commercial_entitlement_assumed": false,
+    "support_policy": "Self-maintained Noble SDK runtime; qualify a supported successor before the support horizon, not an assumed commercial LTS patch stream.",
+    "artifact_policy": "local-operator-use-only",
+    "qt_corresponding_source_verified": false,
+    "licenses": {
+      "ICU-73-license": {"url": "https://raw.githubusercontent.com/unicode-org/icu/release-73-2/icu4c/LICENSE", "sha256": "f3005e195ff74d8812cc1f182a1c446fab678d70a10e3dada497585befee5416"},
+      "LGPL-3.0": {"url": "https://raw.githubusercontent.com/gcc-mirror/gcc/cada5a5bcdc4ec5e1d8e56fed922330e8b95887c/COPYING3.LIB", "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c"},
+      "GPL-3.0": {"url": "https://raw.githubusercontent.com/gcc-mirror/gcc/cada5a5bcdc4ec5e1d8e56fed922330e8b95887c/COPYING3", "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"},
+      "Qt-GPL-exception-1.0": {"url": "https://raw.githubusercontent.com/qt/qtbase/dev/LICENSES/Qt-GPL-exception-1.0.txt", "sha256": "40678d338ce53cd93f8b22b281a2ecbcaa3ee65ce60b25ffb0c462b0530846b2"}
+    },
+    "features": ["USE_JEMALLOC", "CRASH_HANDLER", "SOCKETS", "WAYLAND", "WAYLAND_WLR_LAYERSHELL", "WAYLAND_SESSION_LOCK", "WAYLAND_TOPLEVEL_MANAGEMENT", "HYPRLAND", "HYPRLAND_IPC", "HYPRLAND_GLOBAL_SHORTCUTS", "HYPRLAND_FOCUS_GRAB", "HYPRLAND_SURFACE_EXTENSIONS", "SCREENCOPY", "SCREENCOPY_ICC", "SCREENCOPY_WLR", "SCREENCOPY_HYPRLAND_TOPLEVEL", "X11", "I3", "I3_IPC", "SERVICE_STATUS_NOTIFIER", "SERVICE_PIPEWIRE", "SERVICE_MPRIS", "SERVICE_PAM", "SERVICE_POLKIT", "SERVICE_GREETD", "SERVICE_UPOWER", "SERVICE_NOTIFICATIONS", "BLUETOOTH", "NETWORK"],
+    "sources": {
+      "quickshell": {"url": "https://codeload.github.com/quickshell-mirror/quickshell/tar.gz/4f508be500dea6e5732cc3d50382a0048b17e7b1", "sha256": "6806c64680b8058918f3c79d9af0603e99004601bc49bd1828029335673774c6", "commit": "4f508be500dea6e5732cc3d50382a0048b17e7b1"},
+      "wayland": {"url": "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.24.0/downloads/wayland-1.24.0.tar.xz", "sha256": "82892487a01ad67b334eca83b54317a7c86a03a89cfadacfef5211f11a5d0536"},
+      "protocols": {"url": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/1.45/downloads/wayland-protocols-1.45.tar.xz", "sha256": "4d2b2a9e3e099d017dc8107bf1c334d27bb87d9e4aff19a0c8d856d17cd41ef0"},
+      "bzip2": {"url": "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz", "sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"},
+      "cpptrace": {"url": "https://codeload.github.com/jeremy-rifkin/cpptrace/tar.gz/refs/tags/v1.0.4", "sha256": "5c9f5b301e903714a4d01f1057b9543fa540f7bfcc5e3f8bd1748e652e24f9ea"},
+      "libdwarf": {"url": "https://codeload.github.com/jeremy-rifkin/libdwarf-lite/tar.gz/5dfb2cd2aacf2bf473e5bfea79e41289f88b3a5f", "sha256": "ba0f0325e671e5010acbff4a897cedfe29c7f71202a905ca4b10085cbb839e51"},
+      "zstd": {"url": "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz", "sha256": "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"},
+      "dux-source": {"url": "https://codeload.github.com/duxlabs-dev/dux-shell/tar.gz/refs/tags/v2.0.0", "sha256": "e81b0b496b3a6a5a08a6b045ef04d79b3a36f9b07bbfdf475e7dceb80228aca4"},
+      "dms": {"url": "https://github.com/duxlabs-dev/dux-shell/releases/download/v2.0.0/dms-cli-amd64.gz", "sha256": "364292c726d3033081a8329bc2be1b2ac3f5ef9f906473aee53aa0361f764b81"}
+    },
+    "qt_archives": [
+      {"module": "qtbase", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.linux_gcc_64/6.11.3-0-202610220312qtbase-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "ce282da4d8a83dc216ed96b715202872d655177189c16205dc5fab09b41a9f09"},
+      {"module": "qtdeclarative", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.linux_gcc_64/6.11.3-0-202610220312qtdeclarative-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "424a4012edd475e21c108df6e297ab034cb786ec91f5fe451d20e3a5540e486d"},
+      {"module": "qtwayland", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.linux_gcc_64/6.11.3-0-202610220312qtwayland-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "510a61a415699e83a9d0431c7e3d4621e50776c7f57aefbe0f9a841132e2dd99"},
+      {"module": "qtsvg", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.linux_gcc_64/6.11.3-0-202610220312qtsvg-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "7b71eea32674d6ac8e9b5b1d3819f510c6081619ca440b6cac86fd970942cf7a"},
+      {"module": "qttranslations", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.linux_gcc_64/6.11.3-0-202610220312qttranslations-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "50991f143b82942001c73a263fe50e6fafa256d68c4da67ac8a7a9771dbfbdb9"},
+      {"module": "icu", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.linux_gcc_64/6.11.3-0-202610220312icu-linux-Rhel8.6-x86_64.7z", "sha256": "16f1e8f409bd9f0b248e36d10deab498d0c1b33d25e0a515a076b1f6b5a1ab28"},
+      {"module": "qtshadertools", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.addons.qtshadertools.linux_gcc_64/6.11.3-0-202610220312qtshadertools-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "66d6df772d7e4a65262a036b905761a11862b653a8a50794190d8eb2e8130042"},
+      {"module": "qtmultimedia", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.addons.qtmultimedia.linux_gcc_64/6.11.3-0-202610220312qtmultimedia-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "e2186e997704b4e5e6b7a8250818a198deb45c030a385a28fd64d43de682e5c4"},
+      {"module": "qtimageformats", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.addons.qtimageformats.linux_gcc_64/6.11.3-0-202610220312qtimageformats-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "05d9f331274a6b4247020f592306975b745a9ef2799b4a01dd7a4b881555d197"},
+      {"module": "qt5compat", "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6113/qt6_6113/qt.qt6.6113.addons.qt5compat.linux_gcc_64/6.11.3-0-202610220312qt5compat-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z", "sha256": "3acfe616b1db7a1486607ae4afdbcb1edba31c4f5a7c847090e50ab3774b22fb"}
+    ]
+  },
+  "ppa": {
+    "url": "https://ppa.launchpadcontent.net/cppiber/hyprland/ubuntu", "suite": "noble", "origin": "LP-PPA-cppiber-hyprland",
+    "fingerprint": "A54D23B62FF3FCC76EFF71E8FDBAAA1CF0CCF48E",
+    "key_url": "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xA54D23B62FF3FCC76EFF71E8FDBAAA1CF0CCF48E",
+    "scope": {"hyprlock": "0.9.6-1ppa1", "hypridle": "0.1.8-1ppa1", "libhyprgraphics4": "0.5.1-1ppa3", "libhyprlang2": "0.6.8-3ppa2", "libhyprutils13": "0.14.3-1ppa1", "libsdbus-c++2": "2.1.0-1ppa2", "libxkbcommon0": "1.12.3-1", "wayland-protocols": "1.49-1ppa2"},
+    "install": ["hyprlock", "hypridle", "libhyprgraphics4", "libhyprlang2", "libhyprutils13", "libsdbus-c++2"],
+    "policy": "Deny every PPA package except the exact install allowlist. Reviewed-but-unadopted xkbcommon/protocols versions remain inspection metadata only; current native app minima are satisfied by stock Noble and QS uses its own source XML prefix. Do not add another Ubuntu suite or replace system Qt/Wayland. Existing path/package ownership must be explicit before adoption."
+  }
+}

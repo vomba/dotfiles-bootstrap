@@ -1,0 +1,10 @@
+[Unit]
+Description=GnuPG browser agent socket
+[Socket]
+ListenStream=%t/gnupg/S.gpg-agent.browser
+FileDescriptorName=browser
+SocketMode=0600
+DirectoryMode=0700
+Service=gpg-agent.service
+[Install]
+WantedBy=sockets.target

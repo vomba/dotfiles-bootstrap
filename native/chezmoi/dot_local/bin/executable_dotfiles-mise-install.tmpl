@@ -1,0 +1,19 @@
+#!/bin/sh
+# Explicit private-entrypoint dispatch only; never run from shell startup.
+set -eu
+if [ "$#" -ne 0 ]; then
+    printf '%s\n' 'dotfiles-mise-install accepts no arguments; selected tools come from the manifest' >&2
+    exit 64
+fi
+{{- $selected := list -}}
+{{- range .packages -}}
+{{- if eq .provider "mise" -}}
+{{- $selected = append $selected .id -}}
+{{- end -}}
+{{- end }}
+{{ if not $selected -}}
+printf '%s\n' 'No mise tools are selected in this profile; use the explicit bootstrap interface' >&2
+exit 1
+{{ else -}}
+exec /bin/sh -p '{{ printf "%s/bootstrap" .root | replace "'" "'\\''" }}' provision --yes{{ range $selected }} --id '{{ . | replace "'" "'\\''" }}'{{ end }}
+{{ end -}}

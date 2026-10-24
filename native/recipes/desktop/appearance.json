@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "nordic-theme": {
+    "version": "2.2.0",
+    "variants": {
+      "Nordic": {
+        "url": "https://codeload.github.com/EliverLara/nordic/tar.gz/v2.2.0",
+        "sha256": "ac8624d6f4e12e7e333d083500dbb52fab03553107482391728fcf3dcc0ec25f"
+      },
+      "Nordic-standard-buttons": {
+        "url": "https://codeload.github.com/EliverLara/nordic/tar.gz/e1ee76f47ebf06ecbee41c95a80a61a739e22785",
+        "sha256": "a02dc9665fa31e30a05bb9feda0867503950c7972fdb797c1be87e7c31948cd1"
+      },
+      "Nordic-darker": {
+        "url": "https://codeload.github.com/EliverLara/nordic/tar.gz/5122374e9112ccc803f4b8702263f7f099fe525d",
+        "sha256": "4b9ca72a1d9c635f75f90b4ce07fc373f72e8ebbb06c143208f783b58f565eb3"
+      },
+      "Nordic-darker-standard-buttons": {
+        "url": "https://codeload.github.com/EliverLara/nordic/tar.gz/d4cec0c58d19bfa9e6395b9dff37b770a3e4f9ee",
+        "sha256": "6c07d98aa1fc8f694224fa62fb2e230a5d85e8e963798cd798382c28a278bc75"
+      },
+      "Nordic-bluish-accent": {
+        "url": "https://codeload.github.com/EliverLara/nordic/tar.gz/e10f44d8ba698677bfda79aa5ebfd3117a885e1d",
+        "sha256": "6c1aefee5c1ff5dad338cde7beae0e661c28906c197aeab7fbdb32b2a59a1faa"
+      },
+      "Nordic-bluish-accent-standard-buttons": {
+        "url": "https://codeload.github.com/EliverLara/nordic/tar.gz/be6abf568801f84b07dccafbd61c1e9d070191cd",
+        "sha256": "735cd512dd0208f5c001c798a8e6d8d1b53b9043848a224845739a9bfd1e1c5b"
+      },
+      "Nordic-Polar": {
+        "url": "https://codeload.github.com/EliverLara/nordic-polar/tar.gz/4103a3d4e3445e71de6544b348a3562fa2021ead",
+        "sha256": "83facbd1ab4b89ec4f58d392a8849f1c9ae280a51a3cab0f143cbecedb15c574"
+      },
+      "Nordic-Polar-standard-buttons": {
+        "url": "https://codeload.github.com/EliverLara/nordic-polar/tar.gz/31319bcd1c51362c98fec67e7ffff7af1544b2c8",
+        "sha256": "e764a1bc91ca762260fefaeeeb685368d9c8b0964bbe3b5d3af02a3a0c2fc54a"
+      }
+    }
+  },
+  "meslolgs-nf": {
+    "version": "145eb9fbc2f42ee408dacd9b22d8e6e0e553f83d",
+    "url": "https://codeload.github.com/romkatv/powerlevel10k-media/tar.gz/145eb9fbc2f42ee408dacd9b22d8e6e0e553f83d",
+    "sha256": "b557bfac3bebf86aa3a6b0dda48c7ab5fd2905e1119e908c7cdf98a1715d8389"
+  },
+  "jetbrains-mono-nf": {
+    "version": "3.5.1",
+    "url": "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/JetBrainsMono.tar.xz",
+    "sha256": "04d5e8f903693f9dd13e16f867e994834e681eb3c72c0d337a770dcda09010cf"
+  },
+  "nordzy-cursors": {
+    "version": "2.5.0",
+    "url": "https://codeload.github.com/guillaumeboehm/Nordzy-cursors/tar.gz/c7fc485e9e4fd974c4f4ff9f5f14610fa7835e7b",
+    "sha256": "7f2c440469c4b448d726184360071a73e01242edc66b8d9c20f966f15da06d8c"
+  }
+}

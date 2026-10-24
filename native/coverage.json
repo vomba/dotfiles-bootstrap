@@ -1,0 +1,2266 @@
+{
+  "schema_version": 1,
+  "supported_platforms": [
+    "linux-x64",
+    "macos-arm64"
+  ],
+  "sources_reviewed": [
+    "flake.nix",
+    "modules/options.nix",
+    "modules/home.nix",
+    "modules/darwin.nix",
+    "modules/dev/dev.nix",
+    "modules/dev/cloud.nix",
+    "modules/dev/kubernetes.nix",
+    "modules/dev/lsp.nix",
+    "modules/dev/mise.nix",
+    "modules/apps/packages.nix",
+    "modules/apps/editors.nix",
+    "modules/apps/firefox.nix",
+    "modules/apps/yazi.nix",
+    "modules/shell/shell.nix",
+    "modules/shell/zsh.nix",
+    "modules/shell/git.nix",
+    "modules/shell/gpg.nix",
+    "modules/shell/gnu-tools.nix",
+    "modules/shell/completions.nix",
+    "modules/themes/nord.nix",
+    "overlays/default.nix",
+    "overlays/helm.nix",
+    "overlays/openstack-tui.nix",
+    "overlays/zsh-kubecolor.nix",
+    "overlays/nordic.nix",
+    "packages/mise.nix",
+    "packages/mise-install.nix"
+  ],
+  "feature_defaults": {
+    "theme": {
+      "nord": {
+        "enable": false
+      }
+    },
+    "desktop": {
+      "enable": true,
+      "niri": {
+        "enable": true
+      }
+    },
+    "dev": {
+      "enable": true,
+      "mise": {
+        "enable": true
+      },
+      "kubernetes": {
+        "enable": true,
+        "kubieConfigPath": null
+      },
+      "cloud": {
+        "enable": true
+      },
+      "lsp": {
+        "enable": true
+      }
+    },
+    "shell": {
+      "enable": true,
+      "zsh": {
+        "enable": true
+      },
+      "git": {
+        "enable": true
+      },
+      "gpg": {
+        "enable": true
+      },
+      "gnuTools": {
+        "enable": true
+      }
+    },
+    "apps": {
+      "enable": true,
+      "firefox": {
+        "enable": true
+      },
+      "editors": {
+        "enable": true
+      },
+      "yazi": {
+        "enable": true
+      }
+    }
+  },
+  "ownership": [
+    {
+      "source": "modules/dev/dev.nix",
+      "old_owner": "pkgs.pre-commit",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "pre-commit"
+      ],
+      "when": "dev.enable"
+    },
+    {
+      "source": "modules/dev/dev.nix",
+      "old_owner": "pkgs.skopeo",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "skopeo"
+      ],
+      "when": "dev.enable"
+    },
+    {
+      "source": "modules/dev/dev.nix",
+      "old_owner": "pkgs.parallel",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "parallel"
+      ],
+      "when": "dev.enable"
+    },
+    {
+      "source": "modules/dev/dev.nix",
+      "old_owner": "programs.go",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "go"
+      ],
+      "when": "dev.enable",
+      "config_consumer": "native/chezmoi: GOPATH and GOTELEMETRY=off"
+    },
+    {
+      "source": "modules/dev/dev.nix",
+      "old_owner": "pkgs.xcodegen",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "xcodegen"
+      ],
+      "when": "dev.enable"
+    },
+    {
+      "source": "modules/dev/cloud.nix",
+      "old_owner": "pkgs.openstackclient-full",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "openstackclient-full",
+        "python312"
+      ],
+      "when": "dev.cloud.enable",
+      "reason": "OpenStack alone uses the separately scoped Python3.12 ABI runtime (python312, executable python3.12) for its frozen cp312/abi3 wheels; it neither selects nor replaces interactive/global Python."
+    },
+    {
+      "source": "modules/dev/cloud.nix",
+      "old_owner": "pkgs.openstack-tui",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "openstack-rust"
+      ],
+      "when": "dev.cloud.enable"
+    },
+    {
+      "source": "modules/dev/cloud.nix",
+      "old_owner": "pkgs.upcloud-cli",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "upctl"
+      ],
+      "when": "dev.cloud.enable"
+    },
+    {
+      "source": "modules/dev/cloud.nix",
+      "old_owner": "pkgs.tenv",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "tenv"
+      ],
+      "when": "dev.cloud.enable"
+    },
+    {
+      "source": "modules/dev/cloud.nix",
+      "old_owner": "tenv Terraform proxy",
+      "status": "retired",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.cloud.enable",
+      "reason": "Only competing Terraform proxy is retired. tenv/tofu/terragrunt commands remain native; Terraform stays mise-owned1.5.7."
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.kubie",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "kubie"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.kind",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "kind"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.kubernetes-helm",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helm"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.kubecolor",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "kubecolor"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.kubectl",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "kubectl"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.kubelogin-oidc",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "kubelogin-oidc"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.sonobuoy",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "sonobuoy"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.velero",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "velero"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.crossplane-cli",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "crossplane"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.kubectl-view-secret",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "kubectl-view-secret"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.viddy",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "viddy"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "pkgs.ansible",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "ansible"
+      ],
+      "when": "dev.kubernetes.enable"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "home.file..kube/kubie.yaml",
+      "status": "private",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "config_consumer": "private optional selectors.kubieConfigPath; no private configuration content in public"
+    },
+    {
+      "source": "modules/dev/kubernetes.nix",
+      "old_owner": "home.activation.helmPluginsLink",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helm"
+      ],
+      "when": "dev.kubernetes.enable",
+      "config_consumer": "native/recipes/tools/tools.py --id helm owned plugin bundle; no forced foreign link overwrite"
+    },
+    {
+      "source": "modules/dev/mise.nix",
+      "old_owner": "mise selected cidr",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "cidr"
+      ],
+      "when": [
+        "dev.mise.enable",
+        "dev.cloud.enable"
+      ],
+      "config_consumer": "canonical apps/mise/mise.toml and platform lock"
+    },
+    {
+      "source": "modules/dev/mise.nix",
+      "old_owner": "mise selected terraform",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "terraform"
+      ],
+      "when": [
+        "dev.mise.enable",
+        "dev.cloud.enable"
+      ],
+      "config_consumer": "canonical apps/mise/mise.toml and platform lock"
+    },
+    {
+      "source": "modules/dev/mise.nix",
+      "old_owner": "mise selected helmfile",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helmfile"
+      ],
+      "when": [
+        "dev.mise.enable",
+        "dev.kubernetes.enable"
+      ],
+      "config_consumer": "canonical apps/mise/mise.toml and platform lock"
+    },
+    {
+      "source": "modules/dev/mise.nix",
+      "old_owner": "programs.mise",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.mise.enable",
+      "config_consumer": "native engine selected-user-global config/strict shims; checksum-pinned internal bootstrap backend remains separate"
+    },
+    {
+      "source": "modules/dev/mise.nix",
+      "old_owner": "dotfiles-mise-install",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.mise.enable",
+      "config_consumer": "native engine selected-user-global config/strict shims; checksum-pinned internal bootstrap backend remains separate"
+    },
+    {
+      "source": "modules/dev/mise.nix",
+      "old_owner": "mise-shims PATH",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.mise.enable",
+      "config_consumer": "native engine selected-user-global config/strict shims; checksum-pinned internal bootstrap backend remains separate"
+    },
+    {
+      "source": "modules/dev/mise.nix",
+      "old_owner": "MISE_AUTO_INSTALL and offline settings",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.mise.enable",
+      "config_consumer": "native engine selected-user-global config/strict shims; checksum-pinned internal bootstrap backend remains separate"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.nixfmt",
+      "status": "retired",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "reason": "Nix-only language/package-store tooling is intentionally removed with the complete Nix-free cutover; Helix Nix server/formatter references removed too."
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.nixd",
+      "status": "retired",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "reason": "Nix-only language/package-store tooling is intentionally removed with the complete Nix-free cutover; Helix Nix server/formatter references removed too."
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.nix-tree",
+      "status": "retired",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "reason": "Nix-only language/package-store tooling is intentionally removed with the complete Nix-free cutover; Helix Nix server/formatter references removed too."
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.typos-lsp",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "typos-lsp"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.bash-language-server",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "bash-language-server"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.shellcheck",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shellcheck"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.yaml-language-server",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "yaml-language-server"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.vscode-json-languageserver",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "vscode-json-languageserver"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.jq",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "jq"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.jq-lsp",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "jq-lsp"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.marksman",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "marksman"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.mpls",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "mpls"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.vale",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "vale"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.terraform-ls",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "terraform-ls"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.helm-ls",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helm-ls"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.gopls",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "gopls"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/dev/lsp.nix",
+      "old_owner": "pkgs.delve",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "delve"
+      ],
+      "when": "dev.lsp.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.golazo",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "golazo"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.gh",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "gh"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.yq-go",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "yq"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.jq",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "jq"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.jless",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "jless"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.glow",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "glow"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.act",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "act"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.hugo",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "hugo"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.socat",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "socat"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.sops",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "sops"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.bitwarden-cli",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "bitwarden"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.rbw",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "rbw"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.yubikey-manager",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "yubikey-manager"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.nodejs_24",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "node"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.python3",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "python"
+      ],
+      "when": "apps.enable",
+      "reason": "Interactive/global Python3.14.9 is managed by Mise core:python under the original apps.enable flag; OpenStack's scoped Python3.12 and the engine's bootstrap interpreter have separate ownership."
+    },
+    {
+      "source": "modules/apps/packages.nix",
+      "old_owner": "pkgs.powershell",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "powershell"
+      ],
+      "when": "apps.enable"
+    },
+    {
+      "source": "modules/apps/editors.nix",
+      "old_owner": "programs.helix",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helix"
+      ],
+      "when": "apps.editors.enable",
+      "config_consumer": "native/chezmoi/dot_config/helix: default editor and all non-Nix LSPs/formatters"
+    },
+    {
+      "source": "modules/apps/firefox.nix",
+      "old_owner": "programs.firefox",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "firefox"
+      ],
+      "when": "apps.firefox.enable",
+      "config_consumer": "native/chezmoi Firefox profile recipe; official Mozilla archive/Linux and native app bundle/macOS"
+    },
+    {
+      "source": "modules/apps/firefox.nix",
+      "old_owner": "profiles.default.settings",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "firefox-profile"
+      ],
+      "when": "apps.firefox.enable",
+      "config_consumer": "native Firefox profile/search recipe with vendored data-only search icon, preferences/search engines preserved without Nix runtime"
+    },
+    {
+      "source": "modules/apps/firefox.nix",
+      "old_owner": "profiles.default.search",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "firefox-profile"
+      ],
+      "when": "apps.firefox.enable",
+      "config_consumer": "native Firefox profile/search recipe with vendored data-only search icon, preferences/search engines preserved without Nix runtime"
+    },
+    {
+      "source": "modules/apps/firefox.nix",
+      "old_owner": "pkgs.nixos-icons",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "firefox-profile"
+      ],
+      "when": "apps.firefox.enable",
+      "config_consumer": "native Firefox profile/search recipe with vendored data-only search icon, preferences/search engines preserved without Nix runtime"
+    },
+    {
+      "source": "modules/apps/yazi.nix",
+      "old_owner": "programs.yazi",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "yazi"
+      ],
+      "when": "apps.yazi.enable",
+      "config_consumer": "native/chezmoi Yazi configuration and Zsh wrapper"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "programs.fzf",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "fzf"
+      ],
+      "when": "shell.enable",
+      "config_consumer": "native/chezmoi shell integration; one OMZ fzf integration"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "programs.bat",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "bat"
+      ],
+      "when": "shell.enable",
+      "config_consumer": "native/chezmoi shell integration; one OMZ fzf integration"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "programs.zoxide",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "zoxide"
+      ],
+      "when": "shell.enable",
+      "config_consumer": "native/chezmoi shell integration; one OMZ fzf integration"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "programs.eza",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "eza"
+      ],
+      "when": "shell.enable",
+      "config_consumer": "native/chezmoi shell integration; one OMZ fzf integration"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "programs.fd",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "fd"
+      ],
+      "when": "shell.enable",
+      "config_consumer": "native/chezmoi shell integration; one OMZ fzf integration"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "programs.ripgrep",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "ripgrep"
+      ],
+      "when": "shell.enable",
+      "config_consumer": "native/chezmoi shell integration; one OMZ fzf integration"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "programs.starship",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "starship"
+      ],
+      "when": "shell.enable",
+      "config_consumer": "native/chezmoi shell integration; one OMZ fzf integration"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.dust",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "dust"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.duf",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "duf"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.btop",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "btop"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.sd",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "sd"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.xh",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "xh"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.tealdeer",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "tealdeer"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.procs",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "procs"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/shell.nix",
+      "old_owner": "pkgs.doggo",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "doggo"
+      ],
+      "when": "shell.enable"
+    },
+    {
+      "source": "modules/shell/zsh.nix",
+      "old_owner": "pkgs.bash",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "bash"
+      ],
+      "when": "shell.zsh.enable"
+    },
+    {
+      "source": "modules/shell/zsh.nix",
+      "old_owner": "pkgs.kubectl",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "kubectl"
+      ],
+      "when": "shell.zsh.enable"
+    },
+    {
+      "source": "modules/shell/zsh.nix",
+      "old_owner": "pkgs.rsync",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "rsync"
+      ],
+      "when": "shell.zsh.enable"
+    },
+    {
+      "source": "modules/shell/zsh.nix",
+      "old_owner": "programs.zsh",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "zsh"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/chezmoi .zshenv/.zshrc; aliases/GOPATH/KREW_ROOT preserved"
+    },
+    {
+      "source": "modules/shell/zsh.nix",
+      "old_owner": "programs.zsh.oh-my-zsh",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "oh-my-zsh"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "one pinned OMZ share root; exact legacy plugin list/custom helper, no auto-update"
+    },
+    {
+      "source": "modules/shell/zsh.nix",
+      "old_owner": "pkgs.zsh-kubecolor",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/chezmoi custom Zsh plugin and absolute native kubectl-rsync launcher"
+    },
+    {
+      "source": "modules/shell/completions.nix",
+      "old_owner": "dotfiles-zsh-completions",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shell-completions"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/recipes/completions.py; package-native > generated > supplemental, offline root candidates"
+    },
+    {
+      "source": "modules/shell/completions.nix",
+      "old_owner": "pkgs.zsh-completions",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shell-completions"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "pinned supplemental collection acquired by completion recipe"
+    },
+    {
+      "source": "modules/shell/completions.nix",
+      "old_owner": "crossplane bashcompinit protocol",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shell-completions"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/recipes/completions.py and authored Zsh registration"
+    },
+    {
+      "source": "modules/shell/completions.nix",
+      "old_owner": "Yazi wrapper compdef",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shell-completions"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/recipes/completions.py and authored Zsh registration"
+    },
+    {
+      "source": "modules/shell/completions.nix",
+      "old_owner": "lazygit first-autoload dispatch",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shell-completions"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/recipes/completions.py and authored Zsh registration"
+    },
+    {
+      "source": "modules/shell/completions.nix",
+      "old_owner": "kubelogin executable/protocol rename",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shell-completions"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/recipes/completions.py and authored Zsh registration"
+    },
+    {
+      "source": "modules/shell/completions.nix",
+      "old_owner": "mise Helmfile exact generator",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "shell-completions"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/recipes/completions.py and authored Zsh registration"
+    },
+    {
+      "source": "modules/shell/git.nix",
+      "old_owner": "programs.git",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "git"
+      ],
+      "when": "shell.git.enable",
+      "config_consumer": "native/chezmoi generic Git config; signing identity belongs private"
+    },
+    {
+      "source": "modules/shell/git.nix",
+      "old_owner": "programs.delta",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "delta"
+      ],
+      "when": "shell.git.enable",
+      "config_consumer": "native/chezmoi Git pager/diff integration"
+    },
+    {
+      "source": "modules/shell/git.nix",
+      "old_owner": "pkgs.lazygit",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "lazygit"
+      ],
+      "when": "shell.git.enable"
+    },
+    {
+      "source": "modules/shell/git.nix",
+      "old_owner": "pkgs.git-crypt",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "git-crypt"
+      ],
+      "when": "shell.git.enable"
+    },
+    {
+      "source": "modules/shell/gpg.nix",
+      "old_owner": "programs.gpg",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "gnupg"
+      ],
+      "when": "shell.gpg.enable",
+      "config_consumer": "native/chezmoi gpg.conf tofu+pgp"
+    },
+    {
+      "source": "modules/shell/gpg.nix",
+      "old_owner": "services.gpg-agent",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "gnupg"
+      ],
+      "when": "shell.gpg.enable",
+      "config_consumer": "native/chezmoi gpg-agent config/native OS socket lifecycle; SSH support and explicit service control"
+    },
+    {
+      "source": "modules/shell/gpg.nix",
+      "old_owner": "pkgs.pinentry_mac",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "pinentry"
+      ],
+      "when": "shell.gpg.enable"
+    },
+    {
+      "source": "modules/shell/gpg.nix",
+      "old_owner": "pkgs.pinentry-qt",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "pinentry"
+      ],
+      "when": "shell.gpg.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.coreutils",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "coreutils"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.findutils",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "findutils"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.gnused",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "gnu-sed"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.gnugrep",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "grep"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.gawk",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "gawk"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.diffutils",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "diffutils"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.gnumake",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "make"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.gnupatch",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "gpatch"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.gnutar",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "tar"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/shell/gnu-tools.nix",
+      "old_owner": "pkgs.less",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "less"
+      ],
+      "when": "shell.gnuTools.enable"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "bat nord-contrast theme/cache",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "bat-nord-cache"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "fzf colors",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "fzf"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "btop nord-contrast",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "btop"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "starship settings",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "starship"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "LS_COLORS/GLAMOUR_STYLE/BAT_THEME",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "delta options",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "delta"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.git.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "lazygit settings",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "lazygit"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.git.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "Helix nord-contrast theme",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helix"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "apps.editors.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "Yazi Nord flavor and theme",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "yazi"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "apps.yazi.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "glow style",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "glow"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "apps.enable"
+      ],
+      "config_consumer": "native/chezmoi authored Nord asset/config with opt-in lower-precedence defaults"
+    },
+    {
+      "source": "modules/themes/nord.nix",
+      "old_owner": "pkgs.yaziPlugins.nord",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "apps.yazi.enable"
+      ],
+      "config_consumer": "native/assets pinned vendored Nord Yazi flavor"
+    },
+    {
+      "source": "overlays/helm.nix",
+      "old_owner": "helm-diff",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helm"
+      ],
+      "when": "dev.kubernetes.enable",
+      "config_consumer": "native/recipes/tools/tools.py --id helm four-plugin composition with source pins"
+    },
+    {
+      "source": "overlays/helm.nix",
+      "old_owner": "helm-secrets",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helm"
+      ],
+      "when": "dev.kubernetes.enable",
+      "config_consumer": "native/recipes/tools/tools.py --id helm four-plugin composition with source pins"
+    },
+    {
+      "source": "overlays/helm.nix",
+      "old_owner": "helm-secrets-getter",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helm"
+      ],
+      "when": "dev.kubernetes.enable",
+      "config_consumer": "native/recipes/tools/tools.py --id helm four-plugin composition with source pins"
+    },
+    {
+      "source": "overlays/helm.nix",
+      "old_owner": "helm-secrets-post-renderer",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "helm"
+      ],
+      "when": "dev.kubernetes.enable",
+      "config_consumer": "native/recipes/tools/tools.py --id helm four-plugin composition with source pins"
+    },
+    {
+      "source": "overlays/openstack-tui.nix",
+      "old_owner": "CLI and TUI release archives",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "openstack-rust"
+      ],
+      "when": "dev.cloud.enable",
+      "config_consumer": "native/recipes/tools native distinct Rust CLI/TUI bundle"
+    },
+    {
+      "source": "overlays/zsh-kubecolor.nix",
+      "old_owner": "plugin aliases/functions",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/chezmoi custom plugin; native/completions declared generation; absolute bash/kubectl/rsync"
+    },
+    {
+      "source": "overlays/zsh-kubecolor.nix",
+      "old_owner": "pod picker",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/chezmoi custom plugin; native/completions declared generation; absolute bash/kubectl/rsync"
+    },
+    {
+      "source": "overlays/zsh-kubecolor.nix",
+      "old_owner": "kubectl-rsync",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/chezmoi custom plugin; native/completions declared generation; absolute bash/kubectl/rsync"
+    },
+    {
+      "source": "overlays/zsh-kubecolor.nix",
+      "old_owner": "generated kubectl completion",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "config_consumer": "native/chezmoi custom plugin; native/completions declared generation; absolute bash/kubectl/rsync"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic-standard-buttons",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic-darker",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic-darker-standard-buttons",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic-bluish-accent",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic-bluish-accent-standard-buttons",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic-Polar",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic-Polar-standard-buttons",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/nordic.nix",
+      "old_owner": "Nordic icons and wallpapers",
+      "status": "native",
+      "platforms": [
+        "linux-x64"
+      ],
+      "native_owners": [
+        "nordic-theme"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "desktop.enable"
+      ],
+      "config_consumer": "native/recipes/desktop pinned upstream asset assembly; drop GTK2 only as legacy overlay did"
+    },
+    {
+      "source": "overlays/default.nix",
+      "old_owner": "mise override",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.mise.enable",
+      "config_consumer": "native/engine/pins.json official checksum-pinned bootstrap and user integration"
+    },
+    {
+      "source": "packages/mise.nix",
+      "old_owner": "official mise release/package-native completion",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.mise.enable",
+      "config_consumer": "native/engine/pins.json; native completion recipe"
+    },
+    {
+      "source": "packages/mise-install.nix",
+      "old_owner": "isolated locked installer and strict shared shims",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.mise.enable",
+      "config_consumer": "native engine sanitized provision; no shell activation/autoinstall/system fallback"
+    },
+    {
+      "source": "modules/darwin.nix",
+      "old_owner": "nix.package",
+      "status": "retired",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "reason": "Nix/nix-darwin-only host state intentionally retired. Actual installer-aware uninstall and live ownership handoff require separate authorization."
+    },
+    {
+      "source": "modules/darwin.nix",
+      "old_owner": "nix.settings",
+      "status": "retired",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "reason": "Nix/nix-darwin-only host state intentionally retired. Actual installer-aware uninstall and live ownership handoff require separate authorization."
+    },
+    {
+      "source": "modules/darwin.nix",
+      "old_owner": "nix.gc",
+      "status": "retired",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "reason": "Nix/nix-darwin-only host state intentionally retired. Actual installer-aware uninstall and live ownership handoff require separate authorization."
+    },
+    {
+      "source": "modules/darwin.nix",
+      "old_owner": "ids.gids.nixbld",
+      "status": "retired",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "reason": "Nix/nix-darwin-only host state intentionally retired. Actual installer-aware uninstall and live ownership handoff require separate authorization."
+    },
+    {
+      "source": "modules/darwin.nix",
+      "old_owner": "system.stateVersion",
+      "status": "retired",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "reason": "Nix/nix-darwin-only host state intentionally retired. Actual installer-aware uninstall and live ownership handoff require separate authorization."
+    },
+    {
+      "source": "modules/darwin.nix",
+      "old_owner": "programs.zsh",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "zsh"
+      ],
+      "config_consumer": "native shell profile/login registration; live shell change remains explicit"
+    },
+    {
+      "source": "modules/darwin.nix",
+      "old_owner": "programs.bash",
+      "status": "native",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "native_owners": [
+        "bash"
+      ],
+      "config_consumer": "native shell profile/login registration; live shell change remains explicit"
+    },
+    {
+      "source": "modules/home.nix",
+      "old_owner": "public module imports",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "config_consumer": "native/engine manifest composition with independent flags"
+    },
+    {
+      "source": "modules/options.nix",
+      "old_owner": "apps.cursor.enable",
+      "status": "retired",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "reason": "Unconsumed legacy option: no public/private module installed or configured Cursor. Retire the unused default rather than introduce a new app or claim an unimplemented private owner."
+    },
+    {
+      "source": "modules/options.nix",
+      "old_owner": "desktop.enable",
+      "status": "native",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "desktop.enable",
+      "config_consumer": "native/manifests/gui-linux.json and gui-macos.json own generic GUI packages independently of apps.enable/desktop.niri.enable; native/recipes/desktop owns compositor/runtime; authored desktop/site configuration stays private"
+    },
+    {
+      "source": "modules/options.nix",
+      "old_owner": "desktop.niri.enable",
+      "status": "private",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "desktop.niri.enable",
+      "config_consumer": "native/recipes/desktop public runtime + private authored desktop/site configuration"
+    },
+    {"source": "flake.nix", "old_owner": "devShells gitleaks", "status": "native", "platforms": ["linux-x64", "macos-arm64"], "when": "dev.enable", "native_owners": ["gitleaks"], "config_consumer": "native verification/task dispatch uses checksum-pinned release"},
+    {"source": "flake.nix", "old_owner": "devShells and scriptTests native interpreter/shell prerequisites", "status": "native", "platforms": ["linux-x64", "macos-arm64"], "native_owners": ["python", "bash", "zsh", "coreutils", "grep", "gnu-sed", "pre-commit", "shellcheck"], "config_consumer": "native verification command prerequisites; no Nix-built test fixtures"},
+    {"source": "flake.nix", "old_owner": "formatter and devShells nixfmt", "status": "retired", "platforms": ["linux-x64", "macos-arm64"], "reason": "Nix-only formatting/toolchain intentionally removed with legacy source retirement; native checks cover actual replacement files."},
+    {"source": "private:modules/desktop/gui.nix", "old_owner": "desktop.enable generic Kitty/Slack/Tabiew/JetBrainsMono Nerd Font", "status": "native", "platforms": ["linux-x64", "macos-arm64"], "when": "desktop.enable", "native_owners": ["gui-kitty", "gui-slack", "gui-tabiew", "jetbrains-mono-nf"], "config_consumer": "native/manifests/gui-linux.json and gui-macos.json; current native providers, no duplicate private package owner; authored Kitty configuration remains private"},
+    {"source": "private:modules/desktop/gui.nix", "old_owner": "desktop.enable Linux Chromium/Nautilus/grim/slurp/wdisplays/Capacities", "status": "native", "platforms": ["linux-x64"], "when": "desktop.enable", "native_owners": ["gui-chromium", "gui-nautilus", "desktop-grim", "desktop-slurp", "gui-wdisplays", "gui-capacities"], "config_consumer": "native/manifests/gui-linux.json and independent desktop.json grim/slurp predicates; native/gui/linux.py and linux-sources.json provide concrete exceptional artifacts"},
+    {"source": "flake.nix", "old_owner": "Nix example packages/check derivations", "status": "retired", "platforms": ["linux-x64", "macos-arm64"], "reason": "Nix evaluation/build wrappers retired; native render/behavior suites replace them, not hidden Nix fixture rendering."}
+  ],
+  "generic_desktop_gui": {
+    "when": "desktop.enable",
+    "independence": "Kitty, Slack, Tabiew and the required font do not depend on apps.enable, desktop.niri.enable or AI/work flags. Linux-only GUI utilities share the desktop.enable boundary. Existing private macOS Capacities, Zed and Paneru selections are not duplicated.",
+    "linux": {
+      "manifest": "native/manifests/gui-linux.json",
+      "recipe": "native/gui/linux.py",
+      "sources": "native/gui/linux-sources.json",
+      "font_owner": "jetbrains-mono-nf in native/manifests/desktop.json",
+      "providers": "Official current Kitty bundle, Slack native deb without vendor repository activation, Tabiew native CLI, Capacities native deb and Canonical Chromium snap assertions; Noble-security Nautilus/wdisplays/grim/slurp.",
+      "policy": "No obsolete NixGL runtime or cross-release ABI mixing; system file-manager/display/screenshot backends retain their explicit distro-security exception and reason."
+    },
+    "macos": {
+      "manifest": "native/manifests/gui-macos.json",
+      "verification": "native/gui/macos.py",
+      "providers": "Homebrew cask kitty/slack/font-jetbrains-mono-nerd-font and formula tabiew, native arm64 only; font cask is the sole Mac JetBrainsMono Nerd Font owner.",
+      "kitty_command": "/Applications/kitty.app/Contents/MacOS/kitty",
+      "tabiew_command": "/opt/homebrew/opt/tabiew/bin/tw",
+      "lifecycle": "Ordinary Homebrew app/font registration and staging, no Nix Apps links or custom installer. Read-only payload/version/architecture/font-family checks bind ownership. Foreign and preexisting apps are preserved; ordinary non-zap retirement preserves app data. Historical Homebrew rollback is explicitly unavailable without retained exact artifacts; reviewed current reinstall is explicit provision.",
+      "host_acceptance": "Actual LaunchServices/login-session and OS consent acceptance remain separate unverified host gates; no startup install/update or automatic OS consent bypass."
+    }
+  },
+  "shared_gui_dependencies": {
+    "platforms": ["linux-x64"],
+    "native_owners": ["gui-alsa", "gui-vulkan", "gui-xkbcommon-x11", "gui-xcb-xfixes", "gui-x11-xcb"],
+    "consumer": "Public browsers/desktop and private native GUI app recipes share single Noble ABI package owners. Each app declares requires so independent flags do not silently lose runtime libraries.",
+    "policy": "Signed Noble security/ABI maintenance, not an upstream-latest graphics stack claim.",
+    "retirement": "These packages and base GTK/D-Bus/X11 ABI owners set retain_shared_runtime. Disabling apps/browser/desktop configuration removes no native ABI payload; explicit retirement records retained-shared-runtime rather than a false uninstalled result. libc, loader and other generic GUI dependencies follow the same policy in gui-linux.json."
+  },
+  "native_desktop_dependencies": {
+    "manifest": "native/manifests/desktop.json",
+    "platforms": ["linux-x64"],
+    "when": ["desktop.enable", "desktop.niri.enable"],
+    "runtime_owners": ["niri", "xwayland-satellite", "dux-runtime", "hyprland-ppa"],
+    "system_owners": ["desktop-dbus", "desktop-portal", "desktop-portal-gnome", "desktop-portal-gtk", "desktop-pipewire", "desktop-pipewire-pulse", "desktop-pipewire-alsa", "desktop-wireplumber", "desktop-polkit", "desktop-pkexec", "desktop-polkit-agent", "desktop-keyring", "desktop-keyring-pam", "desktop-network", "desktop-bluetooth", "desktop-power", "desktop-brightness", "desktop-cups", "desktop-mesa-dri", "desktop-mesa-egl", "desktop-mesa-vulkan", "desktop-firmware", "desktop-xwayland", "desktop-kanshi", "desktop-fuzzel", "desktop-grim", "desktop-slurp", "desktop-clipboard"],
+    "appearance_owners": ["nordic-theme", "meslolgs-nf", "desktop-fontconfig", "desktop-gtk-settings", "gtk3", "desktop-gtk4", "desktop-icons", "desktop-noto-fonts", "desktop-emoji-fonts"],
+    "policy": "Noble system libraries/security updates remain native and are not replaced with another Ubuntu release. Exact exceptional source/runtime pins and build/runtime closure are owned by desktop recipe manifests. Appearance has its own desktop/Nord predicates rather than inheriting compositor enable."
+  },
+  "shell_function_inventory": [
+    {"source": "oh-my-zsh/plugins/zsh-kubecolor/zsh-kubecolor.zsh", "functions": ["ke", "kres", "kgsec-tls", "kll", "kj", "kjx", "ky", "ssh-rm", "ssh-pass", "cert-decode"], "when": "shell.zsh.enable", "config_consumer": "native/chezmoi recursive custom plugin; same alias/function source, native binaries only", "native_owners": ["kubectl", "kubecolor", "jq", "fx", "yh", "openssl", "openssh", "fzf", "bat"]},
+    {"source": "oh-my-zsh/plugins/zsh-kubecolor/alias/fzf.zsh", "functions": ["kexec"], "when": "shell.zsh.enable", "runtime_guard": "command fzf exists", "config_consumer": "native/chezmoi recursive custom plugin; invocation-owned kubectl arguments and selected pod"},
+    {"source": "oh-my-zsh/plugins/zsh-kubecolor/completion/kubecolor_completion", "functions": ["_fzf_complete_kgp", "_fzf_complete_klf", "_fzf_complete_kdelp", "_fzf_complete_kdelpf", "_fzf_complete_kdp", "_fzf_complete_kgpy", "_fzf_complete_kdelpvc", "_fzf_complete_kdelns", "__logs__"], "when": "shell.zsh.enable", "runtime_guard": "command fzf exists", "config_consumer": "native/chezmoi recursive custom plugin; no provider contact during generation"},
+    {"source": "oh-my-zsh/plugins/zsh-kubecolor/bin/kubectl-rsync", "commands": ["kubectl-rsync", "ksync"], "when": "shell.zsh.enable", "native_owners": ["bash", "rsync", "kubectl"], "config_consumer": "native/chezmoi generated absolute interpreter/dependency launcher"},
+    {"source": "oh-my-zsh/plugins/zsh-kubecolor/alias/oc.zsh", "runtime_guard": "command oc exists (already optional external user-selected OpenShift installation, not a missing enabled package)", "when": "shell.zsh.enable", "config_consumer": "native/chezmoi unchanged optional plugin source"},
+    {"source": "oh-my-zsh/plugins/zsh-kubecolor/alias/sealedsecret.zsh", "runtime_guard": "command kubeseal exists (already optional external user-selected installation)", "when": "shell.zsh.enable", "config_consumer": "native/chezmoi unchanged optional plugin source"},
+    {"source": "oh-my-zsh/plugins/zsh-kubecolor", "recursive_alias_sources": ["zsh-kubecolor.zsh", "alias/fzf.zsh", "alias/cert-manager.zsh", "alias/network-plicy.zsh", "alias/traefik.zsh", "alias/oc.zsh", "alias/sealedsecret.zsh"], "when": "shell.zsh.enable", "config_consumer": "native/chezmoi recursively preserves every alias and conditional source; Kubernetes-specific aliases require independently enabled Kubernetes tools"},
+    {"source": "modules/shell/zsh.nix", "aliases": ["cat", "yq4", "tree", "watch", "top", "du", "df"], "native_owners": ["bat", "yq", "eza", "viddy", "btop", "dust", "duf"], "when": "shell.zsh.enable", "config_consumer": "native/chezmoi .zshrc; each target keeps original independently gated feature"},
+    {"source": "modules/shell/zsh.nix", "omz_plugins": ["git", "fzf", "gh", "helm", "zsh-kubecolor", "golang", "terraform", "aws", "pip", "python", "docker", "zoxide", "eza", "azure"], "when": "shell.zsh.enable", "config_consumer": "pinned oh-my-zsh runtime and native/chezmoi custom plugin; upstream command-presence guards preserved"}
+  ],
+  "private_responsibilities": [
+    "Identity/home/name/email and platform signing keys",
+    "SOPS ciphertext/key selection and API credentials/Gmail",
+    "OMP/Zed/MCP/skills/rules/memory and other AI packages",
+    "Work repositories/paths/credentials helpers/GOPRIVATE/kubie input",
+    "Private desktop app selections, monitor profiles and mutable settings"
+  ],
+  "policy": {
+    "native": "Every active old package/function has a package owner or concrete configuration/recipe consumer.",
+    "retired": "Nix-only features are explicit removals, never disabled-default omissions.",
+    "private": "Listed responsibility remains in private entry point; no identity/secret/AI payload is copied here.",
+    "apt": "Signed Noble security/ABI exception, not upstream latest.",
+    "brew": "Concrete provider/version metadata; native updates compare upstream/provider/installed and do not claim immutable formula retention.",
+    "shared_runtime_retirement": "Base manifest retains Noble system Python/venv/pip, host OS command foundations, native Bash/Zsh login/rescue shells, Git and OS crypto/signing/SSH/bootstrap/verifier runtimes. Source/configuration/frontends may retire independently; retained native payload/provenance/services/data remain installed and recover reports no restore needed. This is not an uninstall claim or permission to purge/autoremove reverse dependencies.",
+    "owned_application_retirement": "Ordinary applications and optional tools remain removable when their recorded installed identity is unchanged. APT must simulate removal and permit exactly the requested owned package, ignoring only architecture qualifiers; empty/failed/foreign-cascade plans fail closed before escalation or mutation. No broad cleanup, dependency purge or implicit service/workload stop is authorized.",
+    "mise": "Exact canonical versions, platform lock; approved Go source tools use pinned toolchain and GoSumDB, npm uses package graph sidecars rather than invented artifact hashes.",
+    "scope": "Target actual Ubuntu24.04x86_64 and macOSarm64. Additional legacy lock platforms remain metadata, not qualified target claims."
+  }
+}

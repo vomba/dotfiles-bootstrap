@@ -1,0 +1,12 @@
+# Verification invokes this explicitly; project/user Ruff config is never loaded.
+target-version = "py311"
+line-length = 100
+indent-width = 4
+preview = false
+required-version = "==0.17.2"
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+skip-magic-trailing-comma = false

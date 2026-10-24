@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "homebrew": {
+    "repository": "https://github.com/Homebrew/install",
+    "revision": "85d1a3fc80d8a63932f632aca8f787de11d14a64",
+    "url": "https://raw.githubusercontent.com/Homebrew/install/85d1a3fc80d8a63932f632aca8f787de11d14a64/install.sh",
+    "sha256": "5f333bbe53bc490e51e7ccb1df8779b3dd6ee73a1a7379efda216edb08ccb148",
+    "bytes": 35651,
+    "observed": "2026-10-24",
+    "authority": "https://docs.brew.sh/Installation",
+    "prefix": "/opt/homebrew",
+    "platform": "macos-arm64",
+    "minimum_macos_major": 15,
+    "brew_origin": "https://github.com/Homebrew/brew"
+  }
+}

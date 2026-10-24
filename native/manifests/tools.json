@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "provider": "recipe",
+      "recipe": "native/recipes/tools/tools.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "id": "helm",
+      "version": "4.3.1-assembly.1",
+      "when": "dev.kubernetes.enable",
+      "sources": [
+        "helm",
+        "helm-diff",
+        "helm-secrets",
+        "helm-secrets-getter",
+        "helm-secrets-post-renderer",
+        "helm-vals"
+      ],
+      "commands": [
+        "helm"
+      ],
+      "requires": [
+        "bash",
+        "coreutils",
+        "gnu-sed",
+        "grep",
+        "gawk",
+        "findutils",
+        "gnupg",
+        "sops",
+        "age",
+        "curl",
+        "jq",
+        "yq",
+        "git",
+        "tar",
+        "kubectl"
+      ],
+      "executables": {
+        "helm": "bin/helm"
+      }
+    },
+    {
+      "provider": "recipe",
+      "recipe": "native/recipes/tools/tools.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "id": "openstackclient-full",
+      "version": "10.5.0-assembly.1",
+      "when": "dev.cloud.enable",
+      "sources": [],
+      "commands": [
+        "openstack",
+        "aodh",
+        "barbican",
+        "heat",
+        "baremetal",
+        "mistral",
+        "watcher",
+        "zun",
+        "swift"
+      ],
+      "requires": [
+        "python312"
+      ],
+      "executables": {
+        "openstack": "bin/openstack",
+        "aodh": "bin/aodh",
+        "barbican": "bin/barbican",
+        "heat": "bin/heat",
+        "baremetal": "bin/baremetal",
+        "mistral": "bin/mistral",
+        "watcher": "bin/watcher",
+        "zun": "bin/zun",
+        "swift": "bin/swift"
+      },
+      "python_lock": {
+        "path": "native/recipes/tools/openstack.lock.json",
+        "sha256": "bd91041f335bc79952f66b41dd48cbdc7a68280842e652e21b6b645b6c25249d",
+        "requirements": "native/recipes/tools/requirements.lock",
+        "requirements_sha256": "9f98b78c81f4d997d2f6bb4315f523e604819c9deb79e43dc9010b9f5fd87437"
+      }
+    },
+    {
+      "provider": "recipe",
+      "recipe": "native/recipes/tools/tools.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "id": "openstack-rust",
+      "version": "0.13.8",
+      "when": "dev.cloud.enable",
+      "sources": [
+        "openstack-cli",
+        "openstack-tui"
+      ],
+      "commands": [
+        "osc",
+        "ostui"
+      ],
+      "requires": [
+        "openssl"
+      ],
+      "executables": {
+        "osc": "bin/osc",
+        "ostui": "bin/ostui"
+      }
+    },
+    {
+      "provider": "recipe",
+      "recipe": "native/recipes/tools/tools.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "id": "tenv",
+      "version": "4.15.1",
+      "when": "dev.cloud.enable",
+      "sources": [
+        "tenv"
+      ],
+      "commands": [
+        "tenv",
+        "tofu",
+        "terragrunt",
+        "terramate",
+        "tf",
+        "atmos"
+      ],
+      "executables": {
+        "tenv": "bin/tenv",
+        "tofu": "bin/tofu",
+        "terragrunt": "bin/terragrunt",
+        "terramate": "bin/terramate",
+        "tf": "bin/tf",
+        "atmos": "bin/atmos"
+      }
+    }
+  ],
+  "artifacts": {
+    "helm-diff": {
+      "version": "3.15.15",
+      "upstream": "https://github.com/databus23/helm-diff",
+      "update": {
+        "provider": "github",
+        "repository": "databus23/helm-diff",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "diff-{version}-linux-amd64.tgz",
+          "macos-arm64": "diff-{version}-macos-arm64.tgz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/databus23/helm-diff/releases/download/v3.15.15/diff-3.15.15-linux-amd64.tgz",
+          "sha256": "504e99410611daa70702362e1b10dc74929df8a912cb3f6b5d21d1ee9d0cb7d9",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/databus23/helm-diff/releases/download/v3.15.15/diff-3.15.15-macos-arm64.tgz",
+          "sha256": "af2834052ba32fe8006a44a31db16cad30baf1c46f6b59160b092974578d7798",
+          "archive": "tar"
+        }
+      }
+    },
+    "helm-secrets": {
+      "version": "4.7.9",
+      "upstream": "https://github.com/jkroepke/helm-secrets",
+      "update": {
+        "provider": "github",
+        "repository": "jkroepke/helm-secrets",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "secrets-{version}.tgz",
+          "macos-arm64": "secrets-{version}.tgz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/jkroepke/helm-secrets/releases/download/v4.7.9/secrets-4.7.9.tgz",
+          "sha256": "5b9cc4715f73c927493a5b401342a6a72c423bf58b4175f6442eb111a1da7d68",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/jkroepke/helm-secrets/releases/download/v4.7.9/secrets-4.7.9.tgz",
+          "sha256": "5b9cc4715f73c927493a5b401342a6a72c423bf58b4175f6442eb111a1da7d68",
+          "archive": "tar"
+        }
+      }
+    },
+    "helm-secrets-getter": {
+      "version": "4.7.9",
+      "upstream": "https://github.com/jkroepke/helm-secrets",
+      "update": {
+        "provider": "github",
+        "repository": "jkroepke/helm-secrets",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "secrets-getter-{version}.tgz",
+          "macos-arm64": "secrets-getter-{version}.tgz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/jkroepke/helm-secrets/releases/download/v4.7.9/secrets-getter-4.7.9.tgz",
+          "sha256": "96238dd6881fcd753c11123a86c8b308c626dcbf1a9e9e6d0b7da16c795a0beb",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/jkroepke/helm-secrets/releases/download/v4.7.9/secrets-getter-4.7.9.tgz",
+          "sha256": "96238dd6881fcd753c11123a86c8b308c626dcbf1a9e9e6d0b7da16c795a0beb",
+          "archive": "tar"
+        }
+      }
+    },
+    "helm-secrets-post-renderer": {
+      "version": "4.7.9",
+      "upstream": "https://github.com/jkroepke/helm-secrets",
+      "update": {
+        "provider": "github",
+        "repository": "jkroepke/helm-secrets",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "secrets-post-renderer-{version}.tgz",
+          "macos-arm64": "secrets-post-renderer-{version}.tgz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/jkroepke/helm-secrets/releases/download/v4.7.9/secrets-post-renderer-4.7.9.tgz",
+          "sha256": "9cb9d72ee982fcf14f44459e73f3170575f4d612148e651d0ff1a23ac2feca8a",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/jkroepke/helm-secrets/releases/download/v4.7.9/secrets-post-renderer-4.7.9.tgz",
+          "sha256": "9cb9d72ee982fcf14f44459e73f3170575f4d612148e651d0ff1a23ac2feca8a",
+          "archive": "tar"
+        }
+      }
+    },
+    "helm-vals": {
+      "version": "0.50.0",
+      "upstream": "https://github.com/helmfile/vals",
+      "update": {
+        "provider": "github",
+        "repository": "helmfile/vals",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "vals_{version}_linux_amd64.tar.gz",
+          "macos-arm64": "vals_{version}_darwin_arm64.tar.gz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/helmfile/vals/releases/download/v0.50.0/vals_0.50.0_linux_amd64.tar.gz",
+          "sha256": "4cb1664b1e0aa49481cb05fabe2c52d4944dcaab31c4805924b668ae9f54c379",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/helmfile/vals/releases/download/v0.50.0/vals_0.50.0_darwin_arm64.tar.gz",
+          "sha256": "8f960625cc7f96d7055d02882d5d3b22c5ba31b8e2b31dcd948eb79eb4e105c5",
+          "archive": "tar"
+        }
+      }
+    },
+    "tenv": {
+      "version": "4.15.1",
+      "upstream": "https://github.com/tofuutils/tenv",
+      "update": {
+        "provider": "github",
+        "repository": "tofuutils/tenv",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "tenv_v{version}_Linux_x86_64.tar.gz",
+          "macos-arm64": "tenv_v{version}_Darwin_arm64.tar.gz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/tofuutils/tenv/releases/download/v4.15.1/tenv_v4.15.1_Linux_x86_64.tar.gz",
+          "sha256": "0d931096eefb9d9147bc23f3f29f9bf302a2ee8d3455a86d0171787a7b06bce6",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/tofuutils/tenv/releases/download/v4.15.1/tenv_v4.15.1_Darwin_arm64.tar.gz",
+          "sha256": "46697b3f8e94596b9fb354acb22f238746ac5a1e07f9627e383405d81f221c41",
+          "archive": "tar"
+        }
+      }
+    },
+    "openstack-cli": {
+      "version": "0.13.8",
+      "upstream": "https://github.com/gtema/openstack",
+      "update": {
+        "provider": "github",
+        "repository": "gtema/openstack",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "openstack_cli-x86_64-unknown-linux-gnu.tar.xz",
+          "macos-arm64": "openstack_cli-aarch64-apple-darwin.tar.xz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/gtema/openstack/releases/download/v0.13.8/openstack_cli-x86_64-unknown-linux-gnu.tar.xz",
+          "sha256": "12c52e457b83b0d54c4c5913583564ea0c74114ffe3b45b7bcf250b7b72f2944",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/gtema/openstack/releases/download/v0.13.8/openstack_cli-aarch64-apple-darwin.tar.xz",
+          "sha256": "1e7f605b794d9484d992017215a514fba7fd7aeea58020fd6830f734fc418616",
+          "archive": "tar"
+        }
+      }
+    },
+    "openstack-tui": {
+      "version": "0.13.8",
+      "upstream": "https://github.com/gtema/openstack",
+      "update": {
+        "provider": "github",
+        "repository": "gtema/openstack",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "openstack_tui-x86_64-unknown-linux-gnu.tar.xz",
+          "macos-arm64": "openstack_tui-aarch64-apple-darwin.tar.xz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://github.com/gtema/openstack/releases/download/v0.13.8/openstack_tui-x86_64-unknown-linux-gnu.tar.xz",
+          "sha256": "6e0e93803812a8170eb68f861bca86cb7d478893463af1e5609782f4af7ac34d",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://github.com/gtema/openstack/releases/download/v0.13.8/openstack_tui-aarch64-apple-darwin.tar.xz",
+          "sha256": "c2793c6dc8e0201d117bdc6fb11c6f028a686b29fc17d52fd2e0442d13e763bf",
+          "archive": "tar"
+        }
+      }
+    },
+    "helm": {
+      "version": "4.3.1",
+      "upstream": "https://github.com/helm/helm",
+      "update": {
+        "provider": "github",
+        "repository": "helm/helm",
+        "tag_prefix": "v",
+        "assets": {
+          "linux-x64": "https://get.helm.sh/helm-v{version}-linux-amd64.tar.gz",
+          "macos-arm64": "https://get.helm.sh/helm-v{version}-darwin-arm64.tar.gz"
+        }
+      },
+      "platforms": {
+        "linux-x64": {
+          "url": "https://get.helm.sh/helm-v4.3.1-linux-amd64.tar.gz",
+          "sha256": "0403a88ae20913d11b10a2467b50087721fea7581736da6b9d3992f5357fe54b",
+          "archive": "tar"
+        },
+        "macos-arm64": {
+          "url": "https://get.helm.sh/helm-v4.3.1-darwin-arm64.tar.gz",
+          "sha256": "6b4e61c8cd27d99e5a801e63ff25dd5c70b36875c2cd659d3e9ce6b76fc23198",
+          "archive": "tar"
+        }
+      }
+    },
+    "openstack-python": {
+      "version": "10.5.0",
+      "upstream": "https://pypi.org/project/python-openstackclient/",
+      "update": {
+        "provider": "pypi",
+        "package": "python-openstackclient"
+      },
+      "lock": "native/recipes/tools/openstack.lock.json"
+    }
+  }
+}

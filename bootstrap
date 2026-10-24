@@ -1,0 +1,245 @@
+#!/bin/sh -p
+# Only bootstrap acquires prerequisites, after dependency-free argument validation.
+set -eu
+PATH=/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin
+export PATH
+unset TAR_OPTIONS GZIP XZ_OPT XZ_DEFAULTS BZIP BZIP2 PERL5OPT PERL5LIB
+base=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+root=$base
+private=0
+# Dependency-free preflight mirrors parser()/validate_arguments() before acquisition.
+# Validate the engine CLI syntax and operation contract without installed runtimes.
+home=${HOME:?HOME is required} action='' operation='' previous='' verification=0 override='' help=0
+yes=0 platform='' selected_base=$base checks=0 ids=0 candidate_arg='' promote_arg='' packages=0 family=''
+used=' ' versions=0 positional=0 local_options=0
+fail() { echo "bootstrap: $*" >&2; exit 2; }
+option_value() {
+    case "$option" in
+        --home) home=$value ;;
+        --root) root=$value ;;
+        --base) selected_base=$value ;;
+        --bootstrap-source) override=${value:-.}; local_options=1 ;;
+        --platform) case "$value" in linux-x64|macos-arm64) platform=$value ;; *) fail 'invalid --platform' ;; esac ;;
+        --set)
+            case "$value" in *=true|*=false) selector=${value%=*} ;; *) fail '--set requires FEATURE=true|false' ;; esac
+            case "$selector" in ''|dotfiles.*|.*|*.|*..*|*[!A-Za-z0-9_.-]*) fail 'invalid feature selector' ;; esac ;;
+        --fixture-context) local_options=1 ;;
+        --id) ids=$((ids + 1)) ;;
+        --candidate) candidate_arg=$value ;;
+        --promote) promote_arg=$value ;;
+        --family) case "$value" in mise|desktop|all) family=$value ;; *) fail 'invalid --family' ;; esac ;;
+        --uid) number=$value; case "$number" in -*) number=${number#-} ;; +*) number=${number#+} ;; esac; case "$number" in ''|*[!0-9]*) fail '--uid requires an integer' ;; esac ;;
+        --qt-version|--rust-version|--wayland-version|--protocols-version) versions=1 ;;
+    esac
+    used="$used$option "
+}
+for argument do
+    if [ "$positional" -eq 1 ]; then
+        if [ -z "$action" ]; then action=$argument
+        elif [ -z "$operation" ]; then operation=$argument
+        else fail 'too many operations'; fi
+        continue
+    fi
+    if [ -n "$previous" ]; then
+        case "$argument" in --*|-h) fail "missing value for $previous" ;; esac
+        case "$argument" in
+            -?*) number=${argument#-}; case "$number" in *[!0-9.]*|*.*.*) fail "missing value for $previous" ;; [0-9]*|.[0-9]*) : ;; *) fail "missing value for $previous" ;; esac ;;
+        esac
+        option=$previous value=$argument; option_value
+        previous=
+        continue
+    fi
+    case "$argument" in
+        --home|--root|--base|--bootstrap-source|--platform|--set|--fixture-context|--output|--id|--candidate|--promote|--state-dir|--files-from|--evidence|--family|--message|--branch|--candidate-output|--qt-version|--rust-version|--wayland-version|--protocols-version|--uid|--username)
+            if [ "$private" -eq 1 ]; then case "$argument" in --root|--base) fail 'private source root is fixed by this entry point' ;; esac; fi
+            previous=$argument ;;
+        --*=*)
+            option=${argument%%=*} value=${argument#*=}
+            case "$option" in --home|--root|--base|--bootstrap-source|--platform|--set|--fixture-context|--output|--id|--candidate|--promote|--state-dir|--files-from|--evidence|--family|--message|--branch|--candidate-output|--qt-version|--rust-version|--wayland-version|--protocols-version|--uid|--username) : ;; *) fail "unknown option: $option" ;; esac
+            if [ "$private" -eq 1 ]; then case "$option" in --root|--base) fail 'private source root is fixed by this entry point' ;; esac; fi
+            option_value ;;
+        --verification-only) verification=1 ;;
+        --yes) yes=1 ;;
+        --checks) checks=1; used="$used$argument " ;;
+        --packages) packages=1; used="$used$argument " ;;
+        --verification-tools|--refresh|--no-tests|--ack-desktop-consent|--ack-root-equivalent) used="$used$argument " ;;
+        --require-private-site) [ "$private" -eq 0 ] || fail 'private source root is fixed by this entry point' ;;
+        -h|--help) help=1 ;;
+        --) positional=1 ;;
+        -*) fail "unknown option: $argument" ;;
+        *)
+            if [ -z "$action" ]; then action=$argument
+            elif [ -z "$operation" ]; then operation=$argument
+            else fail 'too many operations'; fi ;;
+    esac
+done
+[ -z "$previous" ] || fail "missing value for $previous"
+action=${action:-plan}
+case "$action" in bootstrap|plan|render|apply|provision|updates|update|verify|services|retire|recover|doctor|desktop|work|source|lifecycle|native-host) : ;; *) fail "invalid action: $action" ;; esac
+if [ "$help" -eq 1 ]; then
+    for candidate in /usr/bin/python3 /opt/homebrew/bin/python3; do
+        if [ -x "$candidate" ] && "$candidate" -I -c 'import sys; sys.exit(sys.version_info < (3, 11))' 2>/dev/null; then
+            exec "$candidate" -I -B "$base/native/engine/__main__.py" --help
+        fi
+    done
+    printf '%s\n' 'Usage: ./bootstrap ACTION [OPERATION] [OPTIONS]' \
+        'Actions: bootstrap plan render apply provision updates update verify services retire recover doctor desktop work source lifecycle native-host' \
+        'Run bootstrap --yes to acquire checksum-pinned Python, mise and chezmoi; add --verification-tools for repository check tools.' \
+        'Use --verification-only --home DISPOSABLE_HOME for --bootstrap-source PATH or --fixture-context PATH.'
+    exit 0
+fi
+case "$action" in
+    desktop) operation=${operation:-status}; routes=' status inspect acquire candidate recover ' ;;
+    work) operation=${operation:-docker-status}; routes=' docker-status docker-start docker-access ' ;;
+    source) operation=${operation:-status}; routes=' status prepare check publish recover ' ;;
+    lifecycle) operation=${operation:-inspect}; routes=' inspect shell handoff rescue recover retire-nix ' ;;
+    native-host) operation=${operation:-status}; routes=' status provision clt-request ' ;;
+    services) operation=${operation:-status}; routes=' status enable disable start stop restart reload recover ' ;;
+    *) [ -z "$operation" ] || fail "$action does not accept an operation"; routes= ;;
+esac
+if [ -n "$routes" ]; then case "$routes" in *" $operation "*) : ;; *) fail "invalid $action operation: $operation" ;; esac; fi
+for option in $used; do
+    allowed=1
+    case "$option" in
+        --verification-tools) [ "$action" = bootstrap ] || allowed=0 ;;
+        --checks) [ "$action" = verify ] || allowed=0 ;;
+        --files-from|--no-tests) [ "$action:$checks" = verify:1 ] || allowed=0 ;;
+        --evidence) [ "$action" = lifecycle ] || allowed=0 ;;
+        --family) [ "$action:$operation" = source:prepare ] || allowed=0 ;;
+        --message|--branch) [ "$action:$operation" = source:publish ] || allowed=0 ;;
+        --candidate-output) [ "$action:$operation" = desktop:acquire ] || allowed=0 ;;
+        --qt-version|--rust-version|--wayland-version|--protocols-version) case "$action:$operation" in desktop:acquire|source:prepare) : ;; *) allowed=0 ;; esac ;;
+        --ack-desktop-consent) [ "$action:$operation" = work:docker-start ] || allowed=0 ;;
+        --ack-root-equivalent|--uid|--username) [ "$action:$operation" = work:docker-access ] || allowed=0 ;;
+        --candidate) case "$action" in update|recover|desktop) : ;; *) allowed=0 ;; esac ;;
+        --state-dir) [ "$action" = recover ] || allowed=0 ;;
+        --promote) [ "$action" = update ] || allowed=0 ;;
+        --packages) case "$action" in retire|recover) : ;; *) allowed=0 ;; esac ;;
+        --refresh) [ "$action" = updates ] || allowed=0 ;;
+        --output) case "$action:$operation" in render:|apply:|desktop:candidate) : ;; *) allowed=0 ;; esac ;;
+    esac
+    [ "$allowed" -eq 1 ] || fail "$option is not valid for $action $operation"
+done
+case "$action" in source|lifecycle|native-host|work) [ "$ids" -eq 0 ] || fail "$action does not accept --id" ;; desktop) [ "$ids" -le 1 ] || fail 'desktop selects exactly one --id' ;; esac
+[ "$action:$checks" != verify:1 ] || [ "$ids" -eq 0 ] || fail 'repository checks do not accept --id'
+[ "$action:$packages" != recover:1 ] || [ -z "$candidate_arg" ] || fail 'choose package or source candidate recovery'
+if [ "$action" = update ]; then
+    if [ -n "$candidate_arg" ]; then [ -z "$promote_arg" ] || fail 'update requires exactly one of --candidate or --promote'
+    else [ -n "$promote_arg" ] || fail 'update requires exactly one of --candidate or --promote'; fi
+fi
+[ "$action:$operation" != desktop:candidate ] || [ -n "$candidate_arg" ] || fail 'desktop candidate requires --candidate'
+[ "$action:$family:$versions" != source:mise:1 ] || fail 'desktop toolchain overrides require --family desktop or all'
+mutation=0
+case "$action" in bootstrap|apply|provision|update|retire|recover) mutation=1 ;; services|desktop|work|source|lifecycle|native-host) case "$operation" in status|inspect|check|docker-status) : ;; *) mutation=1 ;; esac ;; esac
+[ "$mutation" -eq 0 ] || [ "$yes" -eq 1 ] || fail "$action requires --yes"
+if [ "$local_options" -eq 1 ]; then [ "$verification" -eq 1 ] || fail 'local source/fixture context requires --verification-only'; fi
+if [ "$selected_base" != "$base" ] && [ "$verification" -ne 1 ]; then
+    [ -d "$selected_base" ] && [ "$(CDPATH='' cd -- "$selected_base" && pwd -P)" = "$base" ] || fail '--base requires --verification-only'
+fi
+case "$home" in /*) ;; *) fail '--home must be absolute' ;; esac
+case "$home" in *[!/]*) ;; *) fail 'unsafe root home path' ;; esac
+case "$home" in /|*/../*|*/..|*/./*|*/.|*/nix/*) fail 'unsafe home path' ;; esac
+[ ! -L "$home" ] || fail 'home cannot itself be a symlink'
+canonical_home() {
+    candidate=$1 suffix=
+    while [ ! -d "$candidate" ]; do
+        [ ! -e "$candidate" ] && [ ! -L "$candidate" ] || fail 'home ancestor is not a directory'
+        suffix=/${candidate##*/}$suffix
+        candidate=${candidate%/*}
+        [ -n "$candidate" ] || candidate=/
+    done
+    resolved=$(CDPATH='' cd -- "$candidate" && pwd -P)
+    if [ "$resolved" = / ] && [ -n "$suffix" ]; then resolved=; fi
+    printf '%s%s\n' "$resolved" "$suffix"
+}
+home=$(canonical_home "$home")
+case "$home" in /|*/nix/*) fail 'unsafe home path' ;; esac
+real_home=$(canonical_home "$HOME")
+if [ "$verification" -eq 1 ]; then
+    case "$real_home/" in "$home/"*) fail 'verification requires a disposable home, not real HOME or an ancestor' ;; esac
+fi
+if [ -n "$platform" ] && [ "$mutation" -eq 1 ] && [ "$verification" -eq 0 ]; then
+    case "$(uname -s):$(uname -m):$platform" in Linux:x86_64:linux-x64|Darwin:arm64:macos-arm64) : ;; *) fail 'cannot mutate a different platform' ;; esac
+fi
+prefix=$home/.local/share/dotfiles/runtime/bootstrap-python/3.13.17
+current=$home
+for component in .local share dotfiles runtime bootstrap-python 3.13.17; do
+    current=$current/$component
+    [ ! -L "$current" ] || { echo "bootstrap: foreign runtime ancestor: $current" >&2; exit 2; }
+done
+python=$home/.local/share/dotfiles/runtime/bootstrap-python/3.13.17/python/bin/python3
+if [ "$action" = bootstrap ] && [ "$help" -eq 0 ]; then
+    yes=0
+    for argument do [ "$argument" != --yes ] || yes=1; done
+    [ "$yes" -eq 1 ] || { echo 'bootstrap: prerequisite acquisition requires --yes' >&2; exit 2; }
+    if [ -n "$override" ]; then
+        [ "$verification" -eq 1 ] && [ "$home" != "$HOME" ] || { echo 'bootstrap: local source acquisition requires disposable --home and --verification-only' >&2; exit 2; }
+    fi
+    case "$(uname -s):$(uname -m)" in
+        Linux:x86_64) triple=x86_64-unknown-linux-gnu; digest=f829adc9d888e76c8801b4799ed444188d35239fcae3a9808a99ec5cb0d8d92c ;;
+        Darwin:arm64) triple=aarch64-apple-darwin; digest=8dc60610a82f1e73be7faf964383e02520f95f6e39592a5c37c3809f5a7b798e ;;
+        *) echo 'bootstrap: supported hosts are Ubuntu 24.04 x86_64 and macOS arm64' >&2; exit 2 ;;
+    esac
+    prefix=$home/.local/share/dotfiles/runtime/bootstrap-python/3.13.17
+    [ ! -L "$prefix" ] || { echo 'bootstrap: foreign Python prefix symlink' >&2; exit 2; }
+    if [ ! -x "$python" ]; then
+        [ ! -e "$prefix" ] || { echo 'bootstrap: foreign or partial Python prefix; inspect before recovery' >&2; exit 2; }
+        parent=${prefix%/*}
+        mkdir -p "$parent"
+        lock=$parent/.bootstrap.lock
+        mkdir "$lock" 2>/dev/null || { echo 'bootstrap: prerequisite acquisition is locked' >&2; exit 2; }
+        stage=$(mktemp -d "$parent/.python.XXXXXXXX")
+        trap 'rm -rf -- "$stage"; rmdir "$lock" 2>/dev/null || :' EXIT HUP INT TERM
+        url="https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.13.17%2B20261021-$triple-install_only_stripped.tar.gz"
+        curl --disable --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 "$url" -o "$stage/python.tar.gz"
+        if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$stage/python.tar.gz"); else actual=$(shasum -a 256 "$stage/python.tar.gz"); fi
+        actual=${actual%% *}
+        [ "$actual" = "$digest" ] || { echo 'bootstrap: Python SHA-256 mismatch' >&2; exit 2; }
+        mkdir "$stage/tree"
+        tar -xzf "$stage/python.tar.gz" -C "$stage/tree"
+        [ -x "$stage/tree/python/bin/python3" ] || { echo 'bootstrap: pinned Python archive missing interpreter' >&2; exit 2; }
+        mv "$stage/python.tar.gz" "$stage/tree/.archive.tar.gz"
+        printf '%s\n' "$digest" > "$stage/tree/.archive.sha256"
+        mv "$stage/tree" "$prefix"
+        rm -rf -- "$stage"
+        rmdir "$lock"
+        trap - EXIT HUP INT TERM
+    fi
+    [ -f "$prefix/.archive.tar.gz" ] || { echo 'bootstrap: unrecorded Python runtime' >&2; exit 2; }
+    if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$prefix/.archive.tar.gz"); else actual=$(shasum -a 256 "$prefix/.archive.tar.gz"); fi
+    actual=${actual%% *}
+    [ "$actual" = "$digest" ] || { echo 'bootstrap: Python archive verification failed' >&2; exit 2; }
+elif [ ! -x "$python" ]; then
+    python=
+    for candidate in /usr/bin/python3 /opt/homebrew/bin/python3; do
+        if [ -x "$candidate" ] && "$candidate" -I -c 'import sys; sys.exit(sys.version_info < (3, 11))' 2>/dev/null; then python=$candidate; break; fi
+    done
+    if [ -z "$python" ]; then
+        if [ "$help" -eq 1 ] || [ "$#" -eq 0 ]; then
+            printf '%s\n' 'Usage: ./bootstrap {bootstrap,plan,render,apply,provision,updates,update,verify,services,retire,recover,doctor,desktop,work,source,lifecycle,native-host} [OPERATION] [--yes] [--home PATH]' 'Run bootstrap --yes to acquire checksum-pinned Python, mise and chezmoi; add --verification-tools for repository check tools.'
+            exit 0
+        fi
+        echo 'bootstrap: native Python >=3.11 unavailable; run bootstrap --yes to acquire the pinned interpreter' >&2
+        exit 2
+    fi
+fi
+if [ "$python" = "$prefix/python/bin/python3" ]; then
+    case "$(uname -s):$(uname -m)" in
+        Linux:x86_64) digest=f829adc9d888e76c8801b4799ed444188d35239fcae3a9808a99ec5cb0d8d92c ;;
+        Darwin:arm64) digest=8dc60610a82f1e73be7faf964383e02520f95f6e39592a5c37c3809f5a7b798e ;;
+        *) echo 'bootstrap: unsupported Python runtime platform' >&2; exit 2 ;;
+    esac
+    [ -f "$prefix/.archive.tar.gz" ] && [ ! -L "$prefix/.archive.tar.gz" ] || { echo 'bootstrap: unrecorded Python runtime' >&2; exit 2; }
+    if command -v sha256sum >/dev/null 2>&1; then
+        actual=$(sha256sum "$prefix/.archive.tar.gz")
+        expected=$(tar -xzOf "$prefix/.archive.tar.gz" python/bin/python3.13 | sha256sum)
+        executable=$(sha256sum "$python")
+    else
+        actual=$(shasum -a 256 "$prefix/.archive.tar.gz")
+        expected=$(tar -xzOf "$prefix/.archive.tar.gz" python/bin/python3.13 | shasum -a 256)
+        executable=$(shasum -a 256 "$python")
+    fi
+    actual=${actual%% *}; expected=${expected%% *}; executable=${executable%% *}
+    [ "$actual" = "$digest" ] && [ "$expected" = "$executable" ] || { echo 'bootstrap: pinned Python executable/archive changed' >&2; exit 2; }
+fi
+exec "$python" -I -B "$base/native/engine/__main__.py" --root "$root" --base "$base" "$@"

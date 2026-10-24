@@ -1,0 +1,9 @@
+[Unit]
+Description=GnuPG private key agent
+Requires=gpg-agent.socket
+[Service]
+ExecStart={{ index .executables "gpg-agent" }} --supervised
+ExecReload={{ index .executables "gpgconf" }} --reload gpg-agent
+Environment=GNUPGHOME={{ .home }}/.gnupg
+[Install]
+Also=gpg-agent.socket gpg-agent-ssh.socket gpg-agent-extra.socket gpg-agent-browser.socket

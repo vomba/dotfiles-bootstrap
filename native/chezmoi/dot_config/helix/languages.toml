@@ -1,0 +1,48 @@
+[language-server.bash-language-server]
+command = "bash-language-server"
+args = ["start"]
+[language-server.yaml-language-server]
+command = "yaml-language-server"
+args = ["--stdio"]
+[language-server.vscode-json-language-server]
+command = "vscode-json-languageserver"
+args = ["--stdio"]
+[language-server.terraform-ls]
+command = "terraform-ls"
+args = ["serve"]
+[language-server.helm-ls]
+command = "helm_ls"
+args = ["serve"]
+[language-server.gopls]
+command = "gopls"
+[language-server.marksman]
+command = "marksman"
+[language-server.mpls]
+command = "mpls"
+args = ["--dark-mode", "--enable-emoji"]
+[[language]]
+name = "bash"
+language-servers = ["bash-language-server"]
+[[language]]
+name = "yaml"
+language-servers = ["yaml-language-server"]
+[[language]]
+name = "json"
+language-servers = ["vscode-json-language-server"]
+[[language]]
+name = "hcl"
+language-servers = ["terraform-ls"]
+language-id = "terraform"
+[[language]]
+name = "tfvars"
+language-servers = ["terraform-ls"]
+language-id = "terraform-vars"
+[[language]]
+name = "helm"
+language-servers = ["helm-ls"]
+[[language]]
+name = "go"
+language-servers = ["gopls"]
+[[language]]
+name = "markdown"
+language-servers = ["marksman", "mpls"]

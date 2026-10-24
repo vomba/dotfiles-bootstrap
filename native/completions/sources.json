@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "zsh-completions": {
+    "upstream": "https://github.com/zsh-users/zsh-completions",
+    "version": "0.36.0",
+    "url": "https://codeload.github.com/zsh-users/zsh-completions/tar.gz/refs/tags/0.36.0",
+    "sha256": "5aa68be2999a7be2eb56de8e4acff8f3bba4a66b9acbb233752536857408fb2e",
+    "source_directory": "zsh-completions-0.36.0/src",
+    "license": "zsh-completions-0.36.0/LICENSE",
+    "version_source": "https://api.github.com/repos/zsh-users/zsh-completions/releases/latest",
+    "update": {
+      "provider": "github-release",
+      "repository": "zsh-users/zsh-completions",
+      "review_required": true
+    }
+  }
+}

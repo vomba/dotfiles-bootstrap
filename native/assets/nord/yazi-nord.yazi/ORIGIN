@@ -1,0 +1,5 @@
+Source: https://github.com/stepbrobd/nord.yazi
+Revision: 4712015c399cad806572661b0a07b876931e2860
+flavor.toml sha256: e5a738b403127345acb64012e622800c297dd01152cfb21377bb280f4586686b
+LICENSE sha256: 96b61ab7093202f2dc2c99d22f4623866005e47572c60fa6f096aaf3341684d3
+Only runtime flavor data and MIT license are vendored; no screenshot, plugin code or build checkout.

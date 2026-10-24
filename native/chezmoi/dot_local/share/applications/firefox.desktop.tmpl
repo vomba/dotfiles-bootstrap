@@ -1,0 +1,20 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Firefox
+GenericName=Web Browser
+Comment=Browse the Web
+Exec="{{ index .executables "firefox" }}" %u
+Icon={{ .paths.runtime }}/firefox/current/browser/chrome/icons/default/default128.png
+Terminal=false
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+StartupWMClass=firefox
+Actions=new-window;new-private-window;
+[Desktop Action new-window]
+Name=New Window
+Exec="{{ index .executables "firefox" }}" --new-window %u
+[Desktop Action new-private-window]
+Name=New Private Window
+Exec="{{ index .executables "firefox" }}" --private-window %u

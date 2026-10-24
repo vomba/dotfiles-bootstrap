@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "id": "shell-completions",
+      "provider": "recipe",
+      "recipe": "native/recipes/completions.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "requires": [
+        "zsh"
+      ],
+      "policy": "project",
+      "reason": "Completion assets are associated with the installed native tool versions and built explicitly, never at shell startup."
+    }
+  ],
+  "artifacts": {
+    "zsh-completions": {
+      "source_manifest": "native/completions/sources.json",
+      "key": "zsh-completions"
+    }
+  },
+  "completion_policy": {
+    "precedence": [
+      "package-native",
+      "generated",
+      "supplemental"
+    ],
+    "generators": [
+      {
+        "command": "act",
+        "when": "apps.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ]
+      },
+      {
+        "command": "golazo",
+        "when": "apps.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ]
+      },
+      {
+        "command": "upctl",
+        "when": "dev.cloud.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ]
+      },
+      {
+        "command": "sonobuoy",
+        "when": "dev.kubernetes.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ]
+      },
+      {
+        "command": "kubectl-oidc_login",
+        "when": "dev.kubernetes.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ],
+        "rename": [
+          "kubelogin",
+          "kubectl-oidc_login"
+        ]
+      },
+      {
+        "command": "helmfile",
+        "when": [
+          "dev.kubernetes.enable",
+          "dev.mise.enable"
+        ],
+        "args": [
+          "completion",
+          "zsh"
+        ]
+      },
+      {
+        "command": "lazygit",
+        "when": "shell.git.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ],
+        "autoload_dispatch": true
+      },
+      {
+        "command": "mise",
+        "when": "dev.mise.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ]
+      },
+      {
+        "command": "kubectl",
+        "when": "shell.zsh.enable",
+        "args": [
+          "completion",
+          "zsh"
+        ]
+      }
+    ],
+    "required": [
+      {
+        "command": "terraform",
+        "when": "dev.mise.enable"
+      },
+      {
+        "command": "ansible",
+        "when": "dev.kubernetes.enable"
+      },
+      {
+        "command": "openstack",
+        "when": "dev.cloud.enable"
+      },
+      {
+        "command": "yazi",
+        "when": "apps.yazi.enable"
+      }
+    ],
+    "excluded_commands": [
+      "cidr",
+      "cachix",
+      "nix-tree"
+    ]
+  }
+}

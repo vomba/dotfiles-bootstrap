@@ -1,211 +1,115 @@
 # dotfiles-bootstrap
 
-Public flake base for Home Manager and nix-darwin dotfiles. It contains reusable modules, overlays, and example outputs that build without private secrets, hostnames, or local files.
+Public native source/assets for **Ubuntu 24.04 LTS x86_64** and **macOS arm64 (15+)**. The engine composes manifests, stages authored configuration with chezmoi, provisions selected tools through mise/native providers, and handles recorded ownership/recovery. Nix is not required to bootstrap, render, build recipes, verify or run the environment.
 
-The intended consumer is a private activation repo that imports this flake and layers personal identity, secrets, AI tooling, work settings, and machine-specific modules on top.
+Private consumers keep identity, secrets, work, AI tooling and host configuration in their own repository. This public source has no private hook requirement or private user inputs when run standalone.
 
-## Exports
+## Consumption and ownership
 
-- `homeManagerModules.bootstrap`
-- `darwinModules.bootstrap`
-- `overlays.default`
-- `lib.mkPkgs`
-- `lib.mkHomeConfiguration`
-- `lib.mkDarwinConfiguration`
-- `packages.<system>.zsh-kubecolor`
-- `packages.<system>.mise` — hash-pinned official mise release binary
+A consumer's shell entry reads its `bootstrap.lock.json`: HTTPS repository, exact reviewed Git commit and SHA-256 of its Git tar archive. It acquires and validates that source into an immutable managed cache, checks cached bytes before importing engine code and invokes the engine with the consumer root. There is no required separately maintained checkout, mutable-cache update or second chezmoi state.
 
-## Consumption
+The public checkout also has `./bootstrap` for standalone use. `--bootstrap-source PATH --verification-only --home DISPOSABLE_HOME` is an explicit local integration route, not a production override or host-mutation permission. An unpublished consumer pin fails closed.
 
-Private repos can use a GitHub flake URL directly:
+[Linux](examples/linux.json) and [macOS](examples/macos.json) are complete identity-free manifest fragments, not preinstalled profiles or activation scripts. A consumer can place the selected fragment in its own `native/manifests/` (which composes JSON fragments), review its defaults alongside the other declarations, and use `plan` / `render --output EMPTY_STAGE` before any authorized mutation. They contain no private hook, identity, credentials or work/AI wiring.
 
-```nix
-{
-  inputs.bootstrap.url = "github:<owner>/dotfiles-bootstrap";
-}
+| Owner | Responsibility |
+|-------|----------------|
+| `native/manifests/` | defaults, feature/platform selectors, package/service/artifact identities |
+| `native/chezmoi/` | authored portable files/templates; collision-aware installation |
+| `apps/mise/` | requests, multi-platform lock and locked npm Aube graphs |
+| `native/engine/` | validated root operations, providers, immutable source, ownership journals/recovery |
+| `native/recipes/` | exceptional desktop/tool/completion assemblies with explicit provenance |
+| `native/gui/` | native GUI application delivery |
+| `native/assets/`, `themes/nord/` | portable assets, notices and narrow mutable-config adapters |
+| `native/verification/` | pinned internal native checker tooling and verification |
+| consumer private hook | consumer-specific files/reconciliation only; no private code lives here |
+
+Chezmoi is not the owner of application databases or mutable user settings. Mise is not a competing dotfiles writer. APT/Homebrew/recipes have explicit installation ownership; shared OS packages/services are retained rather than globally pruned. Reading source or running tests is not activation authority.
+
+## Operations
+
+Run `./bootstrap --help` for the exact current options. Representative standalone operations:
+
+```sh
+./bootstrap bootstrap --yes
+./bootstrap native-host status
+./bootstrap plan
+./bootstrap render --output /absolute/path/to/empty-stage
+./bootstrap updates
+./bootstrap updates --refresh
+./bootstrap services status
 ```
 
-Typical composition order:
+Bootstrap uses native shell/Git/curl/tar/SHA tools and checksum-pinned standalone Python, mise and chezmoi. Engine Python, interactive Python and scoped recipe interpreters are separate ownership scopes. Mutating operations require `--yes` **and explicit authorization**:
 
-1. import `inputs.bootstrap.homeManagerModules.bootstrap` or `inputs.bootstrap.darwinModules.bootstrap`
-2. add private options and host-specific modules
-3. layer private overlays after `inputs.bootstrap.overlays.default` if needed
-
-## Portable profiles
-
-Zsh includes a store-backed kubecolor plugin and its rsync helper. Kubernetes completion is generated at build time from the selected `kubectl`; startup never writes into the plugin directory. Oh My Zsh owns the single fzf Zsh integration. No private checkout path is required.
-
-The Nord profile is disabled by default:
-
-```nix
-dotfiles.theme.nord.enable = true;
+```sh
+./bootstrap provision --yes
+./bootstrap apply --yes
 ```
 
-It styles enabled shell, Git, Helix, Yazi, and Glow consumers. Theme leaves are defaults, so ordinary consumer settings override them without `mkForce`. Existing unmanaged files retain Home Manager collision protection; the profile never forces replacement of `btop.conf`. Delta selects its custom syntax theme only when Bat's theme cache is enabled.
+Provision installs selected packages. Apply only installs staged authored configuration and performs declared narrow reconciliation; it never implicitly downloads packages, decrypts credentials or starts services. Service transitions are separate `services OPERATION --id SERVICE_ID --yes` actions. IDs come from `plan`/manifests. Unknown flags/action combinations fail before mutation.
 
-Portable DMS and kubecolor palettes are available under `themes/nord/`; the base does not deploy a desktop, choose a location/wallpaper, write a kubeconfig-adjacent file, or set private kubie exclusions. Source attribution and licenses accompany the assets.
+The shell entry checks CLI syntax, platform/operation combinations and isolated-home boundaries before acquiring Python. Help remains available without prerequisites. Feature override syntax is checked there; declared boolean-leaf existence is validated by the composed manifests in the engine.
 
-Remove any old `dotfiles.desktop.hyprland.enable` assignment: the unused option has been removed. The base has no Hyprland module.
+Feature overrides use `--set FEATURE=true|false`. Public defaults compose with the selected `linux-x64` / `macos-arm64` profile, then consumer declarations. A render for the other platform is not native execution. Disabled features do not resurrect old owners; retirement requires exact unchanged recorded ownership and preserves foreign replacements/data.
 
-## Zsh completion
+### macOS native host prerequisites
 
-`dotfiles.shell.zsh.enable` enables completion discovery before Oh My Zsh's
-single `compinit`. Package-provided definitions take precedence over generated
-fallbacks, which take precedence over the supplemental `zsh-completions`
-collection. Disabling a software group removes its generated definitions.
+`native-host status` inspects Apple CLT/default-prefix Homebrew readiness. `native-host clt-request --yes` explicitly invokes Apple's install request; the user completes Apple consent/installation and reruns status. `native-host provision --yes` runs the official revision/digest-pinned Homebrew installer in a scrubbed native environment as a non-root managing user. Normal Apple sudo authorization may prompt; no credentials are stored or license/TCC consent bypassed. Existing valid `/opt/homebrew` installations remain shared and retained; retirement never uninstalls Homebrew/formulas/data. On Linux native-host is not-required.
 
-Build-time native generators cover act, golazo, UpCloud `upctl`, Sonobuoy,
-`kubectl-oidc_login`, Helmfile and lazygit. The OIDC provider uses its renamed
-binary, not Azure's unrelated `kubelogin`. Helmfile's build-only generator comes
-from the exact version, backend and artifact checksum in the committed mise
-lock; only its completion file enters the home profile. Lazygit's sourceable
-output is adapted for first-call Zsh autoload.
+## Portable shell, tools and themes
 
-Crossplane uses its upstream `complete -C` protocol through `bashcompinit`,
-registered after completion initialization without invoking the CLI at startup.
-This avoids its installer fragment's macOS login-shell lookup. Yazi and
-Home Manager lazygit shell wrappers inherit their target's provider, including
-consumer-renamed wrapper commands.
+Zsh owns one Oh My Zsh compinit. Completion fpath precedence is package-native → generated → private → supplemental; private integration runs afterward. Supported fallback assets are generated during explicit provisioning, not at shell startup. Dynamic upstream resource completers may still access services; they are not sandboxed. Generic plugins and kubectl-rsync remain public; private helpers do not.
 
-Existing package/Oh My Zsh providers, including Terraform, kubectl, OpenStack,
-Ansible and mise task names, remain in place. Mise activation and automatic
-installation stay disabled. Tools without an upstream provider retain ordinary
-filename completion; CIDR's pinned release explicitly disables its native
-completion command, so no invented argument grammar is installed.
+The Nord profile is opt-in via `theme.nord.enable`; assets cover enabled shell, Git, Helix, Yazi and Glow without whole-file ownership of mutable Btop state. Firefox configuration preserves user profile data and signed-extension consent boundaries. Linux GUI recipes use native dependencies, not package-store GPU wrappers. Mac apps have native bundle/registration paths.
 
-These additions generate assets during a Nix build, not by installing tools
-or querying providers at startup. Dynamic upstream completers can query their
-services when completing resource names; this is not a network sandbox.
-After separately authorized activation, open a new Zsh session.
+`dev.mise.enable` controls managed global config, shared strict shims and the explicit catalog, independently of general dev enablement. `apps/mise/mise.toml`, `mise.lock` and `.mise/locks/` are the canonical selected request/lock graph. `dotfiles-mise-install` isolates caller/ancestor config and installs explicitly; no shell activation, prompt/chpwd hooks, missing-version system fallback or automatic download. Personal config.local/lock additions must use disjoint keys; do not edit managed files with mise use --global. `mise exec -- command` is an explicit trusted-project environment action.
 
-## Explicit mise tool installation
+Interactive Python is apps-owned; OpenStack uses its separately locked Python 3.12 ABI environment. Terraform retains 1.5.7 for the declared license policy. CIDR/Terraform require cloud+mise; Helmfile Kubernetes+mise. Tenv keeps other tools but no competing Terraform proxy. Helm retains diff/secrets/getter/post-renderer plugins. The native tools recipe owns the full frozen OpenStack plugin assembly plus Rust CLI/TUI and declared native dependencies.
 
-`dotfiles.dev.mise.enable` defaults to true, independently of the general
-development flag. Cloud tooling requests CIDR 2.3.0 and Terraform 1.5.7 (the
-last MPL-2.0 release); Kubernetes tooling requests Helmfile 1.8.1.
-`apps/mise/mise.toml` owns these requests and backend aliases, and its committed
-lock contains checksummed downloads for four Linux/macOS architectures.
+## Desktop recipes
 
-Home Manager owns immutable `mise/config.toml` and its sibling `mise.lock`,
-without forced replacement. After a separately authorized activation, run
-`dotfiles-mise-install` explicitly to install selected tools and rebuild shims.
-Activation never downloads tools. The installer ignores caller project,
-environment and user/system mise configuration, but does not re-attest existing
-tool/plugin storage. It preserves ordinary foreign shim collisions and fails
-rather than reporting success; shim ownership follows mise's native heuristics,
-and failures do not roll back entries already refreshed.
+`native/recipes/desktop/` declares exact stable Niri/satellite source/dependency locks, complete Noble .deb/session integration, official Dux 2.0, isolated Quickshell + private Qt/Wayland runtime, reviewed Noble-targeted Hyprland PPA and appearance provenance. Do not add a newer Ubuntu release repository, replace global Qt/graphics libraries, export global Qt/QML/LD_LIBRARY_PATH or treat temporary research binaries as production inputs. Private Qt ABI changes require rebuilding Quickshell. Qt 6.11 standard support ends 2027-03-17; qualify a supported successor before that date without assuming commercial LTS access.
 
-Bare commands use the shared `$XDG_DATA_HOME/mise-shims` directory. No mise shell
-activation or prompt/chpwd hooks are enabled. Managed direnv/nix-direnv is
-retired: use `mise exec -- command` for trusted project environment variables
-and dotenv settings, and `nix develop` for Nix devshells. There is no automatic
-Nix bridge. Explicit Nix environment commands can take precedence inside that
-shell. Automatic installation and shim system-command fallback are disabled,
-and normal resolution is offline; this is not a network sandbox for the tools
-or trusted project code. Explicit installation goes online. Project Terraform
-pins can override the global fallback; missing versions fail until installed.
+The root exposes `desktop status|inspect|acquire|candidate|recover`; mutations require explicit --yes. Select `--id PACKAGE` (default `niri`). Acquisition defaults to a versioned consumer-managed source-update candidate lock, never the immutable public cache; explicit `--candidate-output` stays within the consumer repository or managed workspace. Desktop `--output BUILD_DIR` is valid only for `candidate`, paired with a complete `--candidate LOCK`. Toolchain version overrides are acquisition/source-preparation options, not status/recovery/build options. A prepared desktop source candidate also comes from the managed source workflow. Production recipes include runtime dependencies/session/portal/service/license payloads, not merely executables. This public source does not supply private monitors, wallpaper/location, identity, Dux user state or AI/work configuration.
 
-Full `mise activate` is intentionally not used: in .17 it removes tool shims
-when auto-install is disabled, allowing ordinary shell PATH lookup to bypass a
-missing selected tool version. Explicit execution preserves the strict policy.
+A new compositor is selected at deliberate logout/login, never automatic restart of a working session. Nested/container UI tests do not prove physical GPU/DRM, GDM/PAM, portals/screenshare, audio/Bluetooth, dock/VRR/scaling, lock/polkit/keyring, suspend or recovery.
 
-Personal additions can use unmanaged `config.local.toml` / `mise.local.lock`
-with disjoint keys. `mise use --global` cannot edit HM-owned configuration.
-Foreign configuration files retain Home Manager's normal collision protection.
+## Updates and dependency workflows
 
-The mise package uses official release archives with measured per-platform
-hashes, source-matched completions, and self-update disabled. Native package
-checks exercise the shipped executable; packaging does not compile or run the
-upstream Rust test suite. Its exported package can be maintained with
-`nix-update --flake mise`; review every changed release and source hash.
+`updates [--refresh]` reports upstream/provider/selected/installed distinctions. A distro provider reporting current is not proof of latest upstream. Policy exceptions (distro-security, project ABI, license pins) are explicit with reasons.
 
-## Package updates
+Consumer-owned source workflow:
 
-Helm plugin, OpenStack, and retained Nordic definitions live in `overlays/`. Check releases without changing files:
-
-```bash
-scripts/check-updates.py --dry-run
+```sh
+./bootstrap source status
+./bootstrap source prepare --family all --yes
+./bootstrap source check
+# Only with separate signed-publication authority:
+./bootstrap source publish --yes
 ```
 
-Explicitly apply complete supported OpenStack or Helm-secrets artifact updates:
+`source prepare --family mise|desktop|all --yes` creates/updates a managed public-only Git worktree derived from the consumer's immutable pin and produces coherent mise/Aube or desktop source locks. Desktop acquisition overrides are `--qt-version`, `--rust-version`, `--wayland-version` and `--protocols-version`. It returns concrete candidate paths; it does not publish, mutate selected/live state or edit the immutable cache. `source check` validates both composed platforms. Desktop candidates are explicitly built/qualified before promotion.
 
-```bash
-scripts/check-updates.py --apply --yes
-```
+`source publish` alone signs a public source commit, performs normal non-force push, fetches fresh source identity and updates the consumer's narrow private source pin. It never commits private state or publishes built binaries. `source recover --yes` resumes recorded interrupted publication/pin transitions, without force resets or foreign-edit destruction. Source publication requires separate approval; updating instructions is not that approval. Public source data in a pinned immutable cache cannot be promoted with ordinary update --promote; the source workflow replaces the pin instead. Private update bundles use their own explicit candidate/promotion contract.
 
-The checker owns only OpenStack and Helm-secrets release groups; Nordic variants
-remain individually pinned and report without mutation. Unknown source shapes
-fail closed. Exit status is `0` for current/no updates, `1` for available
-updates, and `2` for an error. Explicit release checks query public GitHub
-metadata; fixture tests do not contact providers.
-
-Helm's base, SOPS, yq, and ordinary GNU Parallel come directly from nixpkgs.
-The unused Parallel SQL-driver override is retired. CIDR and Helmfile are
-mise-owned, while tenv retains every command and completion except its
-`terraform` proxy; the filtered profile does not change tenv's source package
-or downloaded user versions. Disabling mise does not restore retired Nix owners.
-OpenStack remains 0.13.8 with its existing two-artifact/four-platform recipe.
-
-The standalone nixpkgs, Home Manager and nix-darwin locked records are aligned
-with the consuming configuration. The current Nordic overlay is retained
-because the upstream package's SDDM/KDE dependency closure cannot be evaluated
-on Darwin; no unsupported-platform override or partial theme migration is used.
-
-
-## Layout
-
-```text
-flake.nix
-flake.lock
-AGENTS.md
-lib/
-modules/
-overlays/
-examples/
-themes/nord/
-scripts/check-updates.py
-tests/
-.github/workflows/ci.yml
-```
+Update versions, hashes, platform variants, runtime dependencies and lock graphs together. Keep known-good artifacts until a qualified candidate succeeds. Report upstream compatibility gaps rather than silently downgrading or claiming latest. Review licenses/notices before any separately authorized custom binary distribution.
 
 ## Verification
 
-```bash
-nix run nixpkgs#nixfmt -- --check flake.nix $(find modules -name '*.nix') $(find examples -name '*.nix') overlays/*.nix tests/*.nix
-nix flake check
-nix build .#example-linux --no-link
+Native check dependencies are pinned internal tools, not runtime downloads from caller project configuration:
+
+```sh
+./bootstrap bootstrap --verification-tools --yes
+./bootstrap verify --checks
 ```
 
-For `example-darwin`, use a macOS host or CI runner:
+`verify --checks --files-from JSON` selects explicit paths; `--no-tests` excludes behavior tests and is reduced scope. The public CI workflow exercises native Linux/macOS public-only render/behavior/security/style checks, not private inputs. Consumer private suites remain local. Follow actual verifier help and report optional native-tool skips honestly; no Nix devshell/flake checks remain.
 
-```bash
-nix build .#example-darwin --no-link
-```
+Behavior tests use disposable HOME/synthetic credentials, actual rendered outputs, ownership/feature/security contracts and real supported native tools where available. GUI/login/provider authentication and another platform are not proven by a source render or unit suite. Workers do not run integration gates mid-flight; the integration owner verifies the complete union and applies code/security review after implementation.
 
-On Linux, `nix flake check` will only execute checks for compatible systems unless you provide additional builders.
+## Lifecycle and privacy limits
 
-The example configurations intentionally disable the modules that usually need extra host setup, such as desktop GUI, cloud, and Kubernetes tooling.
+Inspection, shell/login registration, ownership handoff, native rescue and Nix retirement are distinct `lifecycle` operations for consumers with declared lifecycle support. Handoff needs exact old ownership evidence; no inference from a store path or service name. Preserve foreign files, active sessions and shared Docker/Snap/OS resources. Native rescue must work through the OS shell and standalone interpreter without Nix. Installer-aware Nix retirement requires its own authorization and native runtime/login/services/rescue/host acceptance; unsupported/ambiguous installers fail closed. Never guess rm /nix or broad cleanup.
 
-Native checks include the example build, offline updater/plugin suites, optional Nord enable/disable/override boundaries, compiled kubecolor, `mise-integration`, and `shell-completions`. The latter exercises real upstream candidates in isolated interactive ZLE/PTY sessions, wrapper names, feature-disable transitions and completion-only ownership; it does not complete live provider resources. Local immutable mise fixture tools do not attest downloaded release bytes; real artifact installation is a separate disposable smoke. The script check uses a writable disposable source tree and patched shebangs inside the Nix sandbox.
-
-## CI
-
-`.github/workflows/ci.yml`:
-
-1. runs `nixfmt`
-2. runs `nix flake check`
-3. runs `gitleaks`
-4. runs `shellcheck` on the retained kubectl-rsync helper
-5. builds `example-linux` on Ubuntu and `example-darwin` on macOS
-
-## Privacy Guardrails
-
-This repo must not contain:
-
-- real usernames or hostnames
-- vault paths or secret filenames
-- private cache names or tokens
-- work-only domains or package registries
-- tracked AI session artifacts
-
-Before publishing changes, run a targeted leak scan using the private repo's sensitive identifiers as patterns. Also remember that any new `.nix` file must be tracked with `git add` before `nix flake check` will succeed.
+This repository must not contain identity, secrets/encrypted private inputs, credentials, work hosts/paths, OMP/Zed/ACP/MCP/skills, vault/memory/session data or private hostnames. Public examples use placeholders only. No source publication implies workstation activation, credential access, consent completion or built-artifact publication.

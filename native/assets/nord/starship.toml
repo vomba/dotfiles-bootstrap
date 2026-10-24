@@ -1,0 +1,103 @@
+format = """
+[](#5E81AC)\
+$username\
+[](bg:#4C566A fg:#5E81AC)\
+$directory\
+[](fg:#4C566A bg:#3B4252)\
+$git_branch\
+$git_status\
+[](fg:#3B4252 bg:#2E3440)\
+$golang\
+$java\
+$nodejs\
+$rust\
+$ruby\
+[](fg:#2E3440 bg:#1E222A)\
+$kubernetes\
+[](fg:#1E222A bg:#4C566A)\
+$time\
+[ ](fg:#4C566A)\
+"""
+
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Disable the blank line at the start of the prompt
+# add_newline = false
+
+# You can also replace your username with a neat symbol like  to save some space
+[username]
+show_always = true
+style_user = "fg:#ECEFF4 bg:#5E81AC"
+style_root = "fg:#ECEFF4 bg:#BF616A"
+format = '[$user ]($style)'
+
+[directory]
+style = "fg:#ECEFF4 bg:#4C566A"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+# Here is how you can shorten some long paths by text replacement
+# similar to mapped_locations in Oh My Posh:
+[directory.substitutions]
+"Documents" = " "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+# Keep in mind that the order matters. For example:
+# "Important Documents" = "   "
+# will not be replaced, because "Documents" was already substituted before.
+# So either put "Important Documents" before "Documents" or use the substituted version:
+# "Important   " = "   "
+
+[git_branch]
+symbol = ""
+style = "fg:#ECEFF4 bg:#3B4252"
+format = '[[ $symbol $branch ](fg:#ECEFF4 bg:#3B4252)]($style)'
+
+[git_status]
+style = "fg:#ECEFF4 bg:#3B4252"
+format = '[[($all_status$ahead_behind )](fg:#ECEFF4 bg:#3B4252)]($style)'
+
+[golang]
+symbol = " "
+style = "fg:#81A1C1 bg:#2E3440"
+format = '[[ $symbol ($version) ](fg:#81A1C1 bg:#2E3440)]($style)'
+
+[java]
+symbol = " "
+style = "fg:#81A1C1 bg:#2E3440"
+format = '[[ $symbol ($version) ](fg:#81A1C1 bg:#2E3440)]($style)'
+
+[nodejs]
+symbol = "󰎙 "
+style = "fg:#81A1C1 bg:#2E3440"
+format = '[[ $symbol ($version) ](fg:#81A1C1 bg:#2E3440)]($style)'
+
+[rust]
+symbol = ""
+style = "fg:#81A1C1 bg:#2E3440"
+format = '[[ $symbol ($version) ](fg:#81A1C1 bg:#2E3440)]($style)'
+
+[ruby]
+symbol = ""
+style = "fg:#81A1C1 bg:#2E3440"
+format = '[[ $symbol ($version) ](fg:#81A1C1 bg:#2E3440)]($style)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = "fg:#ECEFF4 bg:#4C566A"
+format = '[[  $time ](fg:#ECEFF4 bg:#4C566A)]($style)'
+
+[kubernetes]
+disabled = false
+symbol = "⎈"
+format = '[$symbol](fg:#A3BE8C bg:#1E222A)[$context( \($namespace\))]($style)'
+style = "fg:#A3BE8C bg:#1E222A"
+
+[[kubernetes.contexts]]
+context_pattern = "^production$"
+context_alias = "production"
+style = "fg:#ECEFF4 bg:#BF616A"

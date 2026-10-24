@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "mise": {
+    "version": "2026.10.17",
+    "platforms": {
+      "linux-x64": {
+        "url": "https://github.com/jdx/mise/releases/download/v2026.10.17/mise-v2026.10.17-linux-x64-musl.tar.xz",
+        "sha256": "da0d9ace5d5b3321e391f15fbf8b53fcd65b9024e673ea51c5515189e5810416",
+        "bin": "bin/mise",
+        "archive": "tar",
+        "strip_components": 1
+      },
+      "macos-arm64": {
+        "url": "https://github.com/jdx/mise/releases/download/v2026.10.17/mise-v2026.10.17-macos-arm64.tar.xz",
+        "sha256": "8eb476e56f680a9347ce29346768d84174f631a37e0317759e2e2a565830ca5d",
+        "bin": "bin/mise",
+        "archive": "tar",
+        "strip_components": 1
+      }
+    }
+  },
+  "chezmoi": {
+    "version": "2.73.3",
+    "platforms": {
+      "linux-x64": {
+        "url": "https://github.com/twpayne/chezmoi/releases/download/v2.73.3/chezmoi_2.73.3_linux_amd64.tar.gz",
+        "sha256": "6e5827598cbfc02d132b04f95b5ea10efb5b79230e2a4a0e52df4af144a8ee9f",
+        "bin": "chezmoi",
+        "archive": "tar"
+      },
+      "macos-arm64": {
+        "url": "https://github.com/twpayne/chezmoi/releases/download/v2.73.3/chezmoi_2.73.3_darwin_arm64.tar.gz",
+        "sha256": "ec2d0005f369c912ee9891a26c30d65dc0eda51708f06948e5f7a43db69e1aa7",
+        "bin": "chezmoi",
+        "archive": "tar"
+      }
+    }
+  }
+}

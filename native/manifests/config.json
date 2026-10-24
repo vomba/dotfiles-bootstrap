@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "dotfiles": {
+      "dev": {
+        "go": {
+          "env": {}
+        }
+      },
+      "apps": {
+        "firefox": {
+          "extensions": []
+        },
+        "yazi": {
+          "shellWrapperName": "yy",
+          "enableZshIntegration": true
+        }
+      },
+      "shell": {
+        "git": {
+          "lazygitWrapperName": "lazygit",
+          "lazygitZshIntegration": false
+        }
+      }
+    }
+  },
+  "packages": [
+    {
+      "id": "bat-nord-cache",
+      "provider": "recipe",
+      "recipe": "native/assets/configure.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "requires": [
+        "bat"
+      ],
+      "policy": "project",
+      "reason": "Bat requires explicit regeneration of native syntax/theme caches after authored theme installation"
+    },
+    {
+      "id": "btop-nord-settings",
+      "provider": "recipe",
+      "recipe": "native/assets/configure.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "requires": [
+        "btop"
+      ],
+      "policy": "project",
+      "reason": "Reconcile only Btop color_theme; the application owns its mutable config and state"
+    },
+    {
+      "id": "firefox-profile",
+      "provider": "recipe",
+      "recipe": "native/assets/configure.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.firefox.enable",
+      "requires": [
+        "firefox"
+      ],
+      "policy": "project",
+      "reason": "Reconcile default profile, search metadata and hash-pinned extension payloads without owning mutable browser data"
+    }
+  ],
+  "services": [
+    {
+      "id": "gpg-agent",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.gpg.enable",
+      "manager": "systemd-user",
+      "name": "gpg-agent.service",
+      "source": "native/chezmoi/dot_config/systemd/user/gpg-agent.service.tmpl",
+      "target": ".config/systemd/user/gpg-agent.service"
+    },
+    {
+      "id": "gpg-agent-standard-socket",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.gpg.enable",
+      "manager": "systemd-user",
+      "name": "gpg-agent.socket",
+      "source": "native/chezmoi/dot_config/systemd/user/gpg-agent.socket",
+      "target": ".config/systemd/user/gpg-agent.socket"
+    },
+    {
+      "id": "gpg-agent-ssh-socket",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.gpg.enable",
+      "manager": "systemd-user",
+      "name": "gpg-agent-ssh.socket",
+      "source": "native/chezmoi/dot_config/systemd/user/gpg-agent-ssh.socket",
+      "target": ".config/systemd/user/gpg-agent-ssh.socket"
+    },
+    {
+      "id": "gpg-agent-extra-socket",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.gpg.enable",
+      "manager": "systemd-user",
+      "name": "gpg-agent-extra.socket",
+      "source": "native/chezmoi/dot_config/systemd/user/gpg-agent-extra.socket",
+      "target": ".config/systemd/user/gpg-agent-extra.socket"
+    },
+    {
+      "id": "gpg-agent-browser-socket",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.gpg.enable",
+      "manager": "systemd-user",
+      "name": "gpg-agent-browser.socket",
+      "source": "native/chezmoi/dot_config/systemd/user/gpg-agent-browser.socket",
+      "target": ".config/systemd/user/gpg-agent-browser.socket"
+    },
+    {
+      "id": "gpg-agent-launchd",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "shell.gpg.enable",
+      "manager": "launchd",
+      "name": "org.dotfiles.gpg-agent",
+      "source": "native/chezmoi/Library/LaunchAgents/org.dotfiles.gpg-agent.plist.tmpl",
+      "target": "Library/LaunchAgents/org.dotfiles.gpg-agent.plist"
+    }
+  ],
+  "cache_generators": [
+    {
+      "id": "bat-nord-cache",
+      "when": [
+        "theme.nord.enable",
+        "shell.enable"
+      ],
+      "recipe": "native/assets/configure.py",
+      "action": "provision",
+      "inputs": [
+        "native/assets/nord/Nord-contrast.tmTheme"
+      ],
+      "output": "XDG_CACHE_HOME/bat/themes.bin",
+      "automatic": false
+    },
+    {
+      "id": "nord-dircolors",
+      "source": "native/assets/nord/vivid-nord.yml",
+      "committed_output": "native/assets/nord/ls-colors-nord",
+      "command": [
+        "vivid",
+        "generate",
+        "native/assets/nord/vivid-nord.yml"
+      ],
+      "automatic": false
+    }
+  ],
+  "artifacts": {
+    "yazi-nord-flavor": {
+      "source": "https://github.com/stepbrobd/nord.yazi",
+      "version": "4712015c399cad806572661b0a07b876931e2860",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "path": "native/assets/nord/yazi-nord.yazi",
+      "files": {
+        "flavor.toml": "e5a738b403127345acb64012e622800c297dd01152cfb21377bb280f4586686b",
+        "LICENSE": "96b61ab7093202f2dc2c99d22f4623866005e47572c60fa6f096aaf3341684d3"
+      },
+      "update": {
+        "provider": "github-commit",
+        "repository": "stepbrobd/nord.yazi",
+        "ref": "master",
+        "review_required": true
+      }
+    }
+  },
+  "configuration": {
+    "source": "native/chezmoi",
+    "private_include": "XDG_CONFIG_HOME/dotfiles/private.zsh",
+    "private_git_include": "XDG_CONFIG_HOME/git/private.conf",
+    "completion_order": [
+      "package-native",
+      "generated",
+      "private",
+      "supplemental"
+    ],
+    "mutable_exclusions": [
+      "prefs.js",
+      "profiles.ini",
+      "installs.ini",
+      "search.json.mozlz4",
+      "extensions.json",
+      "key4.db",
+      "logins.json",
+      "sessionstore*",
+      "btop/btop.conf",
+      ".gnupg/private-keys-v1.d",
+      ".gnupg/trustdb.gpg"
+    ],
+    "firefox_provision_requires": "Close Firefox; conflicts in existing default profile selection or foreign extensions require an explicit ownership handoff",
+    "cache_instructions": "Apply authored configuration, then explicitly provision bat-nord-cache; startup never downloads or rebuilds theme caches. Regenerate committed dircolors with the declared vivid command only when updating its reviewed source."
+  }
+}

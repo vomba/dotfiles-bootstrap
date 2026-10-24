@@ -29,7 +29,9 @@ class ShellAliasesTests(unittest.TestCase):
             "CALL_LOG": str(self.log),
             "PLUGIN": str(PLUGIN),
         }
-        self.executable("kubectl", '''
+        self.executable(
+            "kubectl",
+            """
 import json, os, sys
 args = sys.argv[1:]
 with open(os.environ["CALL_LOG"], "a") as stream:
@@ -38,13 +40,19 @@ if os.environ.get("KUBECTL_FAIL"):
     sys.exit(12)
 if args[:2] == ["get", "pods"]:
     print("pod-one\\npod-two")
-''')
-        self.executable("kubecolor", '''
+""",
+        )
+        self.executable(
+            "kubecolor",
+            """
 import json, os, sys
 with open(os.environ["CALL_LOG"], "a") as stream:
     stream.write(json.dumps(sys.argv[1:]) + "\\n")
-''')
-        self.executable("fzf", '''
+""",
+        )
+        self.executable(
+            "fzf",
+            """
 import os, sys
 if os.environ.get("FZF_CANCEL"):
     sys.exit(130)
@@ -52,7 +60,8 @@ if not os.environ.get("FZF_EMPTY"):
     rows = sys.stdin.read().splitlines()
     if rows:
         print(rows[-1])
-''')
+""",
+        )
 
     def executable(self, name: str, body: str) -> None:
         script = self.bin / name
@@ -70,9 +79,11 @@ if not os.environ.get("FZF_EMPTY"):
         scenario = self.home / "scenario.zsh"
         scenario.write_text(body)
         return subprocess.run(
-            [self.zsh, "-f", "-c", setup + 'source "$1"\n',
-             "shell-regressions", str(scenario)],
-            env=self.env, text=True, capture_output=True, check=False,
+            [self.zsh, "-f", "-c", setup + 'source "$1"\n', "shell-regressions", str(scenario)],
+            env=self.env,
+            text=True,
+            capture_output=True,
+            check=False,
         )
 
     def calls(self) -> list[list[str]]:
@@ -81,7 +92,7 @@ if not os.environ.get("FZF_EMPTY"):
         return [json.loads(line) for line in self.log.read_text().splitlines()]
 
     def test_resource_aliases_keep_clusterroles_distinct_from_certificate_requests(self) -> None:
-        result = self.run_zsh('''
+        result = self.run_zsh("""
 kgcr role-a
 kdcr role-a
 kdelcr role-a
@@ -90,44 +101,78 @@ kdcreq request-a
 kdelcreq request-a
 kgcreqa
 kdelc cert-a
-''')
+""")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.calls(), [
-            ["get", "clusterroles", "role-a"],
-            ["describe", "clusterroles", "role-a"],
-            ["delete", "clusterroles", "role-a"],
-            ["get", "certificaterequest", "request-a"],
-            ["describe", "certificaterequest", "request-a"],
-            ["delete", "certificaterequest", "request-a"],
-            ["get", "certificaterequest", "-A"],
-            ["delete", "certificate", "cert-a"],
-        ])
+        self.assertEqual(
+            self.calls(),
+            [
+                ["get", "clusterroles", "role-a"],
+                ["describe", "clusterroles", "role-a"],
+                ["delete", "clusterroles", "role-a"],
+                ["get", "certificaterequest", "request-a"],
+                ["describe", "certificaterequest", "request-a"],
+                ["delete", "certificaterequest", "request-a"],
+                ["get", "certificaterequest", "-A"],
+                ["delete", "certificate", "cert-a"],
+            ],
+        )
 
     def test_edit_namespace_lookup_and_interactive_exec_remain_distinct(self) -> None:
-        result = self.run_zsh('''
+        result = self.run_zsh("""
 kep pod-one
 kgpn kube-system
 kexec --context "context with spaces" -n team -- sh -c "echo hello"
 ke pod-one sh -c "echo hello"
-''')
+""")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.calls(), [
-            ["edit", "pods", "pod-one"],
-            ["get", "pods", "-n", "kube-system"],
-            ["get", "pods", "--context", "context with spaces", "-n", "team",
-             "--no-headers", "--field-selector=status.phase=Running",
-             "--output=custom-columns=NAME:.metadata.name"],
-            ["exec", "-ti", "--context", "context with spaces", "-n", "team",
-             "pod-two", "--", "sh", "-c", "echo hello"],
-            ["exec", "-it", "pod-one", "--", "sh", "-c", "echo hello"],
-        ])
+        self.assertEqual(
+            self.calls(),
+            [
+                ["edit", "pods", "pod-one"],
+                ["get", "pods", "-n", "kube-system"],
+                [
+                    "get",
+                    "pods",
+                    "--context",
+                    "context with spaces",
+                    "-n",
+                    "team",
+                    "--no-headers",
+                    "--field-selector=status.phase=Running",
+                    "--output=custom-columns=NAME:.metadata.name",
+                ],
+                [
+                    "exec",
+                    "-ti",
+                    "--context",
+                    "context with spaces",
+                    "-n",
+                    "team",
+                    "pod-two",
+                    "--",
+                    "sh",
+                    "-c",
+                    "echo hello",
+                ],
+                ["exec", "-it", "pod-one", "--", "sh", "-c", "echo hello"],
+            ],
+        )
 
     def test_picker_defaults_to_bash(self) -> None:
         result = self.run_zsh("kexec -n team\n")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.calls()[-1], [
-            "exec", "-ti", "-n", "team", "pod-two", "--", "bash",
-        ])
+        self.assertEqual(
+            self.calls()[-1],
+            [
+                "exec",
+                "-ti",
+                "-n",
+                "team",
+                "pod-two",
+                "--",
+                "bash",
+            ],
+        )
 
     def test_cancelled_picker_never_executes_a_pod(self) -> None:
         self.env["FZF_CANCEL"] = "1"
@@ -151,36 +196,62 @@ ke pod-one sh -c "echo hello"
         self.assertEqual(self.calls()[0][:2], ["get", "pods"])
 
     def test_ksync_uses_retained_helper_without_vendor_path(self) -> None:
-        self.executable("rsync", '''
+        self.executable(
+            "rsync",
+            """
 import json, os, sys
 with open(os.environ["CALL_LOG"], "a") as stream:
     stream.write(json.dumps(sys.argv[1:]) + "\\n")
     stream.write(json.dumps([os.environ.get(key) for key in
         ("KUBE_CONTEXT", "POD_NAMESPACE", "POD_CONTAINER")]) + "\\n")
-''')
-        result = self.run_zsh('''
+""",
+        )
+        result = self.run_zsh("""
 ksync --context "local context" -n team -c app -- -av "local dir/" pod:/data
 print -r -- "$PATH"
-''')
+""")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), str(self.bin))
         args, environment = self.calls()
-        self.assertEqual(args, ["--blocking-io", f"--rsh={PLUGIN.parent}/bin/kubectl-rsync",
-                                "-av", "local dir/", "pod:/data"])
+        self.assertEqual(
+            args,
+            [
+                "--blocking-io",
+                f"--rsh={PLUGIN.parent}/bin/kubectl-rsync",
+                "-av",
+                "local dir/",
+                "pod:/data",
+            ],
+        )
         self.assertEqual(environment, ["local context", "team", "app"])
 
     def test_ksync_remote_shell_preserves_context_and_command_boundaries(self) -> None:
-        self.env.update({
-            "KUBECTL_RSYNC_RSH": "true",
-            "KUBE_CONTEXT": "local context",
-            "POD_CONTAINER": "app",
-        })
+        self.env.update(
+            {
+                "KUBECTL_RSYNC_RSH": "true",
+                "KUBE_CONTEXT": "local context",
+                "POD_CONTAINER": "app",
+            }
+        )
         result = self.run_zsh('ksync -l pod team rsync --server "remote dir/"\n')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.calls(), [[
-            "exec", "--context=local context", "--namespace=team", "--container=app",
-            "pod", "-i", "--", "rsync", "--server", "remote dir/",
-        ]])
+        self.assertEqual(
+            self.calls(),
+            [
+                [
+                    "exec",
+                    "--context=local context",
+                    "--namespace=team",
+                    "--container=app",
+                    "pod",
+                    "-i",
+                    "--",
+                    "rsync",
+                    "--server",
+                    "remote dir/",
+                ]
+            ],
+        )
 
     def test_ksync_propagates_rsync_failure(self) -> None:
         self.executable("rsync", "import sys\nsys.exit(23)\n")

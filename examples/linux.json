@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "dotfiles": {
+      "theme": {
+        "nord": {
+          "enable": true
+        }
+      }
+    }
+  },
+  "profiles": {
+    "linux-x64": {
+      "dotfiles": {
+        "desktop": {
+          "enable": true,
+          "niri": {
+            "enable": true
+          }
+        }
+      }
+    }
+  },
+  "packages": [],
+  "services": []
+}

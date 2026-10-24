@@ -1,0 +1,2906 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "dotfiles": {
+      "theme": {
+        "nord": {
+          "enable": false
+        }
+      },
+      "desktop": {
+        "enable": true,
+        "niri": {
+          "enable": true
+        }
+      },
+      "dev": {
+        "enable": true,
+        "mise": {
+          "enable": true
+        },
+        "kubernetes": {
+          "enable": true,
+          "kubieConfigPath": null
+        },
+        "cloud": {
+          "enable": true
+        },
+        "lsp": {
+          "enable": true
+        }
+      },
+      "shell": {
+        "enable": true,
+        "zsh": {
+          "enable": true
+        },
+        "git": {
+          "enable": true
+        },
+        "gpg": {
+          "enable": true
+        },
+        "gnuTools": {
+          "enable": true
+        }
+      },
+      "apps": {
+        "enable": true,
+        "firefox": {
+          "enable": true
+        },
+        "editors": {
+          "enable": true
+        },
+        "yazi": {
+          "enable": true
+        }
+      }
+    }
+  },
+  "profiles": {
+    "linux-x64": {
+      "executables": {
+        "ps": "/usr/bin/ps"
+      }
+    },
+    "macos-arm64": {
+      "executables": {
+        "ps": "/bin/ps"
+      }
+    }
+  },
+  "packages": [
+    {
+      "id": "python312",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "python3",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Scoped OpenStack interpreter: Noble maintains the Python3.12 ABI required by the frozen cp312/abi3 wheel lock; this is not the interactive global Python.",
+      "when": "dev.cloud.enable",
+      "executables": {
+        "python3.12": "bin/python3.12"
+      }
+    },
+    {
+      "id": "python312",
+      "provider": "brew",
+      "name": "python@3.12",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "project",
+      "upstream": "https://www.python.org/",
+      "version_source": "https://formulae.brew.sh/api/formula/python@3.12.json",
+      "when": "dev.cloud.enable",
+      "executables": {
+        "python3.12": "bin/python3.12"
+      },
+      "reason": "Scoped OpenStack interpreter: the frozen cp312/abi3 wheel lock requires the Python3.12 ABI, not an exact Homebrew patch or the interactive global Python."
+    },
+    {
+      "id": "python",
+      "provider": "mise",
+      "tool": "python",
+      "version": "3.14.9",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.enable",
+      "executables": {
+        "python3": "bin/python3",
+        "python": "bin/python"
+      }
+    },
+    {
+      "id": "python-venv",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "python3-venv",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.cloud.enable",
+      "requires": [
+        "python312"
+      ]
+    },
+    {
+      "id": "python-pip",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "python3-pip",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.cloud.enable",
+      "requires": [
+        "python312"
+      ]
+    },
+    {
+      "id": "curl",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "curl",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "executables": {
+        "curl": "bin/curl"
+      }
+    },
+    {
+      "id": "curl",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "curl",
+      "version": "8.23.0",
+      "version_source": "https://formulae.brew.sh/api/formula/curl.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "executables": {
+        "curl": "bin/curl"
+      }
+    },
+    {
+      "id": "ca-certificates",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "ca-certificates",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest."
+    },
+    {
+      "id": "ca-certificates",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "ca-certificates",
+      "version": "2026-10-20",
+      "version_source": "https://formulae.brew.sh/api/formula/ca-certificates.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable"
+    },
+    {
+      "id": "unzip",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "unzip",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "executables": {
+        "unzip": "bin/unzip"
+      }
+    },
+    {
+      "id": "unzip",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "unzip",
+      "version": "6.0",
+      "version_source": "https://formulae.brew.sh/api/formula/unzip.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "executables": {
+        "unzip": "bin/unzip"
+      }
+    },
+    {
+      "id": "tar",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "tar",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "executables": {
+        "tar": "bin/tar"
+      }
+    },
+    {
+      "id": "tar",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "gnu-tar",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "version": "1.35",
+      "upstream": "https://www.gnu.org/software/tar/",
+      "version_source": "https://formulae.brew.sh/api/formula/gnu-tar.json",
+      "executables": {
+        "tar": "libexec/gnubin/tar"
+      }
+    },
+    {
+      "id": "bash",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "bash",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.zsh.enable",
+      "executables": {
+        "bash": "bin/bash"
+      }
+    },
+    {
+      "id": "bash",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "bash",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.zsh.enable",
+      "version": "5.3.20",
+      "upstream": "https://www.gnu.org/software/bash/",
+      "version_source": "https://formulae.brew.sh/api/formula/bash.json",
+      "executables": {
+        "bash": "bin/bash"
+      }
+    },
+    {
+      "id": "zsh",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "zsh",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.zsh.enable",
+      "executables": {
+        "zsh": "bin/zsh"
+      }
+    },
+    {
+      "id": "zsh",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "zsh",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.zsh.enable",
+      "version": "5.9.2",
+      "upstream": "https://www.zsh.org/",
+      "version_source": "https://formulae.brew.sh/api/formula/zsh.json",
+      "executables": {
+        "zsh": "bin/zsh"
+      }
+    },
+    {
+      "id": "rsync",
+      "provider": "apt",
+      "name": "rsync",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.zsh.enable",
+      "executables": {
+        "rsync": "bin/rsync"
+      }
+    },
+    {
+      "id": "rsync",
+      "provider": "brew",
+      "name": "rsync",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.zsh.enable",
+      "version": "3.5.1",
+      "upstream": "https://rsync.samba.org/",
+      "version_source": "https://formulae.brew.sh/api/formula/rsync.json",
+      "executables": {
+        "rsync": "bin/rsync"
+      }
+    },
+    {
+      "id": "coreutils",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "coreutils",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "env": "bin/env",
+        "uname": "bin/uname",
+        "sort": "bin/sort",
+        "head": "bin/head",
+        "tail": "bin/tail",
+        "cut": "bin/cut",
+        "tr": "bin/tr",
+        "readlink": "bin/readlink",
+        "mktemp": "bin/mktemp",
+        "dirname": "bin/dirname",
+        "basename": "bin/basename",
+        "cat": "bin/cat",
+        "cp": "bin/cp",
+        "mkdir": "bin/mkdir",
+        "rm": "bin/rm",
+        "sleep": "bin/sleep",
+        "timeout": "bin/timeout",
+        "date": "bin/date",
+        "tee": "bin/tee",
+        "stat": "bin/stat",
+        "realpath": "bin/realpath",
+        "sha256sum": "bin/sha256sum",
+        "mv": "bin/mv",
+        "ln": "bin/ln",
+        "chmod": "bin/chmod",
+        "touch": "bin/touch",
+        "install": "bin/install",
+        "wc": "bin/wc",
+        "printf": "bin/printf",
+        "seq": "bin/seq",
+        "base64": "bin/base64",
+        "pwd": "bin/pwd",
+        "id": "bin/id"
+      }
+    },
+    {
+      "id": "coreutils",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "coreutils",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "9.12",
+      "upstream": "https://www.gnu.org/software/coreutils/",
+      "version_source": "https://formulae.brew.sh/api/formula/coreutils.json",
+      "executables": {
+        "env": "libexec/gnubin/env",
+        "uname": "libexec/gnubin/uname",
+        "sort": "libexec/gnubin/sort",
+        "head": "libexec/gnubin/head",
+        "tail": "libexec/gnubin/tail",
+        "cut": "libexec/gnubin/cut",
+        "tr": "libexec/gnubin/tr",
+        "readlink": "libexec/gnubin/readlink",
+        "mktemp": "libexec/gnubin/mktemp",
+        "dirname": "libexec/gnubin/dirname",
+        "basename": "libexec/gnubin/basename",
+        "cat": "libexec/gnubin/cat",
+        "cp": "libexec/gnubin/cp",
+        "mkdir": "libexec/gnubin/mkdir",
+        "rm": "libexec/gnubin/rm",
+        "sleep": "libexec/gnubin/sleep",
+        "timeout": "libexec/gnubin/timeout",
+        "date": "libexec/gnubin/date",
+        "tee": "libexec/gnubin/tee",
+        "stat": "libexec/gnubin/stat",
+        "realpath": "libexec/gnubin/realpath",
+        "sha256sum": "libexec/gnubin/sha256sum",
+        "mv": "libexec/gnubin/mv",
+        "ln": "libexec/gnubin/ln",
+        "chmod": "libexec/gnubin/chmod",
+        "touch": "libexec/gnubin/touch",
+        "install": "libexec/gnubin/install",
+        "wc": "libexec/gnubin/wc",
+        "printf": "libexec/gnubin/printf",
+        "seq": "libexec/gnubin/seq",
+        "base64": "libexec/gnubin/base64",
+        "pwd": "libexec/gnubin/pwd",
+        "id": "libexec/gnubin/id"
+      }
+    },
+    {
+      "id": "findutils",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "findutils",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "find": "bin/find",
+        "xargs": "bin/xargs"
+      }
+    },
+    {
+      "id": "findutils",
+      "provider": "brew",
+      "name": "findutils",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "4.11.0",
+      "upstream": "https://www.gnu.org/software/findutils/",
+      "version_source": "https://formulae.brew.sh/api/formula/findutils.json",
+      "executables": {
+        "find": "libexec/gnubin/find",
+        "xargs": "libexec/gnubin/xargs"
+      }
+    },
+    {
+      "id": "gnu-sed",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "sed",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "sed": "bin/sed"
+      }
+    },
+    {
+      "id": "gnu-sed",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "gnu-sed",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "4.10",
+      "upstream": "https://www.gnu.org/software/sed/",
+      "version_source": "https://formulae.brew.sh/api/formula/gnu-sed.json",
+      "executables": {
+        "sed": "libexec/gnubin/sed"
+      }
+    },
+    {
+      "id": "grep",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "grep",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "grep": "bin/grep"
+      }
+    },
+    {
+      "id": "grep",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "grep",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "3.12",
+      "upstream": "https://www.gnu.org/software/grep/",
+      "version_source": "https://formulae.brew.sh/api/formula/grep.json",
+      "executables": {
+        "grep": "libexec/gnubin/grep"
+      }
+    },
+    {
+      "id": "gawk",
+      "provider": "apt",
+      "name": "gawk",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "awk": "bin/awk",
+        "gawk": "bin/gawk"
+      }
+    },
+    {
+      "id": "gawk",
+      "provider": "brew",
+      "name": "gawk",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "5.4.1",
+      "upstream": "https://www.gnu.org/software/gawk/",
+      "version_source": "https://formulae.brew.sh/api/formula/gawk.json",
+      "executables": {
+        "awk": "libexec/gnubin/awk",
+        "gawk": "bin/gawk"
+      }
+    },
+    {
+      "id": "diffutils",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "diffutils",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "diff": "bin/diff",
+        "cmp": "bin/cmp",
+        "diff3": "bin/diff3"
+      }
+    },
+    {
+      "id": "diffutils",
+      "provider": "brew",
+      "name": "diffutils",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "3.12",
+      "upstream": "https://www.gnu.org/software/diffutils/",
+      "version_source": "https://formulae.brew.sh/api/formula/diffutils.json",
+      "executables": {
+        "diff": "bin/diff",
+        "cmp": "bin/cmp",
+        "diff3": "bin/diff3"
+      }
+    },
+    {
+      "id": "make",
+      "provider": "apt",
+      "name": "make",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "make": "bin/make"
+      }
+    },
+    {
+      "id": "make",
+      "provider": "brew",
+      "name": "make",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "4.4.1",
+      "upstream": "https://www.gnu.org/software/make/",
+      "version_source": "https://formulae.brew.sh/api/formula/make.json",
+      "executables": {
+        "make": "libexec/gnubin/make",
+        "cc": "/usr/bin/clang",
+        "cxx": "/usr/bin/clang++"
+      }
+    },
+    {
+      "id": "gpatch",
+      "provider": "apt",
+      "name": "patch",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "patch": "bin/patch"
+      }
+    },
+    {
+      "id": "gpatch",
+      "provider": "brew",
+      "name": "gpatch",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "2.8.1",
+      "upstream": "https://savannah.gnu.org/projects/patch/",
+      "version_source": "https://formulae.brew.sh/api/formula/gpatch.json",
+      "executables": {
+        "patch": "libexec/gnubin/patch"
+      }
+    },
+    {
+      "id": "less",
+      "provider": "apt",
+      "name": "less",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "less": "bin/less"
+      }
+    },
+    {
+      "id": "less",
+      "provider": "brew",
+      "name": "less",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "710",
+      "upstream": "https://www.greenwoodsoftware.com/less/index.html",
+      "version_source": "https://formulae.brew.sh/api/formula/less.json",
+      "executables": {
+        "less": "bin/less"
+      }
+    },
+    {
+      "id": "gettext",
+      "provider": "apt",
+      "name": "gettext-base",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gnuTools.enable",
+      "executables": {
+        "envsubst": "bin/envsubst"
+      }
+    },
+    {
+      "id": "gettext",
+      "provider": "brew",
+      "name": "gettext",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gnuTools.enable",
+      "version": "1.0",
+      "upstream": "https://www.gnu.org/software/gettext/",
+      "version_source": "https://formulae.brew.sh/api/formula/gettext.json",
+      "executables": {
+        "envsubst": "bin/envsubst"
+      }
+    },
+    {
+      "id": "gnupg",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "gnupg",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.gpg.enable",
+      "executables": {
+        "gpg": "bin/gpg",
+        "gpgconf": "bin/gpgconf",
+        "gpg-agent": "bin/gpg-agent",
+        "gpg-connect-agent": "bin/gpg-connect-agent"
+      }
+    },
+    {
+      "id": "gnupg",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "gnupg",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.gpg.enable",
+      "version": "2.5.24",
+      "upstream": "https://gnupg.org/",
+      "version_source": "https://formulae.brew.sh/api/formula/gnupg.json",
+      "executables": {
+        "gpg": "bin/gpg",
+        "gpgconf": "bin/gpgconf",
+        "gpg-agent": "bin/gpg-agent",
+        "gpg-connect-agent": "bin/gpg-connect-agent"
+      }
+    },
+    {
+      "id": "pinentry",
+      "provider": "apt",
+      "name": "pinentry-qt",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": {
+        "any": [
+          "shell.gpg.enable",
+          "apps.enable"
+        ]
+      },
+      "executables": {
+        "pinentry": "bin/pinentry-qt"
+      }
+    },
+    {
+      "id": "pinentry",
+      "provider": "brew",
+      "name": "pinentry-mac",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": {
+        "any": [
+          "shell.gpg.enable",
+          "apps.enable"
+        ]
+      },
+      "version": "1.3.1.1",
+      "upstream": "https://github.com/GPGTools/pinentry",
+      "version_source": "https://formulae.brew.sh/api/formula/pinentry-mac.json",
+      "executables": {
+        "pinentry": "bin/pinentry-mac"
+      }
+    },
+    {
+      "id": "git",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "git",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.git.enable",
+      "executables": {
+        "git": "bin/git"
+      }
+    },
+    {
+      "id": "git",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "git",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.git.enable",
+      "version": "2.56.0",
+      "upstream": "https://git-scm.com",
+      "version_source": "https://formulae.brew.sh/api/formula/git.json",
+      "executables": {
+        "git": "bin/git"
+      }
+    },
+    {
+      "id": "git-crypt",
+      "provider": "apt",
+      "name": "git-crypt",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "shell.git.enable",
+      "executables": {
+        "git-crypt": "bin/git-crypt"
+      }
+    },
+    {
+      "id": "git-crypt",
+      "provider": "brew",
+      "name": "git-crypt",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.git.enable",
+      "version": "0.8.0",
+      "upstream": "https://www.agwa.name/projects/git-crypt/",
+      "version_source": "https://formulae.brew.sh/api/formula/git-crypt.json",
+      "executables": {
+        "git-crypt": "bin/git-crypt"
+      }
+    },
+    {
+      "id": "jq",
+      "provider": "apt",
+      "name": "jq",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": {
+        "any": [
+          "apps.enable",
+          "shell.zsh.enable",
+          "dev.lsp.enable"
+        ]
+      },
+      "executables": {
+        "jq": "bin/jq"
+      }
+    },
+    {
+      "id": "jq",
+      "provider": "brew",
+      "name": "jq",
+      "version": "1.8.2",
+      "version_source": "https://formulae.brew.sh/api/formula/jq.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": {
+        "any": [
+          "apps.enable",
+          "shell.zsh.enable",
+          "dev.lsp.enable"
+        ]
+      },
+      "executables": {
+        "jq": "bin/jq"
+      }
+    },
+    {
+      "id": "socat",
+      "provider": "apt",
+      "name": "socat",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.enable",
+      "executables": {
+        "socat": "bin/socat"
+      }
+    },
+    {
+      "id": "socat",
+      "provider": "brew",
+      "name": "socat",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.enable",
+      "version": "1.8.1.3",
+      "upstream": "http://www.dest-unreach.org/socat/",
+      "version_source": "https://formulae.brew.sh/api/formula/socat.json",
+      "executables": {
+        "socat": "bin/socat"
+      }
+    },
+    {
+      "id": "openssl",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "openssl",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": {
+        "any": [
+          "apps.enable",
+          "shell.zsh.enable"
+        ]
+      },
+      "executables": {
+        "openssl": "bin/openssl"
+      }
+    },
+    {
+      "id": "openssl",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "openssl@3",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": {
+        "any": [
+          "apps.enable",
+          "shell.zsh.enable"
+        ]
+      },
+      "version": "3.5.9",
+      "upstream": "https://openssl-library.org",
+      "version_source": "https://formulae.brew.sh/api/formula/openssl@3.json",
+      "executables": {
+        "openssl": "bin/openssl"
+      }
+    },
+    {
+      "id": "openssh",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "openssh-client",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": {
+        "any": [
+          "shell.gpg.enable",
+          "shell.zsh.enable"
+        ]
+      },
+      "executables": {
+        "ssh": "bin/ssh",
+        "ssh-add": "bin/ssh-add",
+        "ssh-agent": "bin/ssh-agent",
+        "ssh-keygen": "bin/ssh-keygen"
+      }
+    },
+    {
+      "id": "openssh",
+      "retain_shared_runtime": true,
+      "provider": "brew",
+      "name": "openssh",
+      "version": "10.6p1",
+      "version_source": "https://formulae.brew.sh/api/formula/openssh.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": {
+        "any": [
+          "shell.gpg.enable",
+          "shell.zsh.enable"
+        ]
+      },
+      "executables": {
+        "ssh": "bin/ssh",
+        "ssh-add": "bin/ssh-add",
+        "ssh-agent": "bin/ssh-agent",
+        "ssh-keygen": "bin/ssh-keygen"
+      }
+    },
+    {
+      "id": "age",
+      "provider": "apt",
+      "name": "age",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.enable",
+      "executables": {
+        "age": "bin/age",
+        "age-keygen": "bin/age-keygen"
+      }
+    },
+    {
+      "id": "age",
+      "provider": "brew",
+      "name": "age",
+      "version": "1.3.2",
+      "version_source": "https://formulae.brew.sh/api/formula/age.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.enable",
+      "executables": {
+        "age": "bin/age",
+        "age-keygen": "bin/age-keygen"
+      }
+    },
+    {
+      "id": "procps",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "procps",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.enable",
+      "executables": {
+        "ps": "bin/ps",
+        "pgrep": "bin/pgrep",
+        "pkill": "bin/pkill"
+      }
+    },
+    {
+      "id": "yubikey-manager",
+      "provider": "apt",
+      "name": "yubikey-manager",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.enable",
+      "executables": {
+        "ykman": "bin/ykman"
+      }
+    },
+    {
+      "id": "yubikey-manager",
+      "provider": "brew",
+      "name": "ykman",
+      "version": "5.9.2",
+      "version_source": "https://formulae.brew.sh/api/formula/ykman.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.enable",
+      "executables": {
+        "ykman": "bin/ykman"
+      }
+    },
+    {
+      "id": "libnotify",
+      "provider": "apt",
+      "name": "libnotify-bin",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.enable",
+      "executables": {
+        "notify-send": "bin/notify-send"
+      }
+    },
+    {
+      "id": "pre-commit",
+      "provider": "apt",
+      "name": "pre-commit",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.enable",
+      "executables": {
+        "pre-commit": "bin/pre-commit"
+      }
+    },
+    {
+      "id": "pre-commit",
+      "provider": "brew",
+      "name": "pre-commit",
+      "version": "4.7.0",
+      "version_source": "https://formulae.brew.sh/api/formula/pre-commit.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "dev.enable",
+      "executables": {
+        "pre-commit": "bin/pre-commit"
+      }
+    },
+    {
+      "id": "skopeo",
+      "provider": "apt",
+      "name": "skopeo",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.enable",
+      "executables": {
+        "skopeo": "bin/skopeo"
+      }
+    },
+    {
+      "id": "skopeo",
+      "provider": "brew",
+      "name": "skopeo",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "dev.enable",
+      "version": "1.24.1",
+      "upstream": "https://github.com/podman-container-tools/skopeo",
+      "version_source": "https://formulae.brew.sh/api/formula/skopeo.json",
+      "executables": {
+        "skopeo": "bin/skopeo"
+      }
+    },
+    {
+      "id": "parallel",
+      "provider": "apt",
+      "name": "parallel",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.enable",
+      "executables": {
+        "parallel": "bin/parallel"
+      }
+    },
+    {
+      "id": "parallel",
+      "provider": "brew",
+      "name": "parallel",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "dev.enable",
+      "version": "20260922",
+      "upstream": "https://savannah.gnu.org/projects/parallel/",
+      "version_source": "https://formulae.brew.sh/api/formula/parallel.json",
+      "executables": {
+        "parallel": "bin/parallel"
+      }
+    },
+    {
+      "id": "xcodegen",
+      "provider": "brew",
+      "name": "xcodegen",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "dev.enable",
+      "version": "2.46.0",
+      "upstream": "https://github.com/yonaskolb/XcodeGen",
+      "version_source": "https://formulae.brew.sh/api/formula/xcodegen.json",
+      "executables": {
+        "xcodegen": "bin/xcodegen"
+      }
+    },
+    {
+      "id": "ansible",
+      "provider": "apt",
+      "name": "ansible",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble-maintained Ansible/Python dependency set is the system CLI; project Kubespray requirements remain independently qualified and may select another version.",
+      "when": "dev.kubernetes.enable",
+      "executables": {
+        "ansible": "bin/ansible",
+        "ansible-config": "bin/ansible-config",
+        "ansible-console": "bin/ansible-console",
+        "ansible-doc": "bin/ansible-doc",
+        "ansible-galaxy": "bin/ansible-galaxy",
+        "ansible-inventory": "bin/ansible-inventory",
+        "ansible-playbook": "bin/ansible-playbook",
+        "ansible-pull": "bin/ansible-pull",
+        "ansible-vault": "bin/ansible-vault"
+      }
+    },
+    {
+      "id": "ansible",
+      "provider": "brew",
+      "name": "ansible",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "dev.kubernetes.enable",
+      "version": "14.5.0",
+      "upstream": "https://www.ansible.com/",
+      "version_source": "https://formulae.brew.sh/api/formula/ansible.json",
+      "executables": {
+        "ansible": "bin/ansible",
+        "ansible-config": "bin/ansible-config",
+        "ansible-console": "bin/ansible-console",
+        "ansible-doc": "bin/ansible-doc",
+        "ansible-galaxy": "bin/ansible-galaxy",
+        "ansible-inventory": "bin/ansible-inventory",
+        "ansible-playbook": "bin/ansible-playbook",
+        "ansible-pull": "bin/ansible-pull",
+        "ansible-vault": "bin/ansible-vault"
+      }
+    },
+    {
+      "id": "shellcheck",
+      "provider": "apt",
+      "name": "shellcheck",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.lsp.enable",
+      "executables": {
+        "shellcheck": "bin/shellcheck"
+      }
+    },
+    {
+      "id": "shellcheck",
+      "provider": "brew",
+      "name": "shellcheck",
+      "version": "0.11.0",
+      "version_source": "https://formulae.brew.sh/api/formula/shellcheck.json",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "dev.lsp.enable",
+      "executables": {
+        "shellcheck": "bin/shellcheck"
+      }
+    },
+    {
+      "id": "pkg-config",
+      "provider": "apt",
+      "name": "pkg-config",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.enable",
+      "executables": {
+        "pkg-config": "bin/pkg-config"
+      }
+    },
+    {
+      "id": "pkg-config",
+      "provider": "brew",
+      "name": "pkgconf",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "dev.enable",
+      "version": "3.0.10",
+      "upstream": "https://github.com/pkgconf/pkgconf",
+      "version_source": "https://formulae.brew.sh/api/formula/pkgconf.json",
+      "executables": {
+        "pkg-config": "bin/pkg-config"
+      }
+    },
+    {
+      "id": "build-tools",
+      "provider": "apt",
+      "name": "build-essential",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "dev.enable",
+      "executables": {
+        "cc": "bin/cc",
+        "c++": "bin/c++",
+        "cxx": "bin/c++"
+      }
+    },
+    {
+      "id": "ffmpeg",
+      "provider": "apt",
+      "name": "ffmpeg",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.yazi.enable",
+      "executables": {
+        "ffmpeg": "bin/ffmpeg",
+        "ffprobe": "bin/ffprobe"
+      }
+    },
+    {
+      "id": "ffmpeg",
+      "provider": "brew",
+      "name": "ffmpeg",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.yazi.enable",
+      "version": "9.0.2",
+      "upstream": "https://ffmpeg.org/",
+      "version_source": "https://formulae.brew.sh/api/formula/ffmpeg.json",
+      "executables": {
+        "ffmpeg": "bin/ffmpeg",
+        "ffprobe": "bin/ffprobe"
+      }
+    },
+    {
+      "id": "poppler",
+      "provider": "apt",
+      "name": "poppler-utils",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.yazi.enable",
+      "executables": {
+        "pdftoppm": "bin/pdftoppm",
+        "pdftotext": "bin/pdftotext"
+      }
+    },
+    {
+      "id": "poppler",
+      "provider": "brew",
+      "name": "poppler",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.yazi.enable",
+      "version": "26.10.0",
+      "upstream": "https://poppler.freedesktop.org/",
+      "version_source": "https://formulae.brew.sh/api/formula/poppler.json",
+      "executables": {
+        "pdftoppm": "bin/pdftoppm",
+        "pdftotext": "bin/pdftotext"
+      }
+    },
+    {
+      "id": "sevenzip",
+      "provider": "apt",
+      "name": "7zip",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.yazi.enable",
+      "executables": {
+        "7zz": "bin/7zz"
+      }
+    },
+    {
+      "id": "sevenzip",
+      "provider": "brew",
+      "name": "sevenzip",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.yazi.enable",
+      "version": "26.05",
+      "upstream": "https://7-zip.org",
+      "version_source": "https://formulae.brew.sh/api/formula/sevenzip.json",
+      "executables": {
+        "7zz": "bin/7zz"
+      }
+    },
+    {
+      "id": "imagemagick",
+      "provider": "apt",
+      "name": "imagemagick",
+      "platforms": [
+        "linux-x64"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble signed native system package: retain Ubuntu security/ABI maintenance; no claim of upstream latest.",
+      "when": "apps.yazi.enable",
+      "executables": {
+        "convert": "bin/convert"
+      }
+    },
+    {
+      "id": "imagemagick",
+      "provider": "brew",
+      "name": "imagemagick",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.yazi.enable",
+      "version": "7.1.2-34",
+      "upstream": "https://imagemagick.org",
+      "version_source": "https://formulae.brew.sh/api/formula/imagemagick.json",
+      "executables": {
+        "convert": "bin/convert"
+      }
+    },
+    {
+      "id": "eza",
+      "provider": "brew",
+      "name": "eza",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.enable",
+      "version": "0.23.5",
+      "upstream": "https://eza.rocks",
+      "version_source": "https://formulae.brew.sh/api/formula/eza.json",
+      "executables": {
+        "eza": "bin/eza"
+      }
+    },
+    {
+      "id": "btop",
+      "provider": "brew",
+      "name": "btop",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "shell.enable",
+      "version": "1.4.7",
+      "upstream": "https://github.com/aristocratos/btop",
+      "version_source": "https://formulae.brew.sh/api/formula/btop.json",
+      "executables": {
+        "btop": "bin/btop"
+      }
+    },
+    {
+      "id": "rbw",
+      "provider": "brew",
+      "name": "rbw",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "policy": "latest-stable",
+      "when": "apps.enable",
+      "requires": [
+        "pinentry",
+        "bash"
+      ],
+      "version": "1.15.0",
+      "upstream": "https://git.tozt.net/rbw",
+      "version_source": "https://formulae.brew.sh/api/formula/rbw.json",
+      "executables": {
+        "rbw": "bin/rbw"
+      }
+    },
+    {
+      "id": "go",
+      "provider": "mise",
+      "tool": "go",
+      "version": "1.27.3",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "go": "bin/go",
+        "gofmt": "bin/gofmt"
+      }
+    },
+    {
+      "id": "typos-lsp",
+      "provider": "mise",
+      "tool": "typos-lsp",
+      "version": "0.1.57",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "typos-lsp": "bin/typos-lsp"
+      },
+      "upstream": "https://github.com/tekumara/typos-lsp/releases/tag/v0.1.57"
+    },
+    {
+      "id": "bash-language-server",
+      "provider": "mise",
+      "tool": "bash-language-server",
+      "version": "5.8.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "bash-language-server": "bin/bash-language-server"
+      },
+      "requires": [
+        "node"
+      ]
+    },
+    {
+      "id": "yaml-language-server",
+      "provider": "mise",
+      "tool": "yaml-language-server",
+      "version": "2.0.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "yaml-language-server": "bin/yaml-language-server"
+      },
+      "requires": [
+        "node"
+      ]
+    },
+    {
+      "id": "vscode-json-languageserver",
+      "provider": "mise",
+      "tool": "vscode-json-languageserver",
+      "version": "4.10.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "vscode-json-language-server": "bin/vscode-json-language-server",
+        "vscode-json-languageserver": "bin/vscode-json-language-server"
+      },
+      "requires": [
+        "node"
+      ]
+    },
+    {
+      "id": "jq-lsp",
+      "provider": "mise",
+      "tool": "jq-lsp",
+      "version": "0.1.19",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "jq-lsp": "bin/jq-lsp"
+      },
+      "upstream": "https://github.com/wader/jq-lsp/releases/tag/v0.1.19"
+    },
+    {
+      "id": "marksman",
+      "provider": "mise",
+      "tool": "marksman",
+      "version": "2026-02-08",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "marksman": "bin/marksman"
+      },
+      "upstream": "https://github.com/artempyanykh/marksman/releases/tag/2026-02-08"
+    },
+    {
+      "id": "mpls",
+      "provider": "mise",
+      "tool": "mpls",
+      "version": "0.23.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "mpls": "bin/mpls"
+      },
+      "upstream": "https://github.com/mhersson/mpls/releases/tag/v0.23.0"
+    },
+    {
+      "id": "vale",
+      "provider": "mise",
+      "tool": "vale",
+      "version": "3.25.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "vale": "bin/vale"
+      },
+      "upstream": "https://github.com/vale-cli/vale/releases/tag/v3.25.1"
+    },
+    {
+      "id": "terraform-ls",
+      "provider": "mise",
+      "tool": "terraform-ls",
+      "version": "0.39.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "terraform-ls": "bin/terraform-ls"
+      },
+      "upstream": "https://github.com/hashicorp/terraform-ls/releases/tag/v0.39.0"
+    },
+    {
+      "id": "helm-ls",
+      "provider": "mise",
+      "tool": "helm-ls",
+      "version": "0.5.4",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "helm_ls": "bin/helm_ls"
+      },
+      "upstream": "https://github.com/mrjosh/helm-ls/releases/tag/v0.5.4"
+    },
+    {
+      "id": "gopls",
+      "provider": "mise",
+      "tool": "gopls",
+      "version": "0.24.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "verification": {
+        "backend": "go",
+        "module": "golang.org/x/tools/gopls",
+        "module_version": "v0.24.0",
+        "toolchain": "go@1.27.3",
+        "sumdb": "sum.golang.org",
+        "scope": "Exact module version verified by Go checksum database; not a prebuilt artifact SHA-256 or vendored dependency closure."
+      },
+      "executables": {
+        "gopls": "bin/gopls"
+      },
+      "requires": [
+        "go"
+      ]
+    },
+    {
+      "id": "delve",
+      "provider": "mise",
+      "tool": "delve",
+      "version": "1.27.2",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.lsp.enable",
+      "policy": "latest-stable",
+      "verification": {
+        "backend": "go",
+        "module": "github.com/go-delve/delve",
+        "module_version": "v1.27.2",
+        "toolchain": "go@1.27.3",
+        "sumdb": "sum.golang.org",
+        "scope": "Exact module version verified by Go checksum database; not a prebuilt artifact SHA-256 or vendored dependency closure."
+      },
+      "executables": {
+        "dlv": "bin/dlv"
+      },
+      "requires": [
+        "go"
+      ]
+    },
+    {
+      "id": "node",
+      "provider": "mise",
+      "tool": "node",
+      "version": "24.22.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "project",
+      "executables": {
+        "node": "bin/node",
+        "npm": "bin/npm",
+        "npx": "bin/npx"
+      },
+      "reason": "Node24 is the qualified shared tooling runtime; latest Node26 is not substituted without compatibility qualification."
+    },
+    {
+      "id": "golazo",
+      "provider": "mise",
+      "tool": "golazo",
+      "version": "0.33.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "golazo": "bin/golazo"
+      },
+      "upstream": "https://github.com/0xjuanma/golazo/releases/tag/v0.33.0"
+    },
+    {
+      "id": "gh",
+      "provider": "mise",
+      "tool": "gh",
+      "version": "2.103.2",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "gh": "bin/gh"
+      },
+      "upstream": "https://github.com/cli/cli/releases/tag/v2.103.2"
+    },
+    {
+      "id": "yq",
+      "provider": "mise",
+      "tool": "yq",
+      "version": "4.54.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "yq": "bin/yq"
+      },
+      "upstream": "https://github.com/mikefarah/yq/releases/tag/v4.54.1"
+    },
+    {
+      "id": "jless",
+      "provider": "mise",
+      "tool": "jless",
+      "version": "0.9.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "jless": "bin/jless"
+      },
+      "upstream": "https://github.com/PaulJuliusMartinez/jless/releases/tag/v0.9.0"
+    },
+    {
+      "id": "glow",
+      "provider": "mise",
+      "tool": "glow",
+      "version": "3.0.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "glow": "bin/glow"
+      },
+      "upstream": "https://github.com/charmbracelet/glow/releases/tag/v3.0.0"
+    },
+    {
+      "id": "act",
+      "provider": "mise",
+      "tool": "act",
+      "version": "0.2.89",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "act": "bin/act"
+      },
+      "upstream": "https://github.com/nektos/act/releases/tag/v0.2.89"
+    },
+    {
+      "id": "hugo",
+      "provider": "mise",
+      "tool": "hugo",
+      "version": "0.168.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "hugo": "bin/hugo"
+      },
+      "upstream": "https://github.com/gohugoio/hugo/releases/tag/v0.168.0"
+    },
+    {
+      "id": "sops",
+      "provider": "mise",
+      "tool": "sops",
+      "version": "3.13.3",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "sops": "bin/sops"
+      },
+      "upstream": "https://github.com/getsops/sops/releases/tag/v3.13.3",
+      "requires": [
+        "age"
+      ]
+    },
+    {
+      "id": "bitwarden",
+      "provider": "mise",
+      "tool": "bitwarden",
+      "version": "2026.10.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "bw": "bin/bw"
+      },
+      "upstream": "https://github.com/bitwarden/clients/releases/tag/desktop-v2026.10.1",
+      "requires": [
+        "node"
+      ]
+    },
+    {
+      "id": "rbw",
+      "provider": "mise",
+      "tool": "rbw",
+      "version": "1.15.0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "requires": [
+        "pinentry",
+        "bash"
+      ],
+      "executables": {
+        "rbw": "bin/rbw"
+      },
+      "upstream": "https://github.com/doy/rbw/releases/tag/1.15.0"
+    },
+    {
+      "id": "powershell",
+      "provider": "mise",
+      "tool": "powershell",
+      "version": "7.6.8",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "pwsh": "bin/pwsh"
+      },
+      "upstream": "https://github.com/PowerShell/PowerShell/releases/tag/v7.6.8"
+    },
+    {
+      "id": "fzf",
+      "provider": "mise",
+      "tool": "fzf",
+      "version": "0.74.5",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "fzf": "bin/fzf"
+      },
+      "upstream": "https://github.com/junegunn/fzf/releases/tag/v0.74.5"
+    },
+    {
+      "id": "bat",
+      "provider": "mise",
+      "tool": "bat",
+      "version": "0.26.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "bat": "bin/bat"
+      },
+      "upstream": "https://github.com/sharkdp/bat/releases/tag/v0.26.1"
+    },
+    {
+      "id": "zoxide",
+      "provider": "mise",
+      "tool": "zoxide",
+      "version": "0.10.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "zoxide": "bin/zoxide"
+      },
+      "upstream": "https://github.com/ajeetdsouza/zoxide/releases/tag/v0.10.0"
+    },
+    {
+      "id": "eza",
+      "provider": "mise",
+      "tool": "eza",
+      "version": "0.23.5",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "eza": "bin/eza"
+      },
+      "upstream": "https://github.com/eza-community/eza/releases/tag/v0.23.5"
+    },
+    {
+      "id": "fd",
+      "provider": "mise",
+      "tool": "fd",
+      "version": "10.5.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "fd": "bin/fd"
+      },
+      "upstream": "https://github.com/sharkdp/fd/releases/tag/v10.5.0"
+    },
+    {
+      "id": "ripgrep",
+      "provider": "mise",
+      "tool": "ripgrep",
+      "version": "15.2.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "rg": "bin/rg"
+      },
+      "upstream": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0"
+    },
+    {
+      "id": "starship",
+      "provider": "mise",
+      "tool": "starship",
+      "version": "1.27.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "starship": "bin/starship"
+      },
+      "upstream": "https://github.com/starship/starship/releases/tag/v1.27.0"
+    },
+    {
+      "id": "dust",
+      "provider": "mise",
+      "tool": "dust",
+      "version": "1.2.6",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "dust": "bin/dust"
+      },
+      "upstream": "https://github.com/bootandy/dust/releases/tag/v1.2.6"
+    },
+    {
+      "id": "duf",
+      "provider": "mise",
+      "tool": "duf",
+      "version": "0.9.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "duf": "bin/duf"
+      },
+      "upstream": "https://github.com/muesli/duf/releases/tag/v0.9.1"
+    },
+    {
+      "id": "btop",
+      "provider": "mise",
+      "tool": "btop",
+      "version": "1.4.7",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "btop": "bin/btop"
+      },
+      "upstream": "https://github.com/aristocratos/btop/releases/tag/v1.4.7"
+    },
+    {
+      "id": "sd",
+      "provider": "mise",
+      "tool": "sd",
+      "version": "1.1.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "sd": "bin/sd"
+      },
+      "upstream": "https://github.com/chmln/sd/releases/tag/v1.1.0"
+    },
+    {
+      "id": "xh",
+      "provider": "mise",
+      "tool": "xh",
+      "version": "0.26.3",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "xh": "bin/xh"
+      },
+      "upstream": "https://github.com/ducaale/xh/releases/tag/v0.26.3"
+    },
+    {
+      "id": "tealdeer",
+      "provider": "mise",
+      "tool": "tealdeer",
+      "version": "1.9.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "tldr": "bin/tldr"
+      },
+      "upstream": "https://github.com/tealdeer-rs/tealdeer/releases/tag/v1.9.0"
+    },
+    {
+      "id": "procs",
+      "provider": "mise",
+      "tool": "procs",
+      "version": "0.14.12",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "procs": "bin/procs"
+      },
+      "upstream": "https://github.com/dalance/procs/releases/tag/v0.14.12"
+    },
+    {
+      "id": "doggo",
+      "provider": "mise",
+      "tool": "doggo",
+      "version": "1.4.2",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "doggo": "bin/doggo"
+      },
+      "upstream": "https://github.com/mr-karan/doggo/releases/tag/v1.4.2"
+    },
+    {
+      "id": "delta",
+      "provider": "mise",
+      "tool": "delta",
+      "version": "0.20.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.git.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "delta": "bin/delta"
+      },
+      "upstream": "https://github.com/dandavison/delta/releases/tag/0.20.1"
+    },
+    {
+      "id": "lazygit",
+      "provider": "mise",
+      "tool": "lazygit",
+      "version": "0.66.2",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.git.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "lazygit": "bin/lazygit"
+      },
+      "upstream": "https://github.com/jesseduffield/lazygit/releases/tag/v0.66.2"
+    },
+    {
+      "id": "helix",
+      "provider": "mise",
+      "tool": "helix",
+      "version": "25.07.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.editors.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "hx": "bin/hx"
+      },
+      "upstream": "https://github.com/helix-editor/helix/releases/tag/25.07.1"
+    },
+    {
+      "id": "yazi",
+      "provider": "mise",
+      "tool": "yazi",
+      "version": "26.9.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "apps.yazi.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "yazi": "bin/yazi",
+        "ya": "bin/ya"
+      },
+      "upstream": "https://github.com/sxyazi/yazi/releases/tag/v26.9.1",
+      "requires": [
+        "ffmpeg",
+        "poppler",
+        "sevenzip",
+        "imagemagick",
+        "jq",
+        "fd",
+        "ripgrep",
+        "fzf",
+        "zoxide"
+      ]
+    },
+    {
+      "id": "kubie",
+      "provider": "mise",
+      "tool": "kubie",
+      "version": "0.28.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "kubie": "bin/kubie"
+      },
+      "upstream": "https://github.com/kubie-org/kubie/releases/tag/v0.28.0"
+    },
+    {
+      "id": "kind",
+      "provider": "mise",
+      "tool": "kind",
+      "version": "0.33.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "kind": "bin/kind"
+      },
+      "upstream": "https://github.com/kubernetes-sigs/kind/releases/tag/v0.33.0"
+    },
+    {
+      "id": "kubecolor",
+      "provider": "mise",
+      "tool": "kubecolor",
+      "version": "0.8.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "kubecolor": "bin/kubecolor"
+      },
+      "upstream": "https://github.com/kubecolor/kubecolor/releases/tag/v0.8.0"
+    },
+    {
+      "id": "kubelogin-oidc",
+      "provider": "mise",
+      "tool": "kubelogin-oidc",
+      "version": "1.36.4",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "kubectl-oidc_login": "bin/kubectl-oidc_login",
+        "kubelogin": "bin/kubelogin"
+      }
+    },
+    {
+      "id": "sonobuoy",
+      "provider": "mise",
+      "tool": "sonobuoy",
+      "version": "0.57.5",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "sonobuoy": "bin/sonobuoy"
+      },
+      "upstream": "https://github.com/vmware-tanzu/sonobuoy/releases/tag/v0.57.5"
+    },
+    {
+      "id": "velero",
+      "provider": "mise",
+      "tool": "velero",
+      "version": "1.18.4",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "velero": "bin/velero"
+      },
+      "upstream": "https://github.com/velero-io/velero/releases/tag/v1.18.4"
+    },
+    {
+      "id": "crossplane",
+      "provider": "mise",
+      "tool": "crossplane",
+      "version": "2.4.3",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "crossplane": "bin/crossplane"
+      },
+      "upstream": "https://github.com/crossplane/crossplane/releases/tag/v2.4.3"
+    },
+    {
+      "id": "viddy",
+      "provider": "mise",
+      "tool": "viddy",
+      "version": "1.3.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "viddy": "bin/viddy"
+      },
+      "upstream": "https://github.com/sachaos/viddy/releases/tag/v1.3.1"
+    },
+    {
+      "id": "upctl",
+      "provider": "mise",
+      "tool": "upctl",
+      "version": "3.37.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.cloud.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "upctl": "bin/upctl"
+      },
+      "upstream": "https://github.com/UpCloudLtd/upcloud-cli/releases/tag/v3.37.0"
+    },
+    {
+      "id": "pnpm",
+      "provider": "mise",
+      "tool": "pnpm",
+      "version": "12.15.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.enable",
+      "policy": "latest-stable",
+      "requires": [
+        "node"
+      ],
+      "executables": {
+        "pnpm": "bin/pnpm"
+      }
+    },
+    {
+      "id": "kubectl",
+      "provider": "mise",
+      "tool": "kubectl",
+      "version": "1.37.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": {
+        "any": [
+          "dev.kubernetes.enable",
+          "shell.zsh.enable"
+        ]
+      },
+      "policy": "latest-stable",
+      "executables": {
+        "kubectl": "bin/kubectl"
+      },
+      "upstream": "https://github.com/kubernetes/kubernetes/releases/tag/v1.37.1"
+    },
+    {
+      "id": "cidr",
+      "provider": "mise",
+      "tool": "cidr",
+      "version": "2.3.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": [
+        "dev.cloud.enable",
+        "dev.mise.enable"
+      ],
+      "policy": "latest-stable",
+      "executables": {
+        "cidr": "bin/cidr"
+      }
+    },
+    {
+      "id": "terraform",
+      "provider": "mise",
+      "tool": "terraform",
+      "version": "1.5.7",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": [
+        "dev.cloud.enable",
+        "dev.mise.enable"
+      ],
+      "policy": "license-pinned",
+      "executables": {
+        "terraform": "bin/terraform"
+      },
+      "reason": "Terraform1.5.7 is the final MPL2 release; preserve the explicit pre-BUSL license policy and project .terraform-version overrides. tenv does not own a Terraform proxy."
+    },
+    {
+      "id": "helmfile",
+      "provider": "mise",
+      "tool": "helmfile",
+      "version": "1.8.2",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": [
+        "dev.kubernetes.enable",
+        "dev.mise.enable"
+      ],
+      "policy": "latest-stable",
+      "executables": {
+        "helmfile": "bin/helmfile"
+      }
+    },
+    {
+      "id": "oh-my-zsh",
+      "provider": "artifact",
+      "version": "2100c630ba4bd67bb48802c3e7da893a4fdaa1a0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "policy": "project",
+      "reason": "Pin Oh My Zsh source and one compinit owner; reviewed source update rather than auto-update on shell startup.",
+      "sources": {
+        "linux-x64": {
+          "url": "https://codeload.github.com/ohmyzsh/ohmyzsh/tar.gz/2100c630ba4bd67bb48802c3e7da893a4fdaa1a0",
+          "sha256": "926a97ef45a948aa014ca15d5d880b34cfd69ebde4f81cd33df845972784f469",
+          "archive": "tar.gz",
+          "strip_components": 1
+        },
+        "macos-arm64": {
+          "url": "https://codeload.github.com/ohmyzsh/ohmyzsh/tar.gz/2100c630ba4bd67bb48802c3e7da893a4fdaa1a0",
+          "sha256": "926a97ef45a948aa014ca15d5d880b34cfd69ebde4f81cd33df845972784f469",
+          "archive": "tar.gz",
+          "strip_components": 1
+        }
+      }
+    },
+    {
+      "id": "firefox",
+      "provider": "artifact",
+      "version": "158.0.1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.firefox.enable",
+      "policy": "latest-stable",
+      "requires": [
+        "gtk3",
+        "firefox-dbus",
+        "firefox-x11",
+        "gui-alsa"
+      ],
+      "executables": {
+        "firefox": "firefox"
+      },
+      "sources": {
+        "linux-x64": {
+          "url": "https://archive.mozilla.org/pub/firefox/releases/158.0.1/linux-x86_64/en-US/firefox-158.0.1.tar.xz",
+          "sha256": "dce45470139242cf294eb6ada3d192a9bb334696842b02b71ade448a139eb41a",
+          "archive": "tar.xz",
+          "strip_components": 1,
+          "bin": {
+            "firefox": "firefox"
+          }
+        }
+      },
+      "upstream": "https://product-details.mozilla.org/1.0/firefox_versions.json"
+    },
+    {
+      "id": "firefox",
+      "provider": "cask",
+      "name": "firefox",
+      "version": "158.0.1",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "apps.firefox.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "firefox": "/Applications/Firefox.app/Contents/MacOS/firefox"
+      }
+    },
+    {
+      "id": "gtk3",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libgtk-3-0t64",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": {
+        "any": [
+          "apps.firefox.enable",
+          "desktop.enable"
+        ]
+      },
+      "policy": "distro-security",
+      "reason": "Shared Firefox/desktop GTK3 ABI follows signed Noble security updates; no private GTK replacement."
+    },
+    {
+      "id": "firefox-dbus",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libdbus-glib-1-2",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.firefox.enable",
+      "policy": "distro-security",
+      "reason": "Official Firefox binary requires Noble native GTK/D-Bus/X11/audio ABI; Ubuntu security updates own those system libraries."
+    },
+    {
+      "id": "firefox-x11",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libxt6t64",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.firefox.enable",
+      "policy": "distro-security",
+      "reason": "Official Firefox binary requires Noble native GTK/D-Bus/X11/audio ABI; Ubuntu security updates own those system libraries."
+    },
+    {
+      "id": "gui-alsa",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libasound2t64",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": {
+        "any": [
+          "apps.enable",
+          "desktop.enable"
+        ]
+      },
+      "policy": "distro-security",
+      "reason": "Shared native GUI/browser audio ABI follows signed Noble security updates; app recipes depend on this owner independently of public feature flags."
+    },
+    {
+      "id": "kubectl-view-secret",
+      "provider": "mise",
+      "tool": "kubectl-view-secret",
+      "version": "0.16.0",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.kubernetes.enable",
+      "policy": "latest-stable",
+      "executables": {
+        "kubectl-view_secret": "bin/kubectl-view_secret"
+      },
+      "upstream": "https://github.com/elsesiy/kubectl-view-secret/releases/tag/v0.16.0"
+    },
+    {
+      "id": "pass",
+      "provider": "apt",
+      "name": "pass",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "apps.enable",
+      "requires": [
+        "bash",
+        "gnupg",
+        "git"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble-maintained password-store keeps native GPG/system integration and security updates; never owns, resets or migrates user password-store data.",
+      "executables": {
+        "pass": "bin/pass"
+      }
+    },
+    {
+      "id": "pass",
+      "provider": "brew",
+      "name": "pass",
+      "version": "1.7.4",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "apps.enable",
+      "requires": [
+        "bash",
+        "gnupg",
+        "git"
+      ],
+      "policy": "latest-stable",
+      "upstream": "https://www.passwordstore.org/",
+      "executables": {
+        "pass": "bin/pass"
+      }
+    },
+    {
+      "id": "kubectx",
+      "provider": "apt",
+      "name": "kubectx",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.zsh.enable",
+      "policy": "distro-security",
+      "reason": "Native shell helper scripts follow signed Noble package/security policy; aliases kx and kns keep one kubectx/kubens owner.",
+      "executables": {
+        "kubectx": "bin/kubectx",
+        "kubens": "bin/kubens"
+      }
+    },
+    {
+      "id": "kubectx",
+      "provider": "brew",
+      "name": "kubectx",
+      "version": "0.11.0",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "policy": "latest-stable",
+      "upstream": "https://github.com/ahmetb/kubectx",
+      "executables": {
+        "kubectx": "bin/kubectx",
+        "kubens": "bin/kubens"
+      }
+    },
+    {
+      "id": "fx",
+      "provider": "mise",
+      "tool": "fx",
+      "version": "40.0.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "policy": "latest-stable",
+      "upstream": "https://github.com/antonmedv/fx/releases/tag/40.0.1",
+      "executables": {
+        "fx": "bin/fx"
+      }
+    },
+    {
+      "id": "yh",
+      "provider": "mise",
+      "tool": "yh",
+      "version": "0.4.0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "shell.zsh.enable",
+      "policy": "latest-stable",
+      "upstream": "https://github.com/andreazorzetto/yh/releases/tag/v0.4.0",
+      "executables": {
+        "yh": "bin/yh"
+      }
+    },
+    {
+      "id": "yh",
+      "provider": "brew",
+      "name": "yh",
+      "version": "0.4.0",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "shell.zsh.enable",
+      "policy": "latest-stable",
+      "upstream": "https://github.com/andreazorzetto/yh",
+      "executables": {
+        "yh": "bin/yh"
+      }
+    },
+    {
+      "id": "gitleaks",
+      "provider": "mise",
+      "tool": "gitleaks",
+      "version": "8.30.1",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "dev.enable",
+      "policy": "latest-stable",
+      "upstream": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "executables": {
+        "gitleaks": "bin/gitleaks"
+      }
+    },
+    {
+      "id": "gui-vulkan",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libvulkan1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": {
+        "any": [
+          "apps.enable",
+          "desktop.enable"
+        ]
+      },
+      "policy": "distro-security",
+      "reason": "Native GUI Vulkan loader follows Noble driver ABI and security updates; no foreign-release graphics replacement."
+    },
+    {
+      "id": "gui-xkbcommon-x11",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libxkbcommon-x11-0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": {
+        "any": [
+          "apps.enable",
+          "desktop.enable"
+        ]
+      },
+      "policy": "distro-security",
+      "reason": "Shared native GUI keyboard/X11 ABI follows signed Noble security updates."
+    },
+    {
+      "id": "gui-xcb-xfixes",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libxcb-xfixes0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": {
+        "any": [
+          "apps.enable",
+          "desktop.enable"
+        ]
+      },
+      "policy": "distro-security",
+      "reason": "Shared native GUI XCB runtime ABI follows signed Noble security updates; development headers have a separate build dependency owner."
+    },
+    {
+      "id": "gui-x11-xcb",
+      "retain_shared_runtime": true,
+      "provider": "apt",
+      "name": "libx11-xcb1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": {
+        "any": [
+          "apps.enable",
+          "desktop.enable"
+        ]
+      },
+      "policy": "distro-security",
+      "reason": "Shared native GUI X11/XCB bridge follows signed Noble security updates."
+    }
+  ],
+  "tasks": {},
+  "metadata": {
+    "supported_platforms": [
+      "linux-x64",
+      "macos-arm64"
+    ],
+    "mise_manifest": "apps/mise/mise.toml",
+    "mise_lock": "apps/mise/mise.lock",
+    "reviewed_on": "2026-10-24",
+    "freshness": "Pinned releases are metadata selections, not claims of native runtime qualification. APT explicitly follows Noble security/ABI policy. Brew versions record provider metadata and must be compared with installed/upstream during updates.",
+    "shared_runtime_retirement": {
+      "field": "retain_shared_runtime",
+      "noble_system": "Distro Python3/venv/pip, coreutils/findutils/sed/grep/diffutils/procps and GTK/D-Bus/X11/audio/Vulkan ABI packages are shared host infrastructure, not disposable feature payloads.",
+      "native_host": "APT/Homebrew Bash and Zsh can remain the current login or rescue shell after profile disable. Git, GnuPG, OpenSSH, OpenSSL, CA certificates, curl and archive tools remain available for bootstrap, signing, recovery and verification; native coreutils/grep/sed preserve verifier prerequisites.",
+      "lifecycle": "Feature/source/configuration/frontend retirement does not imply removal of these native packages. Explicit package retirement reports retained-shared-runtime and preserves installed payload, provenance, services and user data; it must not report uninstall success or purge/autoremove foreign reverse dependencies.",
+      "removable": "Ordinary owned apps/tools, the scoped Homebrew OpenStack Python and project/global mise runtimes are not made permanently installed by this policy. Native apps may remove only their verified owned package when the provider's removal plan has no foreign collateral; artifact/mise retirement removes owned exposure while retaining versioned recovery payload."
+    },
+    "mise_integration": {
+      "when": "dev.mise.enable",
+      "strict_shims": true,
+      "auto_install": false,
+      "not_found_auto_install": false,
+      "not_found_system_fallback": false,
+      "locked": true,
+      "locked_scopes": [
+        "global"
+      ],
+      "project_version_files": [
+        ".terraform-version"
+      ],
+      "shell_activation": false
+    },
+    "private_responsibilities": [
+      "identity and signing identities",
+      "secrets and credentials",
+      "AI/editor integrations including Cursor, OMP, Zed, MCP and memory",
+      "work-specific paths, kubie input and provider environments",
+      "private desktop configuration and application-owned mutable state"
+    ]
+  }
+}

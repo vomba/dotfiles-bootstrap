@@ -1,4 +1,4 @@
-name: CI
+name: Native implementation
 
 on:
   push:
@@ -6,37 +6,35 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build ${{ matrix.name }}
+  verify:
+    name: Native ${{ matrix.name }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            name: Linux
-            target: .#example-linux
-          - os: macos-latest
-            name: macOS
-            target: .#example-darwin
+          - os: ubuntu-24.04
+            name: Ubuntu 24.04 amd64
+          - os: macos-15
+            name: macOS arm64
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
-      - uses: cachix/install-nix-action@v31
         with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-      - name: Check formatting
-        run: nix run nixpkgs#nixfmt -- --check flake.nix $(find modules -name '*.nix') $(find examples -name '*.nix') overlays/*.nix tests/*.nix
-      - name: Check flake
-        run: nix flake check
-      - name: Gitleaks
-        run: nix run nixpkgs#gitleaks -- detect --no-git --source .
-      - name: ShellCheck
-        run: nix run nixpkgs#shellcheck -- oh-my-zsh/plugins/zsh-kubecolor/bin/kubectl-rsync
-      - name: Build example
-        run: nix build ${{ matrix.target }} --no-link
+          persist-credentials: false
+      - name: Acquire repository-owned native check tools
+        shell: bash
+        run: |
+          ./bootstrap bootstrap --verification-tools --yes --verification-only --home "$RUNNER_TEMP/dotfiles-home"
+      - name: Verify native implementation (no activation)
+        shell: bash
+        run: |
+          ./bootstrap verify --checks --verification-only --home "$RUNNER_TEMP/dotfiles-home"

@@ -1,0 +1,653 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "id": "gui-dpkg",
+      "provider": "apt",
+      "name": "dpkg",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble native .deb inspection/repack/install ownership, not a foreign-release package manager.",
+      "executables": {
+        "dpkg-deb": "/usr/bin/dpkg-deb",
+        "dpkg-query": "/usr/bin/dpkg-query"
+      },
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-abi-check",
+      "provider": "apt",
+      "name": "libc-bin",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native Noble ELF loader/linkage inspection; no bundled system glibc replacement.",
+      "executables": {
+        "ldd": "/usr/bin/ldd"
+      },
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-fontconfig",
+      "provider": "apt",
+      "name": "libfontconfig1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native font matching ABI and installed JetBrains Mono Nerd Font remain separate owners.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-gl",
+      "provider": "apt",
+      "name": "libgl1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble GLVND/host graphics ABI, no NixGL or foreign-release loader.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-egl",
+      "provider": "apt",
+      "name": "libegl1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble native EGL/host driver dispatch; compositor is independently optional.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-wayland",
+      "provider": "apt",
+      "name": "libwayland-client0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Stock Noble Wayland client ABI, never the isolated Quickshell runtime.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-wayland-cursor",
+      "provider": "apt",
+      "name": "libwayland-cursor0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Stock Noble Wayland cursor ABI for official Kitty bundle.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xkbcommon",
+      "provider": "apt",
+      "name": "libxkbcommon0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Stock Noble keyboard ABI for independently enabled GUI apps.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-nss",
+      "provider": "apt",
+      "name": "libnss3",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble NSS cryptographic ABI/security maintenance for official Electron packages.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xss",
+      "provider": "apt",
+      "name": "libxss1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble XScreenSaver ABI required by official Electron packages.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xtst",
+      "provider": "apt",
+      "name": "libxtst6",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble XTest ABI required by official Electron packages.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-notify",
+      "provider": "apt",
+      "name": "libnotify4",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native notification library, distinct from libnotify-bin CLI owner.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-atspi",
+      "provider": "apt",
+      "name": "libatspi2.0-0t64",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble time64 accessibility ABI; apt Provides resolves upstream legacy dependency spelling.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-uuid",
+      "provider": "apt",
+      "name": "libuuid1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native UUID ABI required by official Electron packages.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-secret",
+      "provider": "apt",
+      "name": "libsecret-1-0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native secret-service client ABI; never owns keyring data.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-appindicator",
+      "provider": "apt",
+      "name": "libayatana-appindicator3-1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble main native provider explicitly Provides libappindicator3-1, satisfying official Slack dependency without foreign-release packages.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-glib-tools",
+      "provider": "apt",
+      "name": "libglib2.0-bin",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble GLib tools satisfy Slack native trash integration alternative.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-apt-https",
+      "provider": "apt",
+      "name": "apt-transport-https",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble transitional dependency explicitly required by upstream Slack .deb; no Slack APT repository is enabled.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-gbm",
+      "provider": "apt",
+      "name": "libgbm1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble Mesa buffer-management ABI for official Electron hardware acceleration.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-cxx",
+      "provider": "apt",
+      "name": "libstdc++6",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Actual official Kitty/Slack ELF DT_NEEDED C++ ABI follows Noble security maintenance.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-ncurses",
+      "provider": "apt",
+      "name": "libncursesw6",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Official Kitty bundled Python _curses_panel.so requires native libpanelw.so.6.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xcursor",
+      "provider": "apt",
+      "name": "libxcursor1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Official Kitty X11 backend requires native libXcursor.so.1 independently of GTK.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xrandr",
+      "provider": "apt",
+      "name": "libxrandr2",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native Noble X11 monitor ABI for dynamically loaded GUI backends.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xinerama",
+      "provider": "apt",
+      "name": "libxinerama1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native Noble multi-monitor ABI for Kitty X11 backend.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xinput",
+      "provider": "apt",
+      "name": "libxi6",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Native Noble XInput ABI for Kitty X11 backend.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-dbus-lib",
+      "provider": "apt",
+      "name": "libdbus-1-3",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Official Kitty ELF requires native D-Bus library; user session service is independently owned.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xkbfile",
+      "provider": "apt",
+      "name": "libxkbfile1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Actual Slack native ELF/plugin closure requires libxkbfile.so.1, not listed in its top-level vendor Depends.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-xdg-utils",
+      "provider": "apt",
+      "name": "xdg-utils",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble desktop MIME/URL integration required by native GUI packages.",
+      "executables": {
+        "xdg-open": "/usr/bin/xdg-open"
+      },
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-snapd",
+      "provider": "apt",
+      "name": "snapd",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Canonical-supported Chromium delivery on Noble; APT owns shared OS daemon/unit/state, repository services action owns explicit snapd.socket activation.",
+      "executables": {
+        "snap": "/usr/bin/snap"
+      },
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-squashfs",
+      "provider": "apt",
+      "name": "squashfs-tools",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Inspect actual verified Snap metadata/dependencies at staging; no assumed AppImage or archive layout.",
+      "executables": {
+        "unsquashfs": "/usr/bin/unsquashfs"
+      },
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "gui-nautilus",
+      "provider": "apt",
+      "name": "nautilus",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble GNOME file-manager/GTK4 integration follows distro security ABI, rather than mixing newer GNOME libraries into Noble.",
+      "executables": {
+        "nautilus": "/usr/bin/nautilus"
+      }
+    },
+    {
+      "id": "gui-wdisplays",
+      "provider": "apt",
+      "name": "wdisplays",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Reviewed Noble native wlroots-output-management client follows signed distro security maintenance; availability does not imply compositor protocol support.",
+      "executables": {
+        "wdisplays": "/usr/bin/wdisplays"
+      }
+    },
+    {
+      "id": "gui-kitty",
+      "provider": "recipe",
+      "path": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "version": "0.49.2",
+      "policy": "latest-stable",
+      "requires": [
+        "gui-abi-check",
+        "gui-fontconfig",
+        "gui-gl",
+        "gui-egl",
+        "gui-wayland",
+        "gui-wayland-cursor",
+        "gui-xkbcommon",
+        "gui-xkbcommon-x11",
+        "gui-x11-xcb",
+        "gui-xcb-xfixes",
+        "gui-vulkan",
+        "gui-cxx",
+        "gui-ncurses",
+        "gui-xcursor",
+        "gui-xrandr",
+        "gui-xinerama",
+        "gui-xinput",
+        "gui-dbus-lib",
+        "gui-uuid"
+      ],
+      "executables": {
+        "kitty": "bin/kitty",
+        "kitten": "bin/kitten"
+      },
+      "update": {
+        "provider": "github",
+        "repository": "kovidgoyal/kitty",
+        "tag_prefix": "v"
+      }
+    },
+    {
+      "id": "gui-tabiew",
+      "provider": "recipe",
+      "path": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "version": "0.15.1",
+      "policy": "latest-stable",
+      "requires": [
+        "gui-abi-check"
+      ],
+      "executables": {
+        "tw": "bin/tw"
+      },
+      "update": {
+        "provider": "github",
+        "repository": "shshemi/tabiew",
+        "tag_prefix": "v"
+      }
+    },
+    {
+      "id": "gui-slack",
+      "provider": "recipe",
+      "path": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "version": "4.52.182",
+      "policy": "latest-stable",
+      "privileged_actions": [
+        "provision",
+        "retire"
+      ],
+      "build_before_provision": true,
+      "requires": [
+        "gui-dpkg",
+        "gui-abi-check",
+        "gtk3",
+        "gui-nss",
+        "gui-xss",
+        "gui-xtst",
+        "gui-notify",
+        "gui-atspi",
+        "gui-uuid",
+        "gui-appindicator",
+        "gui-glib-tools",
+        "gui-apt-https",
+        "gui-gbm",
+        "gui-alsa",
+        "gui-xdg-utils",
+        "procps",
+        "gui-cxx",
+        "gui-xkbfile"
+      ],
+      "executables": {
+        "slack": "/usr/lib/slack/slack"
+      },
+      "update": {
+        "provider": "apt-repository",
+        "url": "https://packagecloud.io/slacktechnologies/slack/debian/dists/jessie/main/binary-amd64/Packages",
+        "package": "slack-desktop",
+        "architecture": "amd64"
+      }
+    },
+    {
+      "id": "gui-capacities",
+      "provider": "recipe",
+      "path": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "version": "1.71.32",
+      "policy": "latest-stable",
+      "privileged_actions": [
+        "provision",
+        "retire"
+      ],
+      "build_before_provision": true,
+      "requires": [
+        "gui-dpkg",
+        "gui-abi-check",
+        "gtk3",
+        "gui-nss",
+        "gui-xss",
+        "gui-xtst",
+        "gui-notify",
+        "gui-atspi",
+        "gui-uuid",
+        "gui-secret",
+        "gui-appindicator",
+        "gui-gbm",
+        "gui-alsa",
+        "gui-xdg-utils",
+        "procps"
+      ],
+      "executables": {
+        "capacities": "/opt/Capacities/capacities"
+      },
+      "update": {
+        "provider": "electron-builder",
+        "url": "https://2vks4.upcloudobjects.com/capacities-desktop-app/latest-linux.yml"
+      }
+    },
+    {
+      "id": "gui-chromium",
+      "provider": "recipe",
+      "path": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "version": "156.0.8078.47",
+      "policy": "latest-stable",
+      "privileged_actions": [
+        "provision",
+        "retire"
+      ],
+      "build_before_provision": true,
+      "requires": [
+        "gui-snapd",
+        "gui-squashfs",
+        "procps"
+      ],
+      "requires_services": [
+        "snapd-socket"
+      ],
+      "executables": {
+        "chromium": "/snap/bin/chromium"
+      },
+      "provider_update": {
+        "provider": "snap",
+        "name": "chromium",
+        "channel": "latest/stable"
+      },
+      "update": {
+        "provider": "chromiumdash",
+        "url": "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux&num=1"
+      }
+    }
+  ],
+  "services": [
+    {
+      "id": "snapd-socket",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "manager": "systemd-system",
+      "name": "snapd.socket",
+      "existing_unit": true,
+      "unit_package": "snapd",
+      "package_id": "gui-snapd",
+      "ownership": "Enable/start only through explicit privileged bootstrap services; never restart/disable shared snapd on application retirement; APT owns unit bytes and system daemon state."
+    }
+  ],
+  "artifacts": {
+    "gui-kitty-linux": {
+      "source_manifest": "native/gui/linux-sources.json",
+      "key": "gui-kitty",
+      "recipe": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ]
+    },
+    "gui-tabiew-linux": {
+      "source_manifest": "native/gui/linux-sources.json",
+      "key": "gui-tabiew",
+      "recipe": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ]
+    },
+    "gui-slack-linux": {
+      "source_manifest": "native/gui/linux-sources.json",
+      "key": "gui-slack",
+      "recipe": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ]
+    },
+    "gui-capacities-linux": {
+      "source_manifest": "native/gui/linux-sources.json",
+      "key": "gui-capacities",
+      "recipe": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ]
+    },
+    "gui-chromium-linux": {
+      "source_manifest": "native/gui/linux-sources.json",
+      "key": "gui-chromium",
+      "recipe": "native/gui/linux.py",
+      "platforms": [
+        "linux-x64"
+      ]
+    }
+  },
+  "metadata": {
+    "linux_gui": "All generic GUI owners are independently desktop.enable gated, not apps.enable or desktop.niri.enable. Existing desktop.json owns JetBrains Mono Nerd Font, grim and slurp; no duplicate theme/font/runtime ownership. Current official Capacities .deb supersedes the former AppImage/NixGL delivery. Physical workstation graphics/sandbox/portal/profile gates remain explicit."
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "id": "gui-kitty",
+      "provider": "cask",
+      "name": "kitty",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "desktop.enable",
+      "policy": "latest-stable",
+      "version": "0.49.2",
+      "upstream": "https://github.com/kovidgoyal/kitty",
+      "update": {
+        "provider": "github",
+        "repository": "kovidgoyal/kitty",
+        "tag_prefix": "v"
+      },
+      "version_source": "https://formulae.brew.sh/api/cask/kitty.json",
+      "executables": {
+        "kitty": "/Applications/kitty.app/Contents/MacOS/kitty",
+        "kitten": "/Applications/kitty.app/Contents/MacOS/kitten"
+      },
+      "macos": {
+        "app": {
+          "name": "kitty.app",
+          "bundle_id": "net.kovidgoyal.kitty",
+          "binary": "Contents/MacOS/kitty"
+        }
+      },
+      "provider_snapshot": {
+        "observed": "2026-10-24",
+        "version": "0.49.2",
+        "url": "https://github.com/kovidgoyal/kitty/releases/download/v0.49.2/kitty-0.49.2.dmg",
+        "sha256": "e524b894145d89cb76b584e3a9691196ae56bfa31d51384a44aa774252b7cef7",
+        "architecture": "universal macOS artifact; installed command must contain arm64"
+      }
+    },
+    {
+      "id": "gui-slack",
+      "provider": "cask",
+      "name": "slack",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "desktop.enable",
+      "policy": "latest-stable",
+      "version": "4.52.182",
+      "upstream": "https://slack.com/release-notes/mac",
+      "update": {
+        "provider": "slack-macos"
+      },
+      "version_source": "https://formulae.brew.sh/api/cask/slack.json",
+      "macos": {
+        "app": {
+          "name": "Slack.app",
+          "bundle_id": "com.tinyspeck.slackmacgap",
+          "binary": "Contents/MacOS/Slack"
+        }
+      },
+      "provider_snapshot": {
+        "observed": "2026-10-24",
+        "version": "4.52.182",
+        "url": "https://downloads.slack-edge.com/desktop-releases/mac/arm64/4.52.182/Slack-4.52.182-macOS.dmg",
+        "sha256": "c069f3a29ee962d6c0392949a9db6539e2eb9d959dd3a4fed796fe83ce3ab2e3",
+        "architecture": "arm64"
+      }
+    },
+    {
+      "id": "gui-tabiew",
+      "provider": "brew",
+      "name": "tabiew",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "desktop.enable",
+      "policy": "latest-stable",
+      "version": "0.15.1",
+      "upstream": "https://github.com/shshemi/tabiew",
+      "update": {
+        "provider": "github",
+        "repository": "shshemi/tabiew",
+        "tag_prefix": "v"
+      },
+      "version_source": "https://formulae.brew.sh/api/formula/tabiew.json",
+      "executables": {
+        "tw": "bin/tw"
+      },
+      "macos": {
+        "formula": true
+      },
+      "provider_snapshot": {
+        "observed": "2026-10-24",
+        "version": "0.15.1",
+        "runtime_dependencies": [
+          "openssl@4"
+        ],
+        "source_build_dependencies": [
+          "pkgconf",
+          "rust"
+        ],
+        "dependencies_owner": "Homebrew formula dependency resolution, not a second dotfiles installation owner",
+        "bottle_tag": "arm64_tahoe",
+        "url": "https://ghcr.io/v2/homebrew/core/tabiew/blobs/sha256:0b750691f1af2ccb2ddb26d1d5096ce1f80e3c57f0ce18102a2e41e981a5be2d",
+        "sha256": "0b750691f1af2ccb2ddb26d1d5096ce1f80e3c57f0ce18102a2e41e981a5be2d",
+        "conflicts": "Homebrew watcher also installs tw; never force or overwrite its command"
+      }
+    },
+    {
+      "id": "jetbrains-mono-nf",
+      "provider": "cask",
+      "name": "font-jetbrains-mono-nerd-font",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "desktop.enable",
+      "policy": "latest-stable",
+      "version": "3.5.1",
+      "upstream": "https://github.com/ryanoasis/nerd-fonts",
+      "update": {
+        "provider": "github",
+        "repository": "ryanoasis/nerd-fonts",
+        "tag_prefix": "v"
+      },
+      "version_source": "https://formulae.brew.sh/api/cask/font-jetbrains-mono-nerd-font.json",
+      "macos": {
+        "font": {
+          "family": "JetBrainsMono Nerd Font",
+          "required_faces": [
+            "JetBrainsMonoNerdFont-Regular.ttf",
+            "JetBrainsMonoNerdFont-Bold.ttf",
+            "JetBrainsMonoNerdFont-Italic.ttf",
+            "JetBrainsMonoNerdFont-BoldItalic.ttf"
+          ]
+        }
+      },
+      "provider_snapshot": {
+        "observed": "2026-10-24",
+        "version": "3.5.1",
+        "url": "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/JetBrainsMono.tar.xz",
+        "sha256": "04d5e8f903693f9dd13e16f867e994834e681eb3c72c0d337a770dcda09010cf",
+        "architecture": "architecture-independent font files",
+        "destination": "HOME/Library/Fonts (individual Homebrew font artifacts; no duplicate runtime font owner)"
+      }
+    }
+  ],
+  "artifacts": {
+    "macos-generic-desktop": {
+      "manifest": "native/manifests/gui-macos.json",
+      "verification": "native/gui/macos.py",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "when": "desktop.enable",
+      "ownership": "Ordinary Homebrew casks/formula only. Preexisting installations are preserved, foreign destinations/payload replacements refused, non-zap retirement leaves all preferences, credentials and app data untouched.",
+      "version_policy": "Package versions and SHA-256 snapshots record the reviewed provider release, not an immutable Homebrew tap pin. Explicit provision resolves current native Homebrew metadata; updates reports upstream, provider and actual installed separately. Generic recover refuses Homebrew rollback without a retained exact bottle; explicit provision can reinstall a reviewed current provider release, but removed historical casks/bottles are not promised recoverable.",
+      "registration": "Homebrew native app artifacts install/register /Applications bundles; no Nix Apps links or custom app manager. Actual LaunchServices/login-session and OS consent acceptance are separate host gates; no launch, consent bypass or startup update hooks.",
+      "private_boundary": "Capacities, Zed, Paneru and authored Kitty/desktop configuration remain private and are not redeclared here. Cursor was an unconsumed legacy option, not an installed app to add."
+    }
+  }
+}

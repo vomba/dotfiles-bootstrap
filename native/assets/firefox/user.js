@@ -1,0 +1,21 @@
+// Authored preferences only; prefs.js, sessions, credentials and extension state stay Firefox-owned.
+user_pref("browser.search.defaultengine", "ddg");
+user_pref("browser.startup.page", 3);
+user_pref("browser.aboutConfig.showWarning", false);
+user_pref("browser.translations.neverTranslateLanguages", "fr");
+user_pref("privacy.clearOnShutdown.history", false);
+user_pref("extensions.pocket.enabled", false);
+user_pref("extensions.abuseReport.enabled", false);
+user_pref("extensions.formautofill.creditCards.enabled", false);
+user_pref("identity.fxaccounts.enabled", false);
+user_pref("identity.fxaccounts.toolbar.enabled", false);
+user_pref("identity.fxaccounts.pairing.enabled", false);
+user_pref("identity.fxaccounts.commands.enabled", false);
+user_pref("browser.contentblocking.report.lockwise.enabled", false);
+user_pref("browser.uitour.enabled", false);
+user_pref("browser.newtabpage.activity-stream.showSponsored", false);
+user_pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+user_pref("dom.push.enabled", false);
+user_pref("dom.push.connection.enabled", false);
+user_pref("dom.battery.enabled", false);
+user_pref("dom.private-attribution.submission.enabled", false);

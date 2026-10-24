@@ -1,0 +1,1476 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "id": "desktop-runtime-pulse",
+      "provider": "apt",
+      "name": "libpulse0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Stock Noble PulseAudio client ABI for Qt multimedia; follow signed distro security/ABI updates, not upstream latest.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-runtime-xcb-keysyms",
+      "provider": "apt",
+      "name": "libxcb-keysyms1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Stock Noble XCB key-symbol ABI for Qt X11 plugins; follow signed distro security/ABI updates, not upstream latest.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-runtime-krb5",
+      "provider": "apt",
+      "name": "libgssapi-krb5-2",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Stock Noble GSSAPI/Kerberos ABI for Qt networking; follow signed distro security/ABI updates, not upstream latest.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-runtime-va",
+      "provider": "apt",
+      "name": "libva2",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Stock Noble VA-API dispatch ABI must match host graphics drivers; follow signed distro security/ABI updates, not upstream latest.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-runtime-va-drm",
+      "provider": "apt",
+      "name": "libva-drm2",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Stock Noble VA-API DRM backend follows the host graphics stack and signed distro updates, not upstream latest.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-runtime-va-x11",
+      "provider": "apt",
+      "name": "libva-x11-2",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Stock Noble VA-API X11 backend follows the host graphics stack and signed distro updates, not upstream latest.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-mesa-va",
+      "provider": "apt",
+      "name": "mesa-va-drivers",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep VA-API drivers on stock Noble Mesa security/ABI updates; preserve administrator-selected proprietary drivers rather than replacing the host stack.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-mesa-vdpau",
+      "provider": "apt",
+      "name": "mesa-vdpau-drivers",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep VDPAU drivers on stock Noble Mesa security/ABI updates; preserve administrator-selected proprietary drivers rather than replacing the host stack.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-runtime-vdpau",
+      "provider": "apt",
+      "name": "libvdpau1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Stock Noble VDPAU dispatch ABI must match host video drivers; follow signed distro security/ABI updates, not upstream latest.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-build-clang",
+      "provider": "apt",
+      "name": "clang-18",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble Clang 18 is the host-compatible desktop build compiler; follow signed distro toolchain updates rather than mixing an upstream LLVM release."
+    },
+    {
+      "id": "desktop-build-clang-tools",
+      "provider": "apt",
+      "name": "clang-tools-18",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep Clang build helpers aligned with Noble Clang 18 and its signed distro toolchain updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-libclang",
+      "provider": "apt",
+      "name": "libclang-18-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble libclang 18 supplies bindgen's matching host compiler ABI; follow signed distro toolchain updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-cmake",
+      "provider": "apt",
+      "name": "cmake",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native CMake for the isolated Qt/Quickshell build; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-build-meson",
+      "provider": "apt",
+      "name": "meson",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native Meson for source-built desktop dependencies; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-build-ninja",
+      "provider": "apt",
+      "name": "ninja-build",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native Ninja with the host CMake/Meson toolchain; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-build-dpkg",
+      "provider": "apt",
+      "name": "dpkg-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble dpkg-shlibdeps derives native package ABI dependencies; keep host packaging tools on signed distro updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-patchelf",
+      "provider": "apt",
+      "name": "patchelf",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native ELF patching tool for the isolated desktop runtime; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-build-udev",
+      "provider": "apt",
+      "name": "libudev-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble udev headers must match the host device-management ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-input",
+      "provider": "apt",
+      "name": "libinput-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble libinput headers target the host compositor input ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-seat",
+      "provider": "apt",
+      "name": "libseat-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble libseat headers target the native seat-management ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-xkbcommon",
+      "provider": "apt",
+      "name": "libxkbcommon-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble keyboard headers must match the shared host xkbcommon ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-gbm",
+      "provider": "apt",
+      "name": "libgbm-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble GBM headers must match host Mesa buffer-management libraries; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-egl",
+      "provider": "apt",
+      "name": "libegl1-mesa-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble EGL development dependencies target the host graphics dispatch ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-wayland",
+      "provider": "apt",
+      "name": "libwayland-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble Wayland headers support native Niri builds; the private Qt runtime has a separate source lock, with host libraries following signed distro ABI updates."
+    },
+    {
+      "id": "desktop-build-pango",
+      "provider": "apt",
+      "name": "libpango1.0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble Pango headers target host text-rendering libraries; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-pipewire",
+      "provider": "apt",
+      "name": "libpipewire-0.3-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble PipeWire headers must match native audio/screencast services; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-display-info",
+      "provider": "apt",
+      "name": "libdisplay-info-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble display-info headers target the host display-identification ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-xcb-composite",
+      "provider": "apt",
+      "name": "libxcb-composite0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build Xwayland satellite against Noble's XCB Composite ABI and signed distro updates, not a foreign X11 stack."
+    },
+    {
+      "id": "desktop-build-xcb-xfixes",
+      "provider": "apt",
+      "name": "libxcb-xfixes0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build Xwayland satellite against Noble's XCB XFixes ABI and signed distro updates, not a foreign X11 stack."
+    },
+    {
+      "id": "desktop-build-xcb-render",
+      "provider": "apt",
+      "name": "libxcb-render0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build Xwayland satellite against Noble's XCB Render ABI and signed distro updates, not a foreign X11 stack."
+    },
+    {
+      "id": "desktop-build-xcb-shape",
+      "provider": "apt",
+      "name": "libxcb-shape0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build Xwayland satellite against Noble's XCB Shape ABI and signed distro updates, not a foreign X11 stack."
+    },
+    {
+      "id": "desktop-build-xcb-icccm",
+      "provider": "apt",
+      "name": "libxcb-icccm4-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's XCB ICCCM headers/libraries for satellite and Qt plugins; follow signed distro ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-xcb",
+      "provider": "apt",
+      "name": "libxcb1-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build Xwayland satellite against the stock Noble XCB client ABI and signed distro updates, not a foreign X11 stack."
+    },
+    {
+      "id": "desktop-build-xcb-cursor",
+      "provider": "apt",
+      "name": "libxcb-cursor-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's XCB cursor headers/libraries for satellite and Qt plugins; follow signed distro ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-xcb-res",
+      "provider": "apt",
+      "name": "libxcb-res0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build Xwayland satellite against Noble's XCB resource ABI and signed distro updates, not a foreign X11 stack."
+    },
+    {
+      "id": "desktop-build-xcb-randr",
+      "provider": "apt",
+      "name": "libxcb-randr0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build Xwayland satellite against Noble's XCB RandR ABI and signed distro updates, not a foreign X11 stack."
+    },
+    {
+      "id": "desktop-build-pixman",
+      "provider": "apt",
+      "name": "libpixman-1-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble Pixman headers target the host pixel-manipulation ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-drm",
+      "provider": "apt",
+      "name": "libdrm-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble DRM headers must match the host kernel/userspace graphics boundary; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-vulkan",
+      "provider": "apt",
+      "name": "libvulkan-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble Vulkan development files target the native loader/driver ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-pam",
+      "provider": "apt",
+      "name": "libpam0g-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Build desktop authentication against Noble PAM, never a replacement login stack; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-polkit",
+      "provider": "apt",
+      "name": "libpolkit-agent-1-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble polkit headers must match the native authorization service ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-glib",
+      "provider": "apt",
+      "name": "libglib2.0-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble GLib headers target host D-Bus/event-loop libraries; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-jemalloc",
+      "provider": "apt",
+      "name": "libjemalloc-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native jemalloc build ABI for the private runtime; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-unwind",
+      "provider": "apt",
+      "name": "libunwind-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble unwind headers target native crash/backtrace libraries; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-ffi",
+      "provider": "apt",
+      "name": "libffi-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble FFI headers target the host foreign-call ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-expat",
+      "provider": "apt",
+      "name": "libexpat1-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble Expat headers target the host XML parser ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-zlib",
+      "provider": "apt",
+      "name": "zlib1g-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble zlib headers target the host compression ABI; follow signed distro security/ABI updates, not upstream latest."
+    },
+    {
+      "id": "desktop-build-libxml2",
+      "provider": "apt",
+      "name": "libxml2-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Private Wayland scanner builds against Noble's XML parser headers and signed security/ABI updates."
+    },
+    {
+      "id": "desktop-build-spirv",
+      "provider": "apt",
+      "name": "spirv-tools",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native SPIR-V tools with the host Vulkan development stack; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-build-cli11",
+      "provider": "apt",
+      "name": "libcli11-dev",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's packaged CLI11 headers for the desktop source build; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-dbus",
+      "provider": "apt",
+      "name": "dbus-user-session",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep shared session D-Bus integration on stock Noble security/ABI updates; desktop retirement must not remove the host session bus.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-portal",
+      "provider": "apt",
+      "name": "xdg-desktop-portal",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep the shared portal broker on Noble's signed desktop integration updates; no upstream-latest claim or host portal removal on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-portal-gnome",
+      "provider": "apt",
+      "name": "xdg-desktop-portal-gnome",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble GNOME portal backend stays ABI-compatible with the host broker and GNOME libraries; preserve shared payload on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-portal-gtk",
+      "provider": "apt",
+      "name": "xdg-desktop-portal-gtk",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble GTK portal backend stays ABI-compatible with host dialogs and the portal broker; preserve shared payload on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-pipewire",
+      "provider": "apt",
+      "name": "pipewire",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep shared audio/screencast services on stock Noble security/ABI updates; desktop retirement must not remove the host media stack.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-pipewire-pulse",
+      "provider": "apt",
+      "name": "pipewire-pulse",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep PulseAudio compatibility aligned with Noble PipeWire security/ABI updates; preserve shared host audio payload on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-pipewire-alsa",
+      "provider": "apt",
+      "name": "pipewire-alsa",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep ALSA integration aligned with Noble PipeWire security/ABI updates; preserve shared host audio payload on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-wireplumber",
+      "provider": "apt",
+      "name": "wireplumber",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble WirePlumber matches the stock PipeWire session policy ABI; follow signed distro updates and preserve shared host audio payload.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-polkit",
+      "provider": "apt",
+      "name": "polkitd",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep shared authorization on stock Noble security/ABI updates; desktop retirement must not remove the host polkit service.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-pkexec",
+      "provider": "apt",
+      "name": "pkexec",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep privileged polkit execution aligned with Noble's signed security updates; preserve the shared host authorization payload on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-polkit-agent",
+      "provider": "apt",
+      "name": "policykit-1-gnome",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native polkit authentication agent ABI and signed distro updates, not a newer foreign GNOME dependency stack.",
+      "executables": {
+        "polkit-agent": "/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1"
+      }
+    },
+    {
+      "id": "desktop-keyring",
+      "provider": "apt",
+      "name": "gnome-keyring",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep shared secret-service/login integration on Noble security/ABI updates; preserve host keyring payload and user credentials on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-keyring-pam",
+      "provider": "apt",
+      "name": "libpam-gnome-keyring",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble keyring PAM integration must match the native login stack; follow signed security updates and never remove shared login payload on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-network",
+      "provider": "apt",
+      "name": "network-manager",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep shared host networking on stock Noble security/ABI updates; desktop retirement must not remove NetworkManager or connection state.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-bluetooth",
+      "provider": "apt",
+      "name": "bluez",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep shared host Bluetooth on stock Noble security/ABI updates; desktop retirement must not remove BlueZ or paired-device state.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-power",
+      "provider": "apt",
+      "name": "upower",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep shared power-management integration on stock Noble security/ABI updates; preserve the host service payload on desktop retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-brightness",
+      "provider": "apt",
+      "name": "brightnessctl",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native backlight permissions/device integration and signed distro updates, without claiming upstream latest."
+    },
+    {
+      "id": "desktop-cups",
+      "provider": "apt",
+      "name": "cups",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep printing and Qt print integration on Noble security/ABI updates; preserve shared host CUPS payload and printer state on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-mesa-dri",
+      "provider": "apt",
+      "name": "libgl1-mesa-dri",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep DRI drivers on stock Noble Mesa security/ABI updates; preserve shared graphics payload and administrator-selected proprietary drivers.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-mesa-egl",
+      "provider": "apt",
+      "name": "libegl-mesa0",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep EGL drivers aligned with stock Noble Mesa security/ABI updates; preserve shared graphics payload and administrator-selected proprietary drivers.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-mesa-vulkan",
+      "provider": "apt",
+      "name": "mesa-vulkan-drivers",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Keep Vulkan drivers aligned with stock Noble Mesa security/ABI updates; preserve shared graphics payload and administrator-selected proprietary drivers.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-firmware",
+      "provider": "apt",
+      "name": "linux-firmware",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use signed stock Noble firmware updates matched to the supported host kernel; never remove shared hardware firmware on desktop retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-xwayland",
+      "provider": "apt",
+      "name": "xwayland",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's shared Xwayland server ABI and signed security updates; preserve the host display-server payload on desktop retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-kanshi",
+      "provider": "apt",
+      "name": "kanshi",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native output-management client and signed distro updates; availability does not imply compositor protocol support or upstream latest.",
+      "executables": {
+        "kanshi": "/usr/bin/kanshi"
+      }
+    },
+    {
+      "id": "desktop-fuzzel",
+      "provider": "apt",
+      "name": "fuzzel",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's launcher against the stock Wayland/font libraries and signed distro updates, without claiming upstream latest."
+    },
+    {
+      "id": "desktop-grim",
+      "provider": "apt",
+      "name": "grim",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Use Noble's native screenshot client and signed distro updates; compositor capture protocol support remains a separate runtime requirement.",
+      "executables": {
+        "grim": "/usr/bin/grim"
+      }
+    },
+    {
+      "id": "desktop-slurp",
+      "provider": "apt",
+      "name": "slurp",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Use Noble's native Wayland region selector and signed distro ABI updates, without claiming upstream latest.",
+      "executables": {
+        "slurp": "/usr/bin/slurp"
+      }
+    },
+    {
+      "id": "desktop-clipboard",
+      "provider": "apt",
+      "name": "wl-clipboard",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Use Noble's native Wayland clipboard clients and signed distro ABI updates, without claiming upstream latest."
+    },
+    {
+      "id": "desktop-fontconfig",
+      "provider": "apt",
+      "name": "fontconfig",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Keep shared host font discovery/cache tools on stock Noble security/ABI updates; preserve the native font infrastructure on desktop retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-gtk-settings",
+      "provider": "apt",
+      "name": "gsettings-desktop-schemas",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble settings schemas must match host GTK/GNOME integration; follow signed distro updates and preserve shared desktop schemas on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-gtk4",
+      "provider": "apt",
+      "name": "libgtk-4-1",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Keep shared GTK4 libraries on stock Noble security/ABI updates rather than importing a newer GNOME stack; preserve host runtime payload on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-icons",
+      "provider": "apt",
+      "name": "adwaita-icon-theme",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Noble Adwaita resources match the native GTK icon fallback contract; follow signed distro updates and preserve shared GTK resources on retirement.",
+      "retain_shared_runtime": true
+    },
+    {
+      "id": "desktop-papirus-icons",
+      "provider": "apt",
+      "name": "papirus-icon-theme",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Use Noble's packaged Papirus-Dark inheritance resources for Nordic; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-noto-fonts",
+      "provider": "apt",
+      "name": "fonts-noto-core",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Use Noble's packaged Noto fallback fonts and native fontconfig integration; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "desktop-emoji-fonts",
+      "provider": "apt",
+      "name": "fonts-noto-color-emoji",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "distro-security",
+      "reason": "Use Noble's packaged color-emoji fonts with the host text-rendering stack; follow signed distro updates without claiming upstream latest."
+    },
+    {
+      "id": "nordic-theme",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "theme.nord.enable"
+      ],
+      "policy": "project",
+      "requires": [
+        "gtk3",
+        "desktop-gtk4",
+        "desktop-papirus-icons"
+      ],
+      "reason": "Preserve all eight GTK3/4 variants and wallpaper/icon resources at reviewed upstream revisions; Papirus-Dark supplies the upstream icon inheritance; no GTK2 engine dependency."
+    },
+    {
+      "id": "meslolgs-nf",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64",
+        "macos-arm64"
+      ],
+      "when": "desktop.enable",
+      "policy": "project",
+      "reason": "Pinned official MesloLGS NF four-face artifact plus upstream license."
+    },
+    {
+      "id": "jetbrains-mono-nf",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": "desktop.enable",
+      "policy": "latest-stable",
+      "requires": [
+        "desktop-fontconfig"
+      ]
+    },
+    {
+      "id": "nordzy-cursors",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "latest-stable"
+    },
+    {
+      "id": "desktop-wayland-protocols",
+      "provider": "apt",
+      "name": "wayland-protocols",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "distro-security",
+      "reason": "Noble protocol definitions support the native Hyprland PPA build boundary; the private Qt runtime separately locks its protocol sources, with no upstream-latest claim for the host package."
+    },
+    {
+      "id": "hyprland-ppa",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "latest-stable",
+      "privileged_actions": [
+        "provision",
+        "retire",
+        "recover"
+      ],
+      "requires": [
+        "gnupg",
+        "desktop-wayland-protocols",
+        "desktop-build-xkbcommon"
+      ],
+      "executables": {
+        "hyprlock": "/usr/bin/hyprlock",
+        "hypridle": "/usr/bin/hypridle"
+      }
+    },
+    {
+      "id": "niri",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "latest-stable",
+      "privileged_actions": [
+        "provision",
+        "retire",
+        "recover"
+      ],
+      "build_before_provision": true,
+      "requires": [
+        "git",
+        "curl",
+        "nordic-theme",
+        "nordzy-cursors",
+        "jetbrains-mono-nf",
+        "build-tools",
+        "desktop-build-clang",
+        "desktop-build-libclang",
+        "desktop-build-dpkg",
+        "pkg-config",
+        "desktop-build-udev",
+        "desktop-build-input",
+        "desktop-build-seat",
+        "desktop-build-xkbcommon",
+        "desktop-build-gbm",
+        "desktop-build-egl",
+        "desktop-build-wayland",
+        "desktop-build-pango",
+        "desktop-build-pipewire",
+        "desktop-build-display-info"
+      ],
+      "executables": {
+        "niri": "/usr/bin/niri",
+        "niri-session": "/usr/bin/niri-session"
+      }
+    },
+    {
+      "id": "xwayland-satellite",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "latest-stable",
+      "privileged_actions": [
+        "provision",
+        "retire",
+        "recover"
+      ],
+      "build_before_provision": true,
+      "requires": [
+        "niri",
+        "desktop-xwayland",
+        "desktop-build-xcb-composite",
+        "desktop-build-xcb-xfixes",
+        "desktop-build-xcb-render",
+        "desktop-build-xcb-shape",
+        "desktop-build-xcb-icccm",
+        "desktop-build-xcb",
+        "desktop-build-xcb-cursor",
+        "desktop-build-xcb-res",
+        "desktop-build-xcb-randr",
+        "desktop-build-pixman"
+      ],
+      "executables": {
+        "xwayland-satellite": "/usr/bin/xwayland-satellite"
+      }
+    },
+    {
+      "id": "dux-runtime",
+      "provider": "recipe",
+      "path": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "when": [
+        "desktop.enable",
+        "desktop.niri.enable"
+      ],
+      "policy": "latest-stable",
+      "privileged_actions": [
+        "provision",
+        "retire",
+        "recover"
+      ],
+      "build_before_provision": true,
+      "requires": [
+        "niri",
+        "gtk3",
+        "gui-alsa",
+        "gui-vulkan",
+        "gui-xkbcommon-x11",
+        "gui-xcb-xfixes",
+        "gui-x11-xcb",
+        "desktop-cups",
+        "desktop-runtime-pulse",
+        "desktop-runtime-xcb-keysyms",
+        "desktop-runtime-krb5",
+        "desktop-runtime-va",
+        "desktop-runtime-va-drm",
+        "desktop-runtime-va-x11",
+        "desktop-mesa-va",
+        "desktop-mesa-vdpau",
+        "desktop-runtime-vdpau",
+        "desktop-build-xcb-cursor",
+        "desktop-build-xcb-icccm",
+        "desktop-build-clang-tools",
+        "desktop-build-cmake",
+        "desktop-build-meson",
+        "desktop-build-ninja",
+        "desktop-build-patchelf",
+        "sevenzip",
+        "desktop-build-drm",
+        "desktop-build-vulkan",
+        "desktop-build-pam",
+        "desktop-build-polkit",
+        "desktop-build-glib",
+        "desktop-build-jemalloc",
+        "desktop-build-unwind",
+        "desktop-build-ffi",
+        "desktop-build-expat",
+        "desktop-build-libxml2",
+        "desktop-build-zlib",
+        "desktop-build-spirv",
+        "desktop-build-cli11"
+      ],
+      "executables": {
+        "dms": "/usr/local/bin/dms",
+        "quickshell": "/usr/local/bin/quickshell",
+        "qs": "/usr/local/bin/qs"
+      }
+    }
+  ],
+  "artifacts": {
+    "noble-desktop": {
+      "source_manifest": "native/recipes/desktop/sources.json",
+      "recipe": "native/recipes/desktop/desktop.py",
+      "platforms": [
+        "linux-x64"
+      ],
+      "qt_private_abi": "Rebuild Quickshell for every Qt release; coupled SDK/ICU/plugins/Wayland/protocols/FetchContent source pins",
+      "qt_standard_support_until": "2027-03-17",
+      "artifact_distribution": "local-operator-use-only; source publication is not binary redistribution authorization",
+      "service_owner": "private native service controller; builds/install/check never start services",
+      "hardware_driver_policy": "Stock Noble Mesa/firmware; preserve administrator-selected proprietary driver packages, do not replace them or guess hardware"
+    },
+    "desktop-appearance": {
+      "source_manifest": "native/recipes/desktop/appearance.json",
+      "recipe": "native/recipes/desktop/desktop.py",
+      "ownership": "Versioned user runtime and collision-checked individual theme/font links; no foreign deletion"
+    }
+  }
+}

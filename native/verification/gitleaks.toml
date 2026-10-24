@@ -1,0 +1,4 @@
+# Scan the explicit worktree union, including newly authored/untracked files.
+# No path, rule, fingerprint or secret allowlists are implicit in this policy.
+[extend]
+useDefault = true

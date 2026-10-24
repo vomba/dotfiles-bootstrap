@@ -1,0 +1,60 @@
+{{ if not .dotfiles.shell.zsh.enable }}
+.zshenv
+.config/zsh/**
+{{ end }}
+{{ if not .dotfiles.shell.enable }}
+.config/starship.toml
+.config/bat/**
+{{ end }}
+{{ if not .dotfiles.shell.git.enable }}
+.config/git/config
+.config/lazygit/**
+{{ end }}
+{{ if not .dotfiles.shell.gpg.enable }}
+.gnupg/gpg.conf
+.gnupg/gpg-agent.conf
+{{ end }}
+{{ if not .dotfiles.apps.editors.enable }}
+.config/helix/**
+{{ end }}
+{{ if not .dotfiles.apps.yazi.enable }}
+.config/yazi/**
+{{ end }}
+{{ if not (and .dotfiles.theme.nord.enable .dotfiles.shell.enable) }}
+.config/btop/**
+.config/bat/themes/**
+{{ end }}
+{{ if not .dotfiles.theme.nord.enable }}
+.config/helix/themes/**
+.config/lazygit/**
+.config/yazi/theme.toml
+.config/yazi/flavors/**
+.config/glow/**
+{{ end }}
+{{ if not .dotfiles.apps.enable }}
+.config/glow/**
+{{ end }}
+{{ if not (and (eq .platform "linux-x64") .dotfiles.shell.gpg.enable) }}
+.config/systemd/user/gpg-agent*
+{{ end }}
+{{ if not (and (eq .platform "macos-arm64") .dotfiles.shell.gpg.enable) }}
+Library/LaunchAgents/org.dotfiles.gpg-agent.plist
+{{ end }}
+{{ if not (and (eq .platform "linux-x64") .dotfiles.apps.firefox.enable) }}
+.mozilla/firefox/default/user.js
+.local/share/applications/firefox.desktop
+{{ end }}
+{{ if not (and (eq .platform "macos-arm64") .dotfiles.apps.firefox.enable) }}
+Library/Application Support/Firefox/Profiles/default/user.js
+{{ end }}
+{{ if not (and (eq .platform "linux-x64") .dotfiles.dev.enable) }}
+.config/go/**
+{{ end }}
+{{ if not (and (eq .platform "macos-arm64") .dotfiles.dev.enable) }}
+Library/Application Support/go/env
+Library/Application Support/go/telemetry/mode
+{{ end }}
+{{ if not .dotfiles.dev.mise.enable }}
+.config/mise/**
+.local/bin/dotfiles-mise-install
+{{ end }}

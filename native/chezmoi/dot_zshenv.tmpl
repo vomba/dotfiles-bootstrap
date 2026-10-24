@@ -1,0 +1,41 @@
+# Read by every Zsh, including noninteractive invocations. No installers or agents.
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+{{ if .dotfiles.shell.zsh.enable -}}
+export GOPATH="$HOME/.go"
+export KREW_ROOT="$HOME/.krew"
+{{ end -}}
+{{ if .dotfiles.apps.editors.enable -}}
+export EDITOR=hx VISUAL=hx
+{{ end -}}
+typeset -U path PATH
+{{ if eq .platform "macos-arm64" -}}
+path=(/opt/homebrew/bin /opt/homebrew/sbin $path)
+{{ end -}}
+{{ if and (eq .platform "macos-arm64") .dotfiles.shell.gnuTools.enable -}}
+# Homebrew's unprefixed GNU interfaces must precede BSD tools.
+path=(/opt/homebrew/opt/coreutils/libexec/gnubin /opt/homebrew/opt/findutils/libexec/gnubin /opt/homebrew/opt/gnu-sed/libexec/gnubin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gawk/libexec/gnubin /opt/homebrew/opt/diffutils/bin /opt/homebrew/opt/make/libexec/gnubin /opt/homebrew/opt/gpatch/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin /opt/homebrew/opt/less/bin $path)
+{{ end -}}
+# Strict shared mise shims; never activate mise or auto-install at shell startup.
+{{ if .dotfiles.dev.mise.enable -}}
+export MISE_SHIMS_DIR={{ printf "%s/mise-shims" (dir .paths.data) | quote }}
+export MISE_DATA_DIR={{ printf "%s/mise" .paths.data | quote }}
+export MISE_CONFIG_DIR={{ printf "%s/mise" .paths.config | quote }}
+export MISE_AUTO_INSTALL=0 MISE_NOT_FOUND_AUTO_INSTALL=0 MISE_NOT_FOUND_SYSTEM_FALLBACK=0 MISE_OFFLINE=1
+{{ end -}}
+{{ if .dotfiles.shell.zsh.enable -}}
+path=("$HOME/.go/bin" "$HOME/.krew/bin" $path)
+{{ end -}}
+path=("{{ .paths.bin }}" $path)
+{{ if .dotfiles.dev.mise.enable -}}
+path=("$MISE_SHIMS_DIR" $path)
+{{ end -}}
+export PATH
+{{ if and .dotfiles.shell.enable .dotfiles.theme.nord.enable -}}
+export BAT_THEME=nord-contrast
+export GLAMOUR_STYLE={{ printf "%s/native/assets/nord/glamour-nord.json" .base | quote }}
+export LS_COLORS="$(<{{ printf "%s/native/assets/nord/ls-colors-nord" .base | quote }})"
+{{ end -}}
