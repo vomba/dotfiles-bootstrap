@@ -197,21 +197,27 @@ class CompletionFixture(unittest.TestCase):
         shared = manager / "share/zsh/site-functions"
         shared.mkdir(parents=True)
         (shared / "_git").symlink_to(git)
+        installed_version = self.root / "installed-version"
+        installed_version.write_text("2_1")
         brew.write_text(
             "#!"
             + sys.executable
-            + "\nimport json, sys\n"
+            + "\nimport json, sys\nfrom pathlib import Path\n"
             + "if sys.argv[1:] == ['--prefix', 'git']:\n    print("
             + repr(str(formula))
             + ")\n"
             + "elif sys.argv[1:] == ['info', '--json=v2', 'git']:\n"
-            + "    print(json.dumps({'formulae': [{'installed': [{'version': '2'}]}]}))\n"
+            + "    print(json.dumps({'formulae': [{'installed': [{'version': Path("
+            + repr(str(installed_version))
+            + ").read_text()}]}]}))\n"
             + "elif sys.argv[1:] == ['--version']:\n    print('Homebrew fixture')\n"
             + "else:\n    raise SystemExit('unexpected package-manager operation')\n"
         )
         brew.chmod(0o755)
         self.context["executables"].update({"brew": str(brew), "zsh": ZSH})
-        self.context["packages"].append({"id": "git", "name": "git", "provider": "brew"})
+        self.context["packages"].append(
+            {"id": "git", "name": "git", "provider": "brew", "version": "2"}
+        )
         supplemental = self.context.pop("completion_providers")[1]
         self.context["completion_providers"] = [
             *RECIPE.discover_providers(self.context),
@@ -220,6 +226,13 @@ class CompletionFixture(unittest.TestCase):
         receipt = self.build()
         self.assertEqual(receipt["assets"]["package-native/_git"]["provider"], "git")
         self.assertEqual((self.destination / "package-native/_git").read_bytes(), git.read_bytes())
+        del self.context["completion_providers"]
+        RECIPE.check(self.context)
+        installed_version.write_text("2_2")
+        with self.assertRaisesRegex(
+            RECIPE.CompletionError, "stale completion provider version: git"
+        ):
+            RECIPE.check(self.context)
 
     def test_failed_generator_preserves_previous_tree(self):
         self.build()
@@ -545,6 +558,7 @@ class InstalledNativeCompletions(unittest.TestCase):
             context["paths"]["completions"] = str(root / "built")
             context["paths"]["cache"] = str(root / "build-cache")
             RECIPE.build(context, root / "built")
+            RECIPE.check(context)
             cases = (
                 ("act --li", "--list"),
                 ("golazo --h", "--help"),

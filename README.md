@@ -63,6 +63,8 @@ Zsh owns one Oh My Zsh compinit. Completion fpath precedence is package-native â
 
 On macOS, composed contexts include the trusted `/opt/homebrew/bin/brew` manager path so completion discovery can inspect installed formula assets without inheriting the caller's `PATH`. This does not install Homebrew or activate shell configuration; native-host readiness remains a separate prerequisite.
 
+Completion receipts track the installed native package version, including Homebrew revisions and Debian release suffixes, rather than comparing that provenance with an upstream-only manifest version. Readback re-queries the native manager and rejects changed provider versions even when completion bytes are unchanged.
+
 The Nord profile is opt-in via `theme.nord.enable`; assets cover enabled shell, Git, Helix, Yazi and Glow without whole-file ownership of mutable Btop state. Firefox configuration preserves user profile data and signed-extension consent boundaries. Linux GUI recipes use native dependencies, not package-store GPU wrappers. Mac apps have native bundle/registration paths.
 
 `dev.mise.enable` controls managed global config, shared strict shims and the explicit catalog, independently of general dev enablement. `apps/mise/mise.toml`, `mise.lock` and `.mise/locks/` are the canonical selected request/lock graph. `dotfiles-mise-install` isolates caller/ancestor config and installs explicitly; no shell activation, prompt/chpwd hooks, missing-version system fallback or automatic download. Personal config.local/lock additions must use disjoint keys; do not edit managed files with mise use --global. `mise exec -- command` is an explicit trusted-project environment action.

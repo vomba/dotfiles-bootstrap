@@ -141,12 +141,29 @@ def run_isolated(argv):
     return result.stdout
 
 
+def native_provider_version(context, package):
+    name = package["name"]
+    if package["provider"] == "brew":
+        brew = executable(context, "brew")
+        info = json.loads(run_isolated([brew, "info", "--json=v2", name]))
+        installed = info["formulae"][0]["installed"]
+        if len(installed) != 1:
+            raise CompletionError(f"ambiguous installed completion provider: {name}")
+        return str(installed[0]["version"])
+    query = Path("/usr/bin/dpkg-query")
+    if not query.is_file():
+        raise CompletionError("dpkg-query unavailable for native completion discovery")
+    return run_isolated([query, "-W", "-f=${Version}", name]).decode().strip()
+
+
 def version_for(context, command):
     for provider in context.get("completion_providers", []):
         if command in provider.get("commands", []) or provider["id"] == command:
             if provider.get("version"):
                 return str(provider["version"])
     package = package_for(context, command)
+    if package.get("provider") in ("apt", "brew"):
+        return native_provider_version(context, package)
     selected = package.get("installed_version") or package.get("version")
     if selected and selected not in ("latest", "latest-stable", "system"):
         return str(selected)
@@ -202,9 +219,7 @@ def discover_providers(context):
         name = package.get("name", package.get("id"))
         if provider == "apt":
             query = Path("/usr/bin/dpkg-query")
-            if not query.is_file():
-                raise CompletionError("dpkg-query unavailable for native completion discovery")
-            version = run_isolated([query, "-W", "-f=${Version}", name]).decode().strip()
+            version = native_provider_version(context, package)
             listing = run_isolated([query, "-L", name]).decode().splitlines()
             assets = [
                 p
@@ -229,14 +244,11 @@ def discover_providers(context):
                 if (prefix / relative).is_dir()
             ]
             if assets:
-                info = json.loads(run_isolated([brew, "info", "--json=v2", name]))
-                installed = info["formulae"][0]["installed"]
-                if len(installed) != 1:
-                    raise CompletionError(f"ambiguous installed completion provider: {name}")
+                version = native_provider_version(context, package)
                 providers.append(
                     {
                         "id": package["id"],
-                        "version": installed[0]["version"],
+                        "version": version,
                         "assets": assets,
                         "tier": "supplemental" if name == "zsh-completions" else "package-native",
                     }
@@ -640,14 +652,16 @@ def check(context):
             ):
                 raise CompletionError(f"stale Bash-compatible completion: {relative}")
     for provider in receipt.get("providers", []):
+        package = package_for(context, provider["id"])
         current = next(
             (p for p in context.get("completion_providers", []) if p["id"] == provider["id"]), None
         )
-        selected = (
-            current.get("version")
-            if current
-            else package_for(context, provider["id"]).get("version")
-        )
+        if current:
+            selected = current.get("version")
+        elif package.get("provider") in ("apt", "brew"):
+            selected = native_provider_version(context, package)
+        else:
+            selected = package.get("version")
         if (
             selected
             and selected not in ("latest", "latest-stable", "system")
