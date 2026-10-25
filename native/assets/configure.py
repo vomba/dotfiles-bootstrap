@@ -256,47 +256,204 @@ def encode_search(value):
     return b"mozLz40\0" + struct.pack("<I", size) + block
 
 
+def search_default_hash(profile, value):
+    """Match Firefox's verification salt: profile directory leaf, not full path."""
+    salt = profile.name + value + DISCLAIMER
+    return base64.b64encode(hashlib.sha256(salt.encode()).digest()).decode()
+
+
+def _search_engines(current):
+    if (
+        not isinstance(current, dict)
+        or type(current.get("version")) is not int
+        or current["version"] not in {12, 14}
+        or not isinstance(current.get("engines"), list)
+        or not isinstance(current.get("metaData", {}), dict)
+    ):
+        raise ValueError("unsupported Firefox search schema; refusing destructive replacement")
+    engines = {}
+    for item in current["engines"]:
+        if (
+            not isinstance(item, dict)
+            or not isinstance(item.get("id"), str)
+            or item["id"] in engines
+            or not isinstance(item.get("_metaData", {}), dict)
+        ):
+            raise ValueError("invalid Firefox search engine record; refusing replacement")
+        engines[item["id"]] = item
+    return engines
+
+
 def desired_search(profile, previous=None):
     desired = json.loads((ASSETS / "firefox/search.json").read_text())
-    result = copy.deepcopy(previous or {"version": 12, "engines": [], "metaData": {}})
-    if result.get("version") != 12 or not isinstance(result.get("engines"), list):
-        raise ValueError("unsupported Firefox search schema; refusing destructive replacement")
-    engines = {item["id"]: item.copy() for item in result["engines"]}
+    current = previous if previous is not None else {"version": 12, "engines": [], "metaData": {}}
+    _search_engines(current)
+    result = copy.deepcopy(current)
+    engines = {item["id"]: item for item in result["engines"]}
+    classification = "_isAppProvided" if result["version"] == 12 else "_isConfigEngine"
     for definition in desired["engines"]:
         identifier = definition["id"]
         engine = engines.setdefault(identifier, {"id": identifier})
         engine.update(
             {
                 "_name": identifier,
-                "_isAppProvided": False,
                 "_loadPath": "[dotfiles]/" + identifier,
                 "_definedAliases": [definition["alias"]],
-                "_urls": [{"template": definition["template"], "params": definition["params"]}],
             }
         )
+        # Base/OpenSearch serialization omits the schema-14 config flag.
+        engine.pop("_isAppProvided", None)
+        engine.pop("_isConfigEngine", None)
+        if result["version"] == 12:
+            engine[classification] = False
+        urls = engine.get("_urls")
+        url = urls[0] if isinstance(urls, list) and urls and isinstance(urls[0], dict) else {}
+        old_params = url.get("params", [])
+        params = []
+        for definition_param in definition["params"]:
+            param = (
+                next(
+                    (
+                        item.copy()
+                        for item in old_params
+                        if isinstance(item, dict) and item.get("name") == definition_param["name"]
+                    ),
+                    {},
+                )
+                if isinstance(old_params, list)
+                else {}
+            )
+            # Firefox ignores persisted parameters with truthy config-only
+            # keys. Remove these keys when repairing authored query values.
+            param.pop("purpose", None)
+            param.pop("mozparam", None)
+            param.update(definition_param)
+            params.append(param)
+        url.update(
+            {
+                "template": definition["template"],
+                "method": "GET",
+                "type": "text/html",
+                "rels": [],
+                "params": params,
+            }
+        )
+        engine["_urls"] = [url]
         if "icon" in definition:
-            engine.update({"_iconMapObj": {"16": definition["icon"]}, "_updateInterval": 86400000})
+            icons = engine.get("_iconMapObj")
+            if not isinstance(icons, dict):
+                icons = {}
+            icons["16"] = definition["icon"]
+            engine["_iconMapObj"] = icons
+            engine["_updateInterval"] = 86400000
     for identifier in desired["hidden"] + desired["order"]:
-        engines.setdefault(identifier, {"id": identifier, "_isAppProvided": True, "_metaData": {}})
+        # Never reclassify an existing, unrelated engine.
+        engines.setdefault(identifier, {"id": identifier, classification: True, "_metaData": {}})
     for identifier in desired["hidden"]:
         engines[identifier].setdefault("_metaData", {})["hidden"] = True
-    order = desired["order"] + [name for name in engines if name not in desired["order"]]
+
+    def saved_order(identifier):
+        number = engines[identifier].get("_metaData", {}).get("order")
+        return number if type(number) is int and number > 0 else float("inf")
+
+    # The physical engine array is not Firefox's UI order. Keep the saved
+    # relative order of engines outside the authored prefix when repairing.
+    order = desired["order"] + sorted(
+        (name for name in engines if name not in desired["order"]), key=saved_order
+    )
     for number, identifier in enumerate(order, 1):
         engines[identifier].setdefault("_metaData", {})["order"] = number
     result["engines"] = [engines[identifier] for identifier in order]
-    metadata = dict(result.get("metaData", {}))
-    salt = str(profile) + desired["default"] + DISCLAIMER
+    metadata = result.setdefault("metaData", {})
+    default = desired["default"]
+    if metadata.get("defaultEngineId") == "" and metadata.get("appDefaultEngineId") == default:
+        default = ""
     metadata.update(
         {
-            "defaultEngineId": desired["default"],
-            "defaultEngineIdHash": base64.b64encode(
-                hashlib.sha256(salt.encode()).digest()
-            ).decode(),
+            "defaultEngineId": default,
+            "defaultEngineIdHash": search_default_hash(profile, default),
             "useSavedOrder": True,
         }
     )
-    result["metaData"] = metadata
     return result
+
+
+def search_matches(profile, current):
+    """Compare only authored search policy, allowing Firefox's serialization."""
+    engines = _search_engines(current)
+    desired = json.loads((ASSETS / "firefox/search.json").read_text())
+    for definition in desired["engines"]:
+        engine = engines.get(definition["id"])
+        if engine is None or any(
+            engine.get(key) != value
+            for key, value in (
+                ("_name", definition["id"]),
+                ("_loadPath", "[dotfiles]/" + definition["id"]),
+                ("_definedAliases", [definition["alias"]]),
+            )
+        ):
+            return False
+        if any(
+            engine.get(key, False) is not False for key in ("_isAppProvided", "_isConfigEngine")
+        ):
+            return False
+        urls = engine.get("_urls")
+        if not isinstance(urls, list) or len(urls) != 1 or not isinstance(urls[0], dict):
+            return False
+        url = urls[0]
+        if (
+            url.get("template") != definition["template"]
+            or url.get("method", "GET") != "GET"
+            or url.get("type", "text/html") != "text/html"
+            or url.get("rels", []) != []
+        ):
+            return False
+        params = url.get("params")
+        if (
+            not isinstance(params, list)
+            or len(params) != len(definition["params"])
+            or any(
+                not isinstance(param, dict)
+                or "purpose" in param
+                or "mozparam" in param
+                or any(param.get(key) != value for key, value in expected.items())
+                for param, expected in zip(params, definition["params"])
+            )
+        ):
+            return False
+        if "icon" in definition and (
+            not isinstance(engine.get("_iconMapObj"), dict)
+            or engine["_iconMapObj"].get("16") != definition["icon"]
+            or engine.get("_updateInterval") != 86400000
+        ):
+            return False
+    for identifier in desired["hidden"]:
+        if engines.get(identifier, {}).get("_metaData", {}).get("hidden") is not True:
+            return False
+    orders = []
+    for identifier in desired["order"]:
+        number = engines.get(identifier, {}).get("_metaData", {}).get("order")
+        if type(number) is not int or number <= 0 or (orders and number <= orders[-1]):
+            return False
+        orders.append(number)
+    for identifier, engine in engines.items():
+        number = engine.get("_metaData", {}).get("order")
+        if identifier not in desired["order"]:
+            # Firefox coerces string/float/bool order values; do not certify a
+            # prefix that such a value can precede in its sorted engine array.
+            if number is not None and type(number) is not int:
+                return False
+            if type(number) is int and 0 < number <= orders[-1]:
+                return False
+    metadata = current.get("metaData", {})
+    default = metadata.get("defaultEngineId")
+    if default != desired["default"] and not (
+        default == "" and metadata.get("appDefaultEngineId") == desired["default"]
+    ):
+        return False
+    return metadata.get("useSavedOrder") is True and metadata.get(
+        "defaultEngineIdHash"
+    ) == search_default_hash(profile, default)
 
 
 @contextlib.contextmanager
@@ -598,9 +755,7 @@ def operate(action, context, identifier, output=None):
         ):
             raise ValueError("Firefox default profile has not been provisioned")
         search = profile / "search.json.mozlz4"
-        if not search.is_file() or desired_search(
-            profile, decode_search(search.read_bytes())
-        ) != decode_search(search.read_bytes()):
+        if not search.is_file() or not search_matches(profile, decode_search(search.read_bytes())):
             raise ValueError("Firefox managed search settings differ")
         for record in extensions(context):
             target = profile / "extensions" / (record["id"] + ".xpi")
@@ -624,14 +779,15 @@ def operate(action, context, identifier, output=None):
                     "Firefox search symlink requires the explicit legacy ownership handoff"
                 )
             previous = decode_search(search.read_bytes()) if search.exists() else None
-            desired = desired_search(profile, previous)
+            matches = previous is not None and search_matches(profile, previous)
+            desired = None if matches else desired_search(profile, previous)
             # Validate every profile/schema and acquire all payloads before
             # replacing any browser-owned configuration or extension leaf.
             reconcile_profile(context, dry_run=True)
             prepared = prepare_extensions(context, profile)
             reconcile_profile(context)
             reconcile_extensions(context, profile, prepared=prepared)
-            if previous != desired:
+            if not matches:
                 atomic(search, encode_search(desired))
         else:
             reconcile_extensions(context, profile, retire=True)

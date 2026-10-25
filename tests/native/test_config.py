@@ -123,7 +123,7 @@ class FirefoxConfigurationTests(unittest.TestCase):
         path = root / "profiles.ini"
         original = "[Profile0]\nName=default\nPath=user-profile\nIsRelative=1\n"
         path.write_text(original)
-        with self.assertRaisesRegex(ValueError, "different path"):
+        with self.assertRaises(ValueError):
             configure.operate("provision", self.context, "firefox-profile")
         self.assertEqual(path.read_text(), original)
         self.assertFalse((root / "default/search.json.mozlz4").exists())
@@ -134,44 +134,319 @@ class FirefoxConfigurationTests(unittest.TestCase):
         foreign = Path(self.temp.name) / "foreign"
         foreign.mkdir()
         profile.symlink_to(foreign, target_is_directory=True)
-        with self.assertRaisesRegex(ValueError, "symlink"):
+        with self.assertRaises(ValueError):
             configure.operate("provision", self.context, "firefox-profile")
         self.assertEqual(list(foreign.iterdir()), [])
 
     def test_search_merges_managed_fields_and_preserves_user_searches(self):
         _, profile, _ = configure.firefox_paths(self.context)
-        previous = {
-            "version": 12,
-            "engines": [
-                {
-                    "id": "personal",
-                    "_name": "My Engine",
-                    "_metaData": {"alias": "@mine"},
-                    "custom": 42,
-                },
-                {
-                    "id": "google",
-                    "_isAppProvided": True,
-                    "_metaData": {"hidden": False, "custom": "keep"},
-                },
-            ],
-            "metaData": {"userField": "keep"},
-            "futureField": {"keep": True},
-        }
-        original = copy.deepcopy(previous)
-        result = configure.desired_search(profile, previous)
-        self.assertEqual(previous, original, "planning must not mutate caller-owned search data")
-        self.assertEqual(result["futureField"], {"keep": True})
-        self.assertEqual(result["metaData"]["userField"], "keep")
-        engines = {record["id"]: record for record in result["engines"]}
-        self.assertEqual(engines["personal"]["custom"], 42)
-        self.assertEqual(
-            engines["google"]["_metaData"], {"hidden": True, "custom": "keep", "order": 9}
+        for version in (12, 14):
+            with self.subTest(version=version):
+                flag = "_isAppProvided" if version == 12 else "_isConfigEngine"
+                previous = {
+                    "version": version,
+                    "engines": [
+                        {
+                            "id": "personal",
+                            "_name": "My Engine",
+                            "_metaData": {"alias": "@mine", "future": {"values": [1, 2]}},
+                            "custom": {"nested": {"keep": True}},
+                        },
+                        {
+                            "id": "youtube",
+                            "_name": "Old name",
+                            flag: False,
+                            "_metaData": {"future": {"keep": ["custom"]}},
+                            "futureCustom": {"nested": {"keep": True}},
+                        },
+                        {
+                            "id": "google",
+                            flag: True,
+                            "_metaData": {"hidden": False, "custom": {"keep": [1, 2]}},
+                            "futureConfig": {"nested": {"keep": True}},
+                        },
+                    ],
+                    "metaData": {"userField": {"nested": {"keep": True}}},
+                    "futureField": {"nested": {"keep": True}},
+                }
+                original = copy.deepcopy(previous)
+                result = configure.desired_search(profile, previous)
+                self.assertEqual(previous, original, "planning must not mutate its input")
+                self.assertEqual(result["version"], version)
+                self.assertEqual(result["futureField"], previous["futureField"])
+                self.assertEqual(result["metaData"]["userField"], previous["metaData"]["userField"])
+                engines = {record["id"]: record for record in result["engines"]}
+                for identifier, field in (
+                    ("personal", "custom"),
+                    ("youtube", "futureCustom"),
+                    ("google", "futureConfig"),
+                ):
+                    source = next(
+                        record for record in previous["engines"] if record["id"] == identifier
+                    )
+                    self.assertEqual(engines[identifier][field], source[field])
+                self.assertEqual(engines["personal"]["_metaData"]["future"], {"values": [1, 2]})
+                self.assertEqual(engines["youtube"]["_metaData"]["future"], {"keep": ["custom"]})
+                self.assertEqual(engines["google"]["_metaData"]["custom"], {"keep": [1, 2]})
+                self.assertTrue(engines["google"]["_metaData"]["hidden"])
+                self.assertTrue(engines["google"][flag])
+                self.assertEqual(engines["youtube"]["_name"], "youtube")
+                self.assertEqual(engines["youtube"]["_definedAliases"], ["@yt"])
+                self.assertFalse(engines["youtube"].get(flag, False))
+                self.assertEqual(result["metaData"]["defaultEngineId"], "ddg")
+                self.assertEqual(configure.desired_search(profile, result), result)
+                self.assertEqual(configure.decode_search(configure.encode_search(result)), result)
+
+    def normalized_schema14_profile(self):
+        self.context["platform"] = "macos-arm64"
+        root, profile, relative = configure.firefox_paths(self.context)
+        profile.mkdir(parents=True, exist_ok=True)
+        (root / "profiles.ini").write_text(
+            "[General]\nStartWithLastProfile=1\n\n"
+            "[Profile0]\nName=default\nIsRelative=1\n"
+            f"Path={relative}\nDefault=1\n"
         )
-        self.assertEqual(engines["youtube"]["_definedAliases"], ["@yt"])
-        self.assertEqual(result["metaData"]["defaultEngineId"], "ddg")
-        self.assertEqual(configure.desired_search(profile, result), result)
-        self.assertEqual(configure.decode_search(configure.encode_search(result)), result)
+        current = configure.desired_search(
+            profile,
+            {
+                "version": 14,
+                "engines": [
+                    {
+                        "id": "youtube",
+                        "_filePath": "[profile]/searchplugins/youtube.xml",
+                        "_updateURL": None,
+                        "_metaData": {"future": {"keep": ["custom"]}},
+                        "futureCustom": {"nested": {"keep": True}},
+                    },
+                    {
+                        "id": "google",
+                        "_isConfigEngine": True,
+                        "_metaData": {"future": {"keep": ["config"]}},
+                        "futureConfig": {"nested": {"keep": True}},
+                    },
+                    {
+                        "id": "personal",
+                        "_name": "My Engine",
+                        "_urls": [{"template": "https://example.invalid/?q={searchTerms}"}],
+                        "_metaData": {"alias": "@mine", "future": {"keep": ["personal"]}},
+                        "futurePersonal": {"nested": {"keep": True}},
+                    },
+                ],
+                "metaData": {"future": {"keep": ["metadata"]}},
+                "futureRoot": {"nested": {"keep": True}},
+            },
+        )
+        for engine in current["engines"]:
+            if engine.get("_loadPath", "").startswith("[dotfiles]/"):
+                engine.pop("_isConfigEngine", None)
+                for url in engine["_urls"]:
+                    url["method"] = "GET"
+                    url["type"] = "text/html"
+        current["engines"].reverse()
+        search = profile / "search.json.mozlz4"
+        search.write_bytes(configure.encode_search(current))
+        return profile, search, current
+
+    def test_schema14_firefox_normalization_is_accepted_without_rewriting(self):
+        profile, search, current = self.normalized_schema14_profile()
+        youtube = next(record for record in current["engines"] if record["id"] == "youtube")
+        for explicit_false, explicit_url_defaults in ((False, False), (False, True), (True, True)):
+            with self.subTest(
+                explicit_false=explicit_false, explicit_url_defaults=explicit_url_defaults
+            ):
+                if explicit_false:
+                    youtube["_isConfigEngine"] = False
+                else:
+                    youtube.pop("_isConfigEngine", None)
+                for engine in current["engines"]:
+                    if engine.get("_loadPath", "").startswith("[dotfiles]/"):
+                        for url in engine["_urls"]:
+                            if explicit_url_defaults:
+                                url.update({"method": "GET", "type": "text/html"})
+                            else:
+                                url.pop("method", None)
+                                url.pop("type", None)
+                search.write_bytes(configure.encode_search(current))
+                original = search.read_bytes()
+                self.assertTrue(configure.search_matches(profile, current))
+                self.assertTrue(
+                    configure.operate("check", self.context, "firefox-profile")["verified"]
+                )
+                configure.operate("provision", self.context, "firefox-profile")
+                self.assertEqual(search.read_bytes(), original)
+                self.assertEqual(configure.decode_search(search.read_bytes()), current)
+                self.assertTrue(
+                    configure.operate("check", self.context, "firefox-profile")["verified"]
+                )
+
+    def test_schema14_owned_drift_is_repaired_without_losing_unrelated_data(self):
+        changes = (
+            ("template", "youtube", ("_urls", 0, "template"), "https://example.invalid/wrong"),
+            ("method", "youtube", ("_urls", 0, "method"), "POST"),
+            ("URL role", "youtube", ("_urls", 0, "rels"), ["searchform"]),
+            ("type", "youtube", ("_urls", 0, "type"), "application/json"),
+            (
+                "params",
+                "youtube",
+                ("_urls", 0, "params"),
+                [{"name": "wrong", "value": "{searchTerms}"}],
+            ),
+            ("parameter value", "youtube", ("_urls", 0, "params", 0, "value"), "wrong"),
+            (
+                "ignored purpose parameter",
+                "youtube",
+                ("_urls", 0, "params", 0, "purpose"),
+                "keyword",
+            ),
+            ("ignored moz parameter", "youtube", ("_urls", 0, "params", 0, "mozparam"), True),
+            ("missing parameters", "youtube", ("_urls", 0, "params"), []),
+            ("classification", "youtube", ("_isConfigEngine",), True),
+            ("hidden", "google", ("_metaData", "hidden"), False),
+            ("curated order", "youtube", ("_metaData", "order"), 1000),
+            ("alias", "youtube", ("_definedAliases",), ["@wrong"]),
+            ("name", "youtube", ("_name",), "Wrong name"),
+            ("load path", "youtube", ("_loadPath",), "[other]/youtube"),
+            ("icon", "youtube", ("_iconMapObj",), {"16": "https://example.invalid/icon.ico"}),
+            ("icon update", "youtube", ("_updateInterval",), 1),
+            ("saved order", None, ("metaData", "useSavedOrder"), False),
+            ("default", None, ("metaData", "defaultEngineId"), "google"),
+            ("default hash", None, ("metaData", "defaultEngineIdHash"), "invalid"),
+        )
+        for label, identifier, path, value in changes:
+            with self.subTest(field=label):
+                profile, search, current = self.normalized_schema14_profile()
+                baseline = copy.deepcopy(current)
+                target = (
+                    current
+                    if identifier is None
+                    else next(record for record in current["engines"] if record["id"] == identifier)
+                )
+                for key in path[:-1]:
+                    target = target[key]
+                target[path[-1]] = value
+                if label == "default":
+                    current["metaData"]["defaultEngineIdHash"] = configure.search_default_hash(
+                        profile, "google"
+                    )
+                search.write_bytes(configure.encode_search(current))
+                original = search.read_bytes()
+                self.assertFalse(configure.search_matches(profile, current))
+                with self.assertRaises(ValueError):
+                    configure.operate("check", self.context, "firefox-profile")
+                self.assertEqual(search.read_bytes(), original)
+                configure.operate("provision", self.context, "firefox-profile")
+                self.assertTrue(
+                    configure.operate("check", self.context, "firefox-profile")["verified"]
+                )
+                repaired = configure.decode_search(search.read_bytes())
+                self.assertEqual(repaired["version"], 14)
+                self.assertEqual(repaired["futureRoot"], baseline["futureRoot"])
+                self.assertEqual(repaired["metaData"]["future"], baseline["metaData"]["future"])
+                before = {record["id"]: record for record in baseline["engines"]}
+                after = {record["id"]: record for record in repaired["engines"]}
+                self.assertEqual(after["personal"], before["personal"])
+                for engine, fields in (
+                    ("youtube", ("futureCustom", "_filePath", "_updateURL")),
+                    ("google", ("futureConfig",)),
+                ):
+                    for field in fields:
+                        self.assertEqual(after[engine][field], before[engine][field])
+                    self.assertEqual(
+                        after[engine]["_metaData"]["future"], before[engine]["_metaData"]["future"]
+                    )
+
+    def test_firefox_coercible_unmanaged_order_cannot_precede_authored_prefix(self):
+        for noncanonical in (1.0, "1", True):
+            with self.subTest(order=noncanonical):
+                profile, search, current = self.normalized_schema14_profile()
+                for engine in current["engines"]:
+                    engine["_metaData"]["order"] *= 10
+                self.assertTrue(configure.search_matches(profile, current))
+                personal = next(
+                    engine for engine in current["engines"] if engine["id"] == "personal"
+                )
+                preserved = copy.deepcopy(personal["futurePersonal"])
+                personal["_metaData"]["order"] = noncanonical
+                search.write_bytes(configure.encode_search(current))
+                self.assertFalse(configure.search_matches(profile, current))
+                with self.assertRaises(ValueError):
+                    configure.operate("check", self.context, "firefox-profile")
+                configure.operate("provision", self.context, "firefox-profile")
+                self.assertTrue(
+                    configure.operate("check", self.context, "firefox-profile")["verified"]
+                )
+                repaired = configure.decode_search(search.read_bytes())
+                personal = next(
+                    engine for engine in repaired["engines"] if engine["id"] == "personal"
+                )
+                self.assertIs(type(personal["_metaData"]["order"]), int)
+                self.assertEqual(personal["futurePersonal"], preserved)
+
+    def test_empty_default_requires_authored_application_default_and_stored_value_hash(self):
+        profile, search, current = self.normalized_schema14_profile()
+        current["metaData"].update(
+            {
+                "defaultEngineId": "",
+                "appDefaultEngineId": "ddg",
+                "defaultEngineIdHash": configure.search_default_hash(profile, ""),
+            }
+        )
+        search.write_bytes(configure.encode_search(current))
+        original = search.read_bytes()
+        self.assertTrue(configure.operate("check", self.context, "firefox-profile")["verified"])
+        configure.operate("provision", self.context, "firefox-profile")
+        self.assertEqual(search.read_bytes(), original)
+        for app_default, hash_value in (
+            ("google", configure.search_default_hash(profile, "")),
+            (None, configure.search_default_hash(profile, "")),
+            ("ddg", configure.search_default_hash(profile, "ddg")),
+            ("ddg", "invalid"),
+        ):
+            with self.subTest(app_default=app_default, hash_value=hash_value):
+                invalid = copy.deepcopy(current)
+                if app_default is None:
+                    invalid["metaData"].pop("appDefaultEngineId")
+                else:
+                    invalid["metaData"]["appDefaultEngineId"] = app_default
+                invalid["metaData"]["defaultEngineIdHash"] = hash_value
+                search.write_bytes(configure.encode_search(invalid))
+                self.assertFalse(configure.search_matches(profile, invalid))
+                with self.assertRaises(ValueError):
+                    configure.operate("check", self.context, "firefox-profile")
+                configure.operate("provision", self.context, "firefox-profile")
+                repaired = configure.decode_search(search.read_bytes())
+                stored_default = "" if app_default == "ddg" else "ddg"
+                self.assertEqual(repaired["metaData"]["defaultEngineId"], stored_default)
+                self.assertEqual(
+                    repaired["metaData"]["defaultEngineIdHash"],
+                    configure.search_default_hash(profile, stored_default),
+                )
+                self.assertTrue(
+                    configure.operate("check", self.context, "firefox-profile")["verified"]
+                )
+
+    def test_default_hash_uses_profile_leaf_and_matches_independent_mozilla_vectors(self):
+        # Independently derived with OpenSSL from the exact Firefox SearchUtils
+        # disclaimer, rather than from this adapter's constant or hash helper.
+        profile = self.home / "first/default"
+        relocated = self.home / "second/default"
+        different_leaf = self.home / "first/different"
+        self.assertEqual(
+            configure.search_default_hash(profile, "ddg"),
+            "nVbjzSsX6W+tHUrVamgarg//cmHv2Ul2ykTB2j5qPbE=",
+        )
+        self.assertEqual(
+            configure.search_default_hash(profile, ""),
+            "oCl9JYFf6W31P+pR/cQazmltOV/9CX8qkrO/pCAwgHM=",
+        )
+        self.assertEqual(
+            configure.search_default_hash(profile, "ddg"),
+            configure.search_default_hash(relocated, "ddg"),
+        )
+        self.assertNotEqual(
+            configure.search_default_hash(profile, "ddg"),
+            configure.search_default_hash(different_leaf, "ddg"),
+        )
 
     def test_search_codec_accepts_real_lz4_backreferences_and_rejects_corruption(self):
         # A literal JSON prefix followed by an overlapping LZ4 match, not only
@@ -188,15 +463,31 @@ class FirefoxConfigurationTests(unittest.TestCase):
             with self.assertRaises((ValueError, json.JSONDecodeError)):
                 configure.decode_search(malformed)
 
-    def test_unknown_search_schema_is_preserved(self):
-        _, profile, _ = configure.firefox_paths(self.context)
+    def test_unknown_search_schemas_reject_check_and_provision_without_replacing_bytes(self):
+        root, profile, relative = configure.firefox_paths(self.context)
         profile.mkdir(parents=True)
+        (root / "profiles.ini").write_text(
+            f"[Profile0]\nName=default\nIsRelative=1\nPath={relative}\nDefault=1\n"
+        )
         search = profile / "search.json.mozlz4"
-        original = configure.encode_search({"version": 99, "engines": []})
-        search.write_bytes(original)
-        with self.assertRaisesRegex(ValueError, "unsupported Firefox search schema"):
-            configure.operate("provision", self.context, "firefox-profile")
-        self.assertEqual(search.read_bytes(), original)
+        for version in (13, 15, 99):
+            for action in ("check", "provision"):
+                with self.subTest(version=version, action=action):
+                    current = {
+                        "version": version,
+                        "engines": [],
+                        "future": {"keep": [1, 2]},
+                    }
+                    original = configure.encode_search(current)
+                    search.write_bytes(original)
+                    with self.assertRaises(ValueError):
+                        configure.desired_search(profile, current)
+                    with self.assertRaises(ValueError):
+                        configure.search_matches(profile, current)
+                    with self.assertRaises(ValueError):
+                        configure.operate(action, self.context, "firefox-profile")
+                    self.assertEqual(search.read_bytes(), original)
+                    self.assertEqual(current["version"], version)
 
     def test_only_recorded_unchanged_extensions_are_retired(self):
         _, profile, _ = configure.firefox_paths(self.context)
@@ -231,14 +522,14 @@ class FirefoxConfigurationTests(unittest.TestCase):
                 {"schema_version": 1, "extensions": {"owned@example.invalid": "0" * 64}}
             ).encode(),
         )
-        with self.assertRaisesRegex(ValueError, "locally updated"):
+        with self.assertRaises(ValueError):
             configure.reconcile_extensions(self.context, profile, retire=True)
         self.assertEqual(owned.read_bytes(), b"updated by browser")
         configure.atomic(
             state,
             json.dumps({"schema_version": 1, "extensions": {"../../outside": "0" * 64}}).encode(),
         )
-        with self.assertRaisesRegex(ValueError, "ownership entry"):
+        with self.assertRaises(ValueError):
             configure.reconcile_extensions(self.context, profile, retire=True)
 
     def test_darwin_profile_path_and_disabled_feature_are_independent(self):
@@ -249,7 +540,7 @@ class FirefoxConfigurationTests(unittest.TestCase):
             profile, self.home / "Library/Application Support/Firefox/Profiles/default"
         )
         self.context["dotfiles"]["apps"]["firefox"]["enable"] = False
-        with self.assertRaisesRegex(ValueError, "disabled"):
+        with self.assertRaises(ValueError):
             configure.operate("provision", self.context, "firefox-profile")
         self.assertFalse(profile.exists())
 

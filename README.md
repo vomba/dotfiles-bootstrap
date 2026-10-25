@@ -80,6 +80,13 @@ its normal SSH selection; user and repository Git overrides retain precedence.
 
 The Nord profile is opt-in via `theme.nord.enable`; assets cover enabled shell, Git, Helix, Yazi and Glow without whole-file ownership of mutable Btop state. Firefox configuration preserves user profile data and signed-extension consent boundaries. Linux GUI recipes use native dependencies, not package-store GPU wrappers. Mac apps have native bundle/registration paths.
 
+Firefox search reconciliation supports persisted schemas 12 and 14 without
+downgrading an existing store. It preserves browser-owned fields outside the
+authored settings and compares managed engine/default/UI-order semantics rather
+than Firefox's physical engine-array or URL-default serialization. Verification
+hashes use Firefox's profile-directory leaf salt. Unknown schemas remain blocked
+without replacing the search store.
+
 `dev.mise.enable` controls managed global config, shared strict shims and the explicit catalog, independently of general dev enablement. `apps/mise/mise.toml`, `mise.lock` and `.mise/locks/` are the canonical selected request/lock graph. `dotfiles-mise-install` isolates caller/ancestor config and installs explicitly; no shell activation, prompt/chpwd hooks, missing-version system fallback or automatic download. Personal config.local/lock additions must use disjoint keys; do not edit managed files with mise use --global. `mise exec -- command` is an explicit trusted-project environment action.
 
 Interactive Python is apps-owned; OpenStack uses its separately locked Python 3.12 ABI environment. Terraform retains 1.5.7 for the declared license policy. CIDR/Terraform require cloud+mise; Helmfile Kubernetes+mise. Tenv keeps other tools but no competing Terraform proxy. Helm retains diff/secrets/getter/post-renderer plugins. The native tools recipe owns the full frozen OpenStack plugin assembly plus Rust CLI/TUI and declared native dependencies.
