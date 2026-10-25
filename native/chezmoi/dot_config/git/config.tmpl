@@ -4,6 +4,9 @@
     textconv = sops -d
 [core]
     pager = delta
+{{ if eq .platform "macos-arm64" -}}
+    sshCommand = /usr/bin/ssh
+{{ end -}}
 [interactive]
     diffFilter = delta --color-only
 [delta]
