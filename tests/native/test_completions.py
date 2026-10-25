@@ -185,6 +185,42 @@ class CompletionFixture(unittest.TestCase):
             self.build()
         self.assertEqual(previous, (self.destination / "ownership.json").read_bytes())
 
+    @unittest.skipUnless(ZSH, "native Zsh required")
+    def test_homebrew_shared_completion_links_keep_formula_ownership(self):
+        manager = self.root / "manager"
+        brew = manager / "bin/brew"
+        brew.parent.mkdir(parents=True)
+        formula = self.root / "formula"
+        assets = formula / "share/zsh/site-functions"
+        shutil.copytree(self.assets, assets)
+        git = native_asset(assets, "git", ["--version"])
+        shared = manager / "share/zsh/site-functions"
+        shared.mkdir(parents=True)
+        (shared / "_git").symlink_to(git)
+        brew.write_text(
+            "#!"
+            + sys.executable
+            + "\nimport json, sys\n"
+            + "if sys.argv[1:] == ['--prefix', 'git']:\n    print("
+            + repr(str(formula))
+            + ")\n"
+            + "elif sys.argv[1:] == ['info', '--json=v2', 'git']:\n"
+            + "    print(json.dumps({'formulae': [{'installed': [{'version': '2'}]}]}))\n"
+            + "elif sys.argv[1:] == ['--version']:\n    print('Homebrew fixture')\n"
+            + "else:\n    raise SystemExit('unexpected package-manager operation')\n"
+        )
+        brew.chmod(0o755)
+        self.context["executables"].update({"brew": str(brew), "zsh": ZSH})
+        self.context["packages"].append({"id": "git", "name": "git", "provider": "brew"})
+        supplemental = self.context.pop("completion_providers")[1]
+        self.context["completion_providers"] = [
+            *RECIPE.discover_providers(self.context),
+            supplemental,
+        ]
+        receipt = self.build()
+        self.assertEqual(receipt["assets"]["package-native/_git"]["provider"], "git")
+        self.assertEqual((self.destination / "package-native/_git").read_bytes(), git.read_bytes())
+
     def test_failed_generator_preserves_previous_tree(self):
         self.build()
         previous = (self.destination / "generated/_act").read_bytes()

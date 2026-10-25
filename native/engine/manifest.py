@@ -428,6 +428,8 @@ def compose(base, root, home, selected_platform=None, flags=(), context_file=Non
             raise Error(f"managed {key} path must be within selected home")
     pins = load(base / "native/engine/pins.json")
     executables = {"python3": native(sys.executable)}
+    if active_platform == "macos-arm64":
+        executables["brew"] = "/opt/homebrew/bin/brew"
     for identifier in ("mise", "chezmoi"):
         pin = pins[identifier]
         executables[identifier] = str(

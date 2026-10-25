@@ -164,6 +164,9 @@ def discover_providers(context):
     providers = []
     seen = set()
     for command, raw in sorted(context.get("executables", {}).items()):
+        # Homebrew's shared prefix is enumerated by formula owner below.
+        if command == "brew":
+            continue
         path = Path(raw)
         if not path.is_absolute() or not path.is_file():
             continue
