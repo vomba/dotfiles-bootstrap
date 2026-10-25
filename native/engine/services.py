@@ -241,8 +241,11 @@ def observe(context, service):
     domain = f"gui/{os.getuid()}"
     executable = command(context, "launchctl", "/bin/launchctl")
     disabled_text = run([executable, "print-disabled", domain], context)
-    match = re.search(r'"' + re.escape(service["name"]) + r'"\s*=>\s*(true|false)', disabled_text)
-    disabled = bool(match and match.group(1) == "true")
+    match = re.search(
+        r'"' + re.escape(service["name"]) + r'"\s*=>\s*(true|false|enabled|disabled)',
+        disabled_text,
+    )
+    disabled = bool(match and match.group(1) in ("true", "disabled"))
     try:
         run([executable, "print", f"{domain}/{service['name']}"], context)
     except Error as exc:

@@ -56,7 +56,11 @@ function {{ .dotfiles.apps.yazi.shellWrapperName }}() {
 {{ end -}}
 {{ if .dotfiles.shell.gpg.enable -}}
 [[ ! -t 0 ]] || export GPG_TTY=$(tty)
-# GnuPG's standard socket is discovered without killing or starting an agent.
+{{ if eq .platform "macos-arm64" -}}
+# GnuPG daemonizes; its supported starter makes the SSH socket available.
+"{{ index .executables "gpg-connect-agent" }}" /bye
+{{ end -}}
+# Discover the selected GnuPG home's standard SSH socket without restarting it.
 export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 {{ end -}}
 # Private sources can register compdefs only AFTER the sole OMZ compinit.

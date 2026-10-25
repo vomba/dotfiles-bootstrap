@@ -49,6 +49,9 @@ Bootstrap uses native shell/Git/curl/tar/SHA tools and checksum-pinned standalon
 
 Provision installs selected packages. Apply only installs staged authored configuration and performs declared narrow reconciliation; it never implicitly downloads packages, decrypts credentials or starts services. Service transitions are separate `services OPERATION --id SERVICE_ID --yes` actions. IDs come from `plan`/manifests. Unknown flags/action combinations fail before mutation.
 
+Launchd status accepts Apple's boolean and `enabled`/`disabled` state formats;
+enable/disable transitions must confirm the requested state before committing.
+
 The shell entry checks CLI syntax, platform/operation combinations and isolated-home boundaries before acquiring Python. Help remains available without prerequisites. Feature override syntax is checked there; declared boolean-leaf existence is validated by the composed manifests in the engine.
 
 Feature overrides use `--set FEATURE=true|false`. Public defaults compose with the selected `linux-x64` / `macos-arm64` profile, then consumer declarations. A render for the other platform is not native execution. Disabled features do not resurrect old owners; retirement requires exact unchanged recorded ownership and preserves foreign replacements/data.
@@ -64,6 +67,12 @@ Zsh owns one Oh My Zsh compinit. Completion fpath precedence is package-native â
 On macOS, composed contexts include the trusted `/opt/homebrew/bin/brew` manager path so completion discovery can inspect installed formula assets without inheriting the caller's `PATH`. This does not install Homebrew or activate shell configuration; native-host readiness remains a separate prerequisite.
 
 Completion receipts track the installed native package version, including Homebrew revisions and Debian release suffixes, rather than comparing that provenance with an upstream-only manifest version. Readback re-queries the native manager and rejects changed provider versions even when completion bytes are unchanged.
+
+On macOS, GnuPG owns its on-demand agent lifecycle. Interactive GPG-enabled Zsh
+sessions use the selected native `gpg-connect-agent /bye` before discovering the
+SSH socket; this starts a missing agent without restarting an existing one.
+There is no macOS GPG launch agent: `gpg-agent --daemon` forks and is not a
+resident launchd job. Linux retains its declared systemd socket activation.
 
 The Nord profile is opt-in via `theme.nord.enable`; assets cover enabled shell, Git, Helix, Yazi and Glow without whole-file ownership of mutable Btop state. Firefox configuration preserves user profile data and signed-extension consent boundaries. Linux GUI recipes use native dependencies, not package-store GPU wrappers. Mac apps have native bundle/registration paths.
 

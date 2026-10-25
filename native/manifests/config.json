@@ -132,17 +132,6 @@
       "name": "gpg-agent-browser.socket",
       "source": "native/chezmoi/dot_config/systemd/user/gpg-agent-browser.socket",
       "target": ".config/systemd/user/gpg-agent-browser.socket"
-    },
-    {
-      "id": "gpg-agent-launchd",
-      "platforms": [
-        "macos-arm64"
-      ],
-      "when": "shell.gpg.enable",
-      "manager": "launchd",
-      "name": "org.dotfiles.gpg-agent",
-      "source": "native/chezmoi/Library/LaunchAgents/org.dotfiles.gpg-agent.plist.tmpl",
-      "target": "Library/LaunchAgents/org.dotfiles.gpg-agent.plist"
     }
   ],
   "cache_generators": [

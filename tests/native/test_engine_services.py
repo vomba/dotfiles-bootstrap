@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import plistlib
 from pathlib import Path
 import sys
 import tempfile
@@ -412,6 +413,86 @@ print(json.dumps({'id':'gui-chromium','status':{'provision':'provisioned','check
             with self.assertRaisesRegex(safety.Error, "another dotfiles operation"):
                 entry.execute(arguments)
         self.assertEqual(self.mutations(), [])
+
+
+class LaunchdStateTests(unittest.TestCase):
+    def test_enable_disable_and_recovery_accept_boolean_and_word_states(self):
+        for style in ("boolean", "word"):
+            with self.subTest(style=style), tempfile.TemporaryDirectory() as temporary:
+                home = Path(temporary).resolve()
+                state = home / "launchd-state.json"
+                state.write_text(json.dumps({"disabled": True}))
+                tool = home / "launchctl"
+                tool.write_text(
+                    f"""#!{sys.executable}
+import json, pathlib, sys
+state = pathlib.Path({str(state)!r})
+value = json.loads(state.read_text())
+action = sys.argv[1]
+if action == 'print-disabled':
+    flag = ('true' if value['disabled'] else 'false') if {style!r} == 'boolean' else ('disabled' if value['disabled'] else 'enabled')
+    print('disabled services = {{')
+    print('  "org.dotfiles.fixture.extra" => disabled')
+    print('  "org.dotfiles.fixture" => ' + flag)
+    print('}}')
+elif action == 'print':
+    print('Could not find service ' + sys.argv[2], file=sys.stderr)
+    raise SystemExit(113)
+elif action in ('enable', 'disable'):
+    value['disabled'] = action == 'disable'
+    state.write_text(json.dumps(value))
+else:
+    raise SystemExit(3)
+"""
+                )
+                tool.chmod(0o700)
+                relative = "Library/LaunchAgents/org.dotfiles.fixture.plist"
+                descriptor = home / relative
+                descriptor.parent.mkdir(parents=True)
+                descriptor.write_bytes(
+                    plistlib.dumps(
+                        {"Label": "org.dotfiles.fixture", "ProgramArguments": [str(tool)]}
+                    )
+                )
+                service = {
+                    "id": "fixture-launchd",
+                    "name": "org.dotfiles.fixture",
+                    "manager": "launchd",
+                    "source": relative,
+                    "target": relative,
+                }
+                context = {
+                    "home": str(home),
+                    "root": str(home),
+                    "base": str(home),
+                    "platform": "macos-arm64",
+                    "services": [service],
+                    "executables": {"launchctl": str(tool)},
+                    "paths": {
+                        "state": str(home / "state"),
+                        "config": str(home / ".config"),
+                        "data": str(home / "data"),
+                        "cache": str(home / "cache"),
+                    },
+                    "_verification_only": True,
+                    "_fixture_context": True,
+                }
+                safety.atomic_json(
+                    configuration.record_path(context),
+                    {
+                        "schema_version": 1,
+                        "home": str(home),
+                        "files": {relative: safety.fingerprint(descriptor)},
+                    },
+                )
+                enabled = services.control(context, "enable")["fixture-launchd"]
+                self.assertFalse(enabled["disabled"])
+                self.assertFalse(json.loads(state.read_text())["disabled"])
+                disabled = services.control(context, "disable")["fixture-launchd"]
+                self.assertTrue(disabled["disabled"])
+                self.assertTrue(json.loads(state.read_text())["disabled"])
+                services.control(context, "recover")
+                self.assertFalse(json.loads(state.read_text())["disabled"])
 
 
 if __name__ == "__main__":

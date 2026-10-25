@@ -50,7 +50,7 @@ def context(home, platform="linux-x64", enable=True):
         },
         "executables": {
             name: "/native/bin/" + name
-            for name in ("firefox", "gpg-agent", "gpgconf", "pinentry", "bat")
+            for name in ("firefox", "gpg-agent", "gpg-connect-agent", "gpgconf", "pinentry", "bat")
         },
         "dotfiles": {
             "theme": {"nord": {"enable": enable}},
@@ -371,7 +371,6 @@ class ChezmoiCompositionTests(unittest.TestCase):
         )
         self.assertTrue((self.home / ".config/yazi/flavors/nord.yazi/flavor.toml").is_file())
         self.assertTrue((self.home / ".mozilla/firefox/default/user.js").is_file())
-        self.assertFalse((self.home / "Library/LaunchAgents/org.dotfiles.gpg-agent.plist").exists())
         shell = (self.home / ".config/zsh/.zshrc").read_text()
         self.assertLess(shell.index("fpath=("), shell.index('source "$ZSH/oh-my-zsh.sh"'))
         self.assertLess(
@@ -407,15 +406,6 @@ class ChezmoiCompositionTests(unittest.TestCase):
         self.assertNotIn("nord-contrast", git)
         self.assertTrue((self.home / ".config/helix/languages.toml").is_file())
         self.assertFalse((self.home / ".config/helix/themes/nord-contrast.toml").exists())
-
-    def test_darwin_profile_has_launchd_instead_of_linux_service(self):
-        self.apply("macos-arm64")
-        self.assertTrue(
-            (self.home / "Library/Application Support/Firefox/Profiles/default/user.js").is_file()
-        )
-        self.assertTrue((self.home / "Library/LaunchAgents/org.dotfiles.gpg-agent.plist").is_file())
-        self.assertFalse((self.home / ".config/systemd/user/gpg-agent.service").exists())
-        self.assertFalse((self.home / ".mozilla/firefox/default/user.js").exists())
 
     def test_go_native_config_and_telemetry_are_independent_of_zsh_and_mise(self):
         def overrides(data):
