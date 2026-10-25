@@ -448,6 +448,26 @@ class Fixture(unittest.TestCase):
         self.assertIn("new file.py", union)
         self.assertNotIn("ignored", union)
 
+    def test_exported_source_union_scans_hidden_and_nested_metadata_and_refuses_links(self):
+        names = {
+            "source.py",
+            ".hidden.json",
+            "nested/.bootstrap-receipt.json",
+            ".bootstrap-source.tar",
+            ".bootstrap-receipt.json",
+        }
+        for name in names:
+            path = self.repo / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("{}\n")
+        union = verify.file_union(self.host())
+        self.assertEqual(
+            set(union), {"source.py", ".hidden.json", "nested/.bootstrap-receipt.json"}
+        )
+        (self.repo / "linked-source.py").symlink_to(self.repo / "source.py")
+        with self.assertRaisesRegex(safety.Error, "symlink"):
+            verify.selected_files(self.host(), verify.file_union(self.host()))
+
     def test_actual_commands_fail_independently_and_scanner_never_discloses_output(self):
         (self.repo / "source.py").write_text("x=1\n")
         (self.repo / "broken.sh").write_text("#!/bin/bash\nif then\n")

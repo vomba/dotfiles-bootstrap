@@ -369,6 +369,7 @@ def environment(context, home):
         "MISE_NO_HOOKS": "1",
         "XDG_CONFIG_HOME": str(Path(home) / "config"),
         "XDG_CACHE_HOME": str(Path(home) / "cache"),
+        "RUFF_CACHE_DIR": str(Path(home) / "cache/ruff"),
         "XDG_STATE_HOME": str(Path(home) / "state"),
         "XDG_DATA_HOME": str(Path(home) / "data"),
     }
@@ -408,6 +409,15 @@ def invoke(context, argv, *, cwd=None, quiet=False, report=False):
 
 
 def file_union(context):
+    root = Path(context["root"])
+    git_directory = root / ".git"
+    if not git_directory.exists() and not git_directory.is_symlink():
+        metadata = {root / ".bootstrap-source.tar", root / ".bootstrap-receipt.json"}
+        return sorted(
+            path.relative_to(root).as_posix()
+            for path in root.rglob("*")
+            if path not in metadata and (path.is_symlink() or path.is_file())
+        )
     git = system_tool(context, "git")
     output = invoke(
         context, [git, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--"]

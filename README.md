@@ -128,6 +128,10 @@ Native check dependencies are pinned internal tools, not runtime downloads from 
 
 `verify --checks --files-from JSON` selects explicit paths; `--no-tests` excludes behavior tests and is reduced scope. The public CI workflow exercises native Linux/macOS public-only render/behavior/security/style checks, not private inputs. Consumer private suites remain local. Follow actual verifier help and report optional native-tool skips honestly; no Nix devshell/flake checks remain.
 
+Git checkouts verify the tracked plus nonignored untracked worktree union. Exported public sources verify all physical source leaves without requiring `.git`; only the root `.bootstrap-source.tar` and `.bootstrap-receipt.json` transport metadata are excluded. Hidden and nested source files remain covered, and source symlinks remain rejected.
+
+Checker caches stay in disposable verification homes, never in the consumed source tree. Verification must not add files to an immutable public source archive.
+
 The static `provider-locks` gate reuses source-publication validation across both
 supported targets and public/private compositions. It remains mandatory with
 `--no-tests` or a selected-file list; an uninstalled tool is not an excuse to omit
