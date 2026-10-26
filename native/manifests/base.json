@@ -1029,7 +1029,7 @@
         ]
       },
       "executables": {
-        "ssh": "bin/ssh",
+        "ssh": "/usr/bin/ssh",
         "ssh-add": "bin/ssh-add",
         "ssh-agent": "bin/ssh-agent",
         "ssh-keygen": "bin/ssh-keygen"

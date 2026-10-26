@@ -53,5 +53,8 @@ Library/Application Support/go/telemetry/mode
 {{ end }}
 {{ if not .dotfiles.dev.mise.enable }}
 .config/mise/**
-.local/bin/dotfiles-mise-install
+{{ printf "%s/dotfiles-mise-install" .paths.bin | trimPrefix (printf "%s/" .home) }}
+{{ end }}
+{{ if not (and (eq .platform "macos-arm64") (or .dotfiles.shell.zsh.enable .dotfiles.shell.gpg.enable)) }}
+{{ printf "%s/ssh" .paths.bin | trimPrefix (printf "%s/" .home) }}
 {{ end }}

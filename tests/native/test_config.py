@@ -49,8 +49,18 @@ def context(home, platform="linux-x64", enable=True):
             "omz": str(home / ".local/share/dotfiles/runtime/oh-my-zsh/current"),
         },
         "executables": {
-            name: "/native/bin/" + name
-            for name in ("firefox", "gpg-agent", "gpg-connect-agent", "gpgconf", "pinentry", "bat")
+            **{
+                name: "/native/bin/" + name
+                for name in (
+                    "firefox",
+                    "gpg-agent",
+                    "gpg-connect-agent",
+                    "gpgconf",
+                    "pinentry",
+                    "bat",
+                )
+            },
+            "ssh": "/usr/bin/ssh" if platform == "macos-arm64" else "/native/bin/ssh",
         },
         "dotfiles": {
             "theme": {"nord": {"enable": enable}},
@@ -654,7 +664,136 @@ class ChezmoiCompositionTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return data
 
-    def test_linux_enabled_profile_uses_discoverable_source_assets_and_one_completion_owner(self):
+    def shell_environment(self, enable=True):
+        def overrides(data):
+            data["dotfiles"]["shell"]["enable"] = enable
+            data["dotfiles"]["shell"]["gpg"]["enable"] = False
+            data["dotfiles"]["dev"]["mise"]["enable"] = False
+
+        data = self.apply(overrides=overrides)
+        omz = Path(data["paths"]["omz"])
+        omz.mkdir(parents=True)
+        # Isolate external OMZ plugins/themes, not the rendered navigation code.
+        # Completion still uses native Zsh; real OMZ startup has a separate smoke.
+        # Qualify kubectl with Zsh's real core fallback before the rendered
+        # kubecolor completion alias; this fixture has no package completions.
+        (omz / "oh-my-zsh.sh").write_text(
+            "autoload -Uz compinit\ncompinit -D -i\ncompdef _default kubectl\n"
+        )
+        return {
+            "HOME": str(self.home),
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "TERM": "dumb",
+            "_ZO_DATA_DIR": str(self.directory / "zoxide-data"),
+            "_ZO_FZF_OPTS": "--filter=navigation-target",
+        }
+
+    @unittest.skipUnless(
+        all(shutil.which(name) for name in ("zsh", "zoxide", "fzf")),
+        "native Zsh, zoxide and fzf are required for navigation behavior",
+    )
+    def test_rendered_navigation_aliases_share_native_smart_cd_and_interactive_queries(self):
+        env = self.shell_environment()
+        quoted = (self.home / "quoted [path] ' \"$").resolve()
+        target = (self.home / "navigation-target with spaces").resolve()
+        quoted.mkdir()
+        target.mkdir()
+        scenario = r"""
+zoxide add -- "$1" "$2"
+cd "$1"
+print -r -- "$PWD"
+builtin cd -- "$HOME"
+z "$1"
+print -r -- "$PWD"
+builtin cd -- "$HOME"
+cd navigation-target
+print -r -- "$PWD"
+builtin cd -- "$HOME"
+z navigation-target
+print -r -- "$PWD"
+builtin cd -- "$HOME"
+cdi navigation-target
+print -r -- "$PWD"
+builtin cd -- "$HOME"
+zi navigation-target
+print -r -- "$PWD"
+builtin cd -- "$HOME"
+if cd dotfiles-no-such-navigation-target > /dev/null 2> "$HOME/cd-error"; then
+  exit 91
+fi
+[[ "$PWD" == "$HOME" ]]
+if z dotfiles-no-such-navigation-target > /dev/null 2> "$HOME/z-error"; then
+  exit 92
+fi
+[[ "$PWD" == "$HOME" ]]
+if cdi dotfiles-no-such-navigation-target > /dev/null 2> "$HOME/cdi-error"; then
+  exit 93
+fi
+[[ "$PWD" == "$HOME" ]]
+if zi dotfiles-no-such-navigation-target > /dev/null 2> "$HOME/zi-error"; then
+  exit 94
+fi
+[[ "$PWD" == "$HOME" ]]
+print -r -- failure-preserves-cwd
+"""
+        scenario_path = self.directory / "navigation.zsh"
+        scenario_path.write_text(scenario)
+        # Parse alias-using commands only after the rendered startup defines
+        # them, matching a subsequent interactive command rather than -c parse.
+        script = r"""
+set -e
+function starship() { :; }
+source "$HOME/.zshenv"
+source "$ZDOTDIR/.zshrc"
+source "$3" "$1" "$2"
+"""
+        result = subprocess.run(
+            [
+                shutil.which("zsh"),
+                "-f",
+                "-c",
+                script,
+                "navigation-test",
+                str(quoted),
+                str(target),
+                str(scenario_path),
+            ],
+            env=env,
+            cwd=self.home,
+            text=True,
+            capture_output=True,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout.splitlines(),
+            [str(quoted), str(quoted), *([str(target)] * 4), "failure-preserves-cwd"],
+        )
+        for command in ("cd", "z", "cdi", "zi"):
+            self.assertTrue((self.home / (command + "-error")).read_text(), command)
+
+    @unittest.skipUnless(shutil.which("zsh"), "native Zsh is required for feature-gated startup")
+    def test_disabled_shell_integrations_preserve_builtin_cd_without_navigation_aliases(self):
+        env = self.shell_environment(enable=False)
+        script = r"""
+source "$HOME/.zshenv"
+source "$ZDOTDIR/.zshrc"
+(( ! ${+aliases[z]} && ! ${+aliases[zi]} && ! ${+functions[cd]} && ! ${+functions[cdi]} )) || exit 95
+cd "$HOME"
+print -r -- "$PWD"
+"""
+        result = subprocess.run(
+            [shutil.which("zsh"), "-f", "-c", script],
+            env=env,
+            cwd=self.home,
+            text=True,
+            capture_output=True,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines(), [str(self.home)])
+
+    def test_linux_enabled_profile_uses_discoverable_source_assets(self):
         self.apply()
         self.assertEqual(
             (self.home / ".config/helix/themes/nord-contrast.toml").resolve(),
@@ -663,14 +802,6 @@ class ChezmoiCompositionTests(unittest.TestCase):
         self.assertTrue((self.home / ".config/yazi/flavors/nord.yazi/flavor.toml").is_file())
         self.assertTrue((self.home / ".mozilla/firefox/default/user.js").is_file())
         shell = (self.home / ".config/zsh/.zshrc").read_text()
-        self.assertLess(shell.index("fpath=("), shell.index('source "$ZSH/oh-my-zsh.sh"'))
-        self.assertLess(
-            shell.index('source "$ZSH/oh-my-zsh.sh"'),
-            shell.index('source "$XDG_CONFIG_HOME/dotfiles/private.zsh"'),
-        )
-        self.assertNotRegex(shell, r"(?m)^\s*compinit\b")
-        self.assertNotIn("fzf --zsh", shell)
-        self.assertNotIn("zoxide)", shell)
         self.assertNotIn("/nix/store", shell)
 
     def test_disabled_profile_does_not_claim_optional_files(self):

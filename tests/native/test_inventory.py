@@ -2,8 +2,10 @@
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 import tomllib
@@ -16,6 +18,11 @@ sys.path.insert(0, str(ENGINE))
 SPEC = importlib.util.spec_from_file_location("inventory_manifest", ENGINE / "manifest.py")
 MANIFEST = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MANIFEST)
+import configuration
+import safety
+
+CHEZMOI = os.environ.get("DOTFILES_TEST_CHEZMOI")
+ZSH = shutil.which("zsh")
 
 
 def boolean_leaves(value, prefix=""):
@@ -31,7 +38,7 @@ class NativeInventory(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         self.base = self.root / "public"
         self.home = self.root / "home"
         self.home.mkdir()
@@ -235,6 +242,201 @@ class NativeInventory(unittest.TestCase):
             ):
                 self.assertIn(command, context["executables"])
                 self.assertTrue(Path(context["executables"][command]).is_absolute())
+
+    def test_ssh_client_selection_preserves_platform_and_independent_features(self):
+        for platform in ("linux-x64", "macos-arm64"):
+            for feature in ("shell.zsh.enable", "shell.gpg.enable"):
+                with self.subTest(platform=platform, feature=feature):
+                    context = self.context(platform, disabled=True, flags=[feature + "=true"])
+                    selected = {package["id"]: package for package in context["packages"]}
+                    self.assertEqual(context["executables"]["ssh"], "/usr/bin/ssh")
+                    self.assertTrue(selected["openssh"]["retain_shared_runtime"])
+                    prefix = "/usr" if platform == "linux-x64" else "/opt/homebrew/opt/openssh"
+                    for command in ("ssh-add", "ssh-agent", "ssh-keygen"):
+                        self.assertEqual(context["executables"][command], f"{prefix}/bin/{command}")
+            disabled = self.context(platform, disabled=True)
+            self.assertNotIn("ssh", disabled["executables"])
+            self.assertNotIn("openssh", {package["id"] for package in disabled["packages"]})
+
+    def ssh_configuration(self, platform="macos-arm64", flags=(), bin_relative=".local/bin"):
+        # Render the production source and its real manifest together, not a
+        # copied template or a reduced fixture that could conceal missing data.
+        context = MANIFEST.compose(BASE, BASE, self.home, platform, flags=self.off + list(flags))
+        context["paths"]["bin"] = str(Path(context["home"]) / bin_relative)
+        context["executables"]["chezmoi"] = str(Path(CHEZMOI).resolve())
+        return context
+
+    @unittest.skipUnless(CHEZMOI, "set DOTFILES_TEST_CHEZMOI for real SSH exposure lifecycle")
+    def test_mac_ssh_exposure_follows_independent_features_and_owned_disable(self):
+        target = self.home / ".local/bin/ssh"
+        ssh_config = self.home / ".ssh/config"
+        ssh_config.parent.mkdir()
+        ssh_config.write_text("Host *\n    UseKeychain yes\n")
+        disabled = self.ssh_configuration()
+        for flags in (
+            ["shell.zsh.enable=true"],
+            ["shell.gpg.enable=true"],
+            ["shell.zsh.enable=true", "shell.gpg.enable=true"],
+        ):
+            with self.subTest(flags=flags):
+                enabled = self.ssh_configuration(flags=flags)
+                stage = configuration.stage(enabled)
+                self.assertEqual(os.readlink(stage / "home/.local/bin/ssh"), "/usr/bin/ssh")
+                configuration.apply(enabled, stage)
+                configuration.apply(enabled, configuration.stage(enabled))
+                self.assertEqual(os.readlink(target), enabled["executables"]["ssh"])
+                self.assertEqual(
+                    configuration.read_record(enabled)["files"][".local/bin/ssh"],
+                    {"kind": "symlink", "target": "/usr/bin/ssh"},
+                )
+                configuration.apply(disabled, configuration.stage(disabled))
+                self.assertFalse(target.is_symlink())
+                self.assertNotIn(".local/bin/ssh", configuration.read_record(disabled)["files"])
+                self.assertEqual(ssh_config.read_text(), "Host *\n    UseKeychain yes\n")
+        linux = self.ssh_configuration("linux-x64", flags=["shell.zsh.enable=true"])
+        linux_stage = configuration.stage(linux)
+        self.assertFalse((linux_stage / "home/.local/bin/ssh").is_symlink())
+        self.assertNotIn(".local/bin/ssh", safety.load(linux_stage / "render.json")["files"])
+
+    @unittest.skipUnless(CHEZMOI, "set DOTFILES_TEST_CHEZMOI for real SSH collision boundaries")
+    def test_mac_ssh_exposure_preserves_foreign_files_links_and_owned_replacements(self):
+        enabled = self.ssh_configuration(flags=["shell.zsh.enable=true"])
+        stage = configuration.stage(enabled)
+        target = self.home / ".local/bin/ssh"
+        target.parent.mkdir(parents=True)
+        target.write_text("foreign client")
+        with self.assertRaisesRegex(safety.Error, "foreign"):
+            configuration.apply(enabled, stage)
+        self.assertEqual(target.read_text(), "foreign client")
+        target.unlink()
+        # Even an identical target is not authority to adopt an unrecorded leaf.
+        target.symlink_to("/usr/bin/ssh")
+        with self.assertRaisesRegex(safety.Error, "foreign"):
+            configuration.apply(enabled, stage)
+        self.assertEqual(os.readlink(target), "/usr/bin/ssh")
+        target.unlink()
+        configuration.apply(enabled, stage)
+        target.unlink()
+        target.symlink_to(sys.executable)
+        disabled = self.ssh_configuration()
+        for operation in (
+            lambda: configuration.apply(disabled, configuration.stage(disabled)),
+            lambda: configuration.apply(enabled, retire=True),
+        ):
+            with self.assertRaisesRegex(safety.Error, "modified"):
+                operation()
+            self.assertEqual(os.readlink(target), sys.executable)
+
+    @unittest.skipUnless(CHEZMOI and ZSH, "native chezmoi and Zsh required for managed SSH PATH")
+    def test_mac_managed_shell_path_resolves_exposed_client(self):
+        for bin_relative in (".local/bin", "bin", ".commands/nested", ".local/bin/custom"):
+            with self.subTest(bin_relative=bin_relative):
+                context = self.ssh_configuration(
+                    flags=["shell.zsh.enable=true"], bin_relative=bin_relative
+                )
+                configuration.apply(context, configuration.stage(context))
+                result = subprocess.run(
+                    [ZSH, "-c", "command -v ssh"],
+                    env={
+                        "HOME": str(self.home),
+                        "PATH": "/opt/homebrew/bin:/usr/bin:/bin",
+                        "ZDOTDIR": str(self.home),
+                    },
+                    text=True,
+                    capture_output=True,
+                    check=True,
+                )
+                exposed = Path(result.stdout.strip())
+                self.assertEqual(exposed, Path(context["paths"]["bin"]) / "ssh")
+                self.assertEqual(exposed.resolve(), Path(context["executables"]["ssh"]).resolve())
+                disabled = self.ssh_configuration(bin_relative=bin_relative)
+                configuration.apply(disabled, configuration.stage(disabled))
+                self.assertFalse(exposed.is_symlink())
+
+    @unittest.skipUnless(CHEZMOI, "native chezmoi required for custom bin source merging")
+    def test_custom_bin_merges_generated_commands_and_rejects_source_collisions(self):
+        private_body = "#!/bin/sh\nprintf 'private-command\\n'\n"
+
+        def generate_private_command(context, action, context_path, source_dir, **kwargs):
+            destination = source_dir / configuration.encoded(
+                Path(context["paths"]["bin"]).relative_to(context["home"])
+            )
+            destination.mkdir(parents=True, exist_ok=True)
+            (destination / "executable_private-helper").write_text(private_body)
+
+        def generate_collision(context, action, context_path, source_dir, **kwargs):
+            generate_private_command(context, action, context_path, source_dir)
+            destination = source_dir / configuration.encoded(
+                Path(context["paths"]["bin"]).relative_to(context["home"])
+            )
+            (destination / "symlink_ssh.tmpl").write_text("/private/client\n")
+
+        for bin_relative in (".commands/nested", ".local/bin/custom", ".local/bin/custom/deep"):
+            with self.subTest(bin_relative=bin_relative):
+                context = self.ssh_configuration(
+                    flags=["shell.zsh.enable=true"], bin_relative=bin_relative
+                )
+                with patch.object(configuration, "site", side_effect=generate_private_command):
+                    stage = configuration.stage(context)
+                rendered_bin = stage / "home" / bin_relative
+                self.assertEqual((rendered_bin / "private-helper").read_text(), private_body)
+                self.assertEqual(os.readlink(rendered_bin / "ssh"), "/usr/bin/ssh")
+                self.assertEqual(
+                    {path.relative_to(rendered_bin).as_posix() for path in rendered_bin.rglob("*")},
+                    {"private-helper", "ssh"},
+                )
+                configuration.apply(context, stage)
+                target = Path(context["paths"]["bin"]) / "private-helper"
+                self.assertEqual(target.read_text(), private_body)
+                with (
+                    patch.object(configuration, "site", side_effect=generate_collision),
+                    self.assertRaisesRegex(safety.Error, "custom bin source collision"),
+                ):
+                    configuration.stage(context)
+                self.assertEqual(target.read_text(), private_body)
+                self.assertEqual(os.readlink(Path(context["paths"]["bin"]) / "ssh"), "/usr/bin/ssh")
+                disabled = self.ssh_configuration(bin_relative=bin_relative)
+                with patch.object(configuration, "site", side_effect=generate_private_command):
+                    disabled_stage = configuration.stage(disabled)
+                configuration.apply(disabled, disabled_stage)
+                self.assertFalse((Path(context["paths"]["bin"]) / "ssh").is_symlink())
+                self.assertEqual(target.read_text(), private_body)
+
+        mise = self.ssh_configuration(
+            flags=["dev.mise.enable=true"], bin_relative=".commands/nested"
+        )
+        mise_stage = configuration.stage(mise)
+        self.assertTrue((mise_stage / "home/.commands/nested/dotfiles-mise-install").is_file())
+        self.assertFalse((mise_stage / "home/.commands/nested/ssh").is_symlink())
+        linux = self.ssh_configuration(
+            "linux-x64", flags=["shell.zsh.enable=true"], bin_relative=".commands/nested"
+        )
+        self.assertFalse((configuration.stage(linux) / "home/.commands/nested/ssh").is_symlink())
+
+    @unittest.skipUnless(
+        CHEZMOI and sys.platform == "darwin",
+        "native macOS and chezmoi required for Apple UseKeychain behavior",
+    )
+    def test_mac_selected_and_exposed_ssh_accept_apple_keychain_config(self):
+        context = self.ssh_configuration(flags=["shell.zsh.enable=true"])
+        configuration.apply(context, configuration.stage(context))
+        config = self.home / "synthetic-ssh-config"
+        config.write_text("Host *\n    UseKeychain yes\n    IdentityFile none\n")
+        for executable in (
+            context["executables"]["ssh"],
+            str(Path(context["paths"]["bin"]) / "ssh"),
+        ):
+            with self.subTest(executable=executable):
+                # -G evaluates only this synthetic config: no SSH connection,
+                # authentication, key access or ambient user config is needed.
+                result = subprocess.run(
+                    [executable, "-G", "-F", str(config), "keychain-test.invalid"],
+                    env={"HOME": str(self.home), "PATH": "/usr/bin:/bin"},
+                    text=True,
+                    capture_output=True,
+                    check=True,
+                )
+                self.assertIn("hostname keychain-test.invalid", result.stdout)
 
     def test_generic_gui_abi_dependencies_are_linux_only_and_shared(self):
         gui = {"gui-alsa", "gui-vulkan", "gui-xkbcommon-x11", "gui-xcb-xfixes", "gui-x11-xcb"}

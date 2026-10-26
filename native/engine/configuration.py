@@ -143,6 +143,41 @@ def stage(context, output=None):
             raise Error(f"custom XDG source collision: {destination}")
         destination.parent.mkdir(parents=True, exist_ok=True)
         (source / "dot_config").rename(destination)
+    bin_path = Path(context["paths"]["bin"])
+    authored_bin = source / "dot_local/bin"
+    if bin_path != Path(context["home"]) / ".local/bin" and authored_bin.exists():
+        # Private renderers may already have authored disjoint commands at the
+        # selected bin path. Merge directories, never overwrite a source leaf.
+        destination = source / encoded(bin_path.relative_to(context["home"]))
+        if destination.exists() and not destination.is_dir():
+            raise Error(f"custom bin source collision: {destination}")
+        positioned_bin = None
+        # A descendant destination is already positioned, not another subtree
+        # to relocate beneath itself. Preserve it before moving the default bin.
+        if destination.is_relative_to(authored_bin) and destination.exists():
+            positioned_bin = directory / "positioned-bin-source"
+            destination.rename(positioned_bin)
+            ancestor = destination.parent
+            while ancestor != authored_bin and not any(ancestor.iterdir()):
+                ancestor.rmdir()
+                ancestor = ancestor.parent
+        relocated_bin = directory / "bin-source"
+        authored_bin.rename(relocated_bin)
+        if positioned_bin is not None:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            positioned_bin.rename(destination)
+        destination.mkdir(parents=True, exist_ok=True)
+        for path in sorted(relocated_bin.rglob("*")):
+            target = destination / path.relative_to(relocated_bin)
+            if path.is_dir():
+                if target.exists() and not target.is_dir():
+                    raise Error(f"custom bin source collision: {target}")
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                if target.exists():
+                    raise Error(f"custom bin source collision: {target}")
+                path.rename(target)
+        shutil.rmtree(relocated_bin)
     settings = directory / "chezmoi.json"
     # Disable scripts even though source validation has already rejected them.
     atomic_json(

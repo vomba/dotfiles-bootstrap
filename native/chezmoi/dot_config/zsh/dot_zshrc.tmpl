@@ -14,7 +14,7 @@ ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
 # Provisioning creates these caches; mkdir never downloads or installs anything.
 mkdir -p "$ZSH_CACHE_DIR" "${ZSH_COMPDUMP:h}"
 zstyle ':omz:update' mode disabled
-plugins=(git gh helm golang terraform aws pip python docker azure)
+plugins=(git gh helm golang terraform pip python docker)
 {{ if .dotfiles.shell.enable -}}
 # These integrations have exactly one owner. Zoxide uses --cmd cd below.
 plugins+=(fzf eza)
@@ -34,6 +34,8 @@ alias ll='eza --long --git --icons=auto'
 alias la='eza --all --git --icons=auto'
 alias l='eza --long --all --git --icons=auto'
 eval "$(zoxide init zsh --cmd cd)"
+# One backend/history preserves smart cd/cdi behavior under both command pairs.
+alias z=cd zi=cdi
 {{ if .dotfiles.theme.nord.enable -}}
 export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:+$FZF_DEFAULT_OPTS }--color=fg:#ECEFF4,bg:#000000,hl:#81A1C1,fg+:#ECEFF4,bg+:#3B4252,hl+:#81A1C1,info:#A3BE8C,prompt:#5E81AC,pointer:#B48EAD,marker:#EBCB8B,spinner:#81A1C1,header:#5E81AC"
 {{ end -}}

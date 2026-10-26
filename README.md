@@ -64,6 +64,11 @@ Feature overrides use `--set FEATURE=true|false`. Public defaults compose with t
 
 Zsh owns one Oh My Zsh compinit. Completion fpath precedence is package-native → generated → private → supplemental; private integration runs afterward. Supported fallback assets are generated during explicit provisioning, not at shell startup. Dynamic upstream resource completers may still access services; they are not sandboxed. Generic plugins and kubectl-rsync remain public; private helpers do not.
 
+Zoxide initializes once for smart `cd`/`cdi`; `z`/`zi` are aliases to the same
+entry points and use the same directory history. AWS and Azure plugins are not
+enabled implicitly, so undeclared cloud CLIs do not trigger shell-startup
+Homebrew discovery.
+
 On macOS, composed contexts include the trusted `/opt/homebrew/bin/brew` manager path so completion discovery can inspect installed formula assets without inheriting the caller's `PATH`. This does not install Homebrew or activate shell configuration; native-host readiness remains a separate prerequisite.
 
 Completion receipts track the installed native package version, including Homebrew revisions and Debian release suffixes, rather than comparing that provenance with an upstream-only manifest version. Readback re-queries the native manager and rejects changed provider versions even when completion bytes are unchanged.
@@ -74,9 +79,12 @@ SSH socket; this starts a missing agent without restarting an existing one.
 There is no macOS GPG launch agent: `gpg-agent --daemon` forks and is not a
 resident launchd job. Linux retains its declared systemd socket activation.
 
-Managed Git uses `/usr/bin/ssh` on macOS so existing Keychain-specific SSH
-options remain supported even when portable OpenSSH is installed. Linux keeps
-its normal SSH selection; user and repository Git overrides retain precedence.
+On macOS, the selected SSH client and its managed user-bin link use
+`/usr/bin/ssh`, preserving Keychain-specific user configuration even when
+portable OpenSSH is installed. The other Homebrew SSH utilities remain
+available; no user keys/configuration or global Homebrew links are changed.
+Managed Git selects the same Apple client. Linux keeps its native distro
+selection; user and repository Git overrides retain precedence.
 
 The Nord profile is opt-in via `theme.nord.enable`; assets cover enabled shell, Git, Helix, Yazi and Glow without whole-file ownership of mutable Btop state. Firefox configuration preserves user profile data and signed-extension consent boundaries. Linux GUI recipes use native dependencies, not package-store GPU wrappers. Mac apps have native bundle/registration paths.
 
